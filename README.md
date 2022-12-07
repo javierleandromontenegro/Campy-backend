@@ -20,4 +20,4 @@ El repositorio tiene como carpeta principal el `/src`, dentro se encuentra el ar
 
 ## Producción/Desarrollo
 
-El repositorio cuenta con un archivo package.json donde se especifican las dependencias y las dependencias de desarrollo. Una vez hecho `npm i` para leventar el server se necesita el comando `npm run dev`, el cual a su vez creará una carpeta `/build` con todo compilado a `JavaScript` puro. Esa carpeta es para lanzarlo a producción.
+El repositorio cuenta con un archivo package.json donde se especifican las dependencias y las dependencias de desarrollo. Una vez hecho `npm i` para leventar el server se necesita el comando `npm run dev`. Para realizar la producción se deberá ejecutar el comando `npm tsc`. Esto creará una carpeta `/build` con todo compilado a `JavaScript/NodeJS` puro.
