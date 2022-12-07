@@ -1,7 +1,7 @@
 import { Router } from 'express';
 // Importar todos los routers;
 
-const router = Router();
+const router: Router = Router();
 
 // Configurar los routers
 
