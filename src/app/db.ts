@@ -43,6 +43,11 @@ let capsEntries = entries.map((entry) => [
   entry[1],
 ]);
 
+const { Usuarios, Tipo_usuarios } = sequelize.models;
+
+Usuarios.hasOne(Tipo_usuarios);
+Tipo_usuarios.belongsTo(Usuarios);
+
 const models = Object.fromEntries(capsEntries);
 
 export default  {
