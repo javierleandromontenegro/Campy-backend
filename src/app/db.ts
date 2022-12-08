@@ -3,6 +3,7 @@ import { Sequelize } from 'sequelize';
 import fs from 'fs';
 import path from 'path';
 import modelTable from './types/ModelTable';
+import modelRelations from './modelRelations';
 
 dotenv.config();
 
@@ -36,21 +37,10 @@ fs.readdirSync(path.join(__dirname, "/models"))
   });
 // Injectamos la conexion (sequelize) a todos los modelos
 modelDefiners.forEach((model: modelTable): void => model(sequelize));
-// Capitalizamos los nombres de los modelos ie: product => Product
-let entries = Object.entries(sequelize.models);
-let capsEntries = entries.map((entry) => [
-  entry[0][0].toUpperCase() + entry[0].slice(1),
-  entry[1],
-]);
 
-const { Usuarios, Tipo_usuarios } = sequelize.models;
-
-Usuarios.hasOne(Tipo_usuarios);
-Tipo_usuarios.belongsTo(Usuarios);
-
-const models = Object.fromEntries(capsEntries);
+modelRelations(sequelize.models)
 
 export default  {
-  ...models,
+  ...sequelize.models,
   conn: sequelize,
 };
