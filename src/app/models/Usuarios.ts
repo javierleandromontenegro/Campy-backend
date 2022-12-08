@@ -4,10 +4,6 @@ export default (sequelize: Sequelize) => {
   sequelize.define(
     'Usuarios',
     {
-      usuario: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
       email: {
         type: DataTypes.STRING,
         allowNull: false,
