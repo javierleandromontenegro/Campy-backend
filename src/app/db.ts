@@ -40,7 +40,8 @@ modelDefiners.forEach((model: modelTable): void => model(sequelize));
 
 modelRelations(sequelize.models)
 
-export default  {
+module.exports = {
+  sequelize,
   ...sequelize.models,
   conn: sequelize,
 };
