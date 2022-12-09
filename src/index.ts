@@ -1,7 +1,6 @@
 import server from './app/app';
-import db from './app/db';
 
-const { conn } = db;
+const { conn } = require('./app/db.ts');
 const PORT = process.env.PORT || 3001;
 
 // Syncing all the models at once.
