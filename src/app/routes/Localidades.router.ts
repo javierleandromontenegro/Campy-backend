@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
-import { getLocalidades } from '../services/Localidades.service';
+import { getLocalidades, postLocalidades } from '../services/Localidades.service';
+import createLocalidad from '../types/datosLocalidad';
 
 const localidadesRouter: Router = Router();
 
@@ -10,6 +11,15 @@ localidadesRouter.get('/:idProvincia', async (req: Request<{idProvincia: string}
     res.status(200).json(await getLocalidades(idProvincia))
   } catch {
     res.status(404).json({error: 'no se pudo en http://localhost/api/localidades'});
+  }
+});
+
+localidadesRouter.post('/', async (req: Request<createLocalidad>, res: Response) => {
+
+  try {
+    res.status(200).json(await postLocalidades(req.body))
+  } catch(error: any) {
+    res.status(error.error).json(error);
   }
 });
 
