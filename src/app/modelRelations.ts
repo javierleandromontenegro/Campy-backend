@@ -79,8 +79,9 @@ export default (models: any):void => {
   Provincias.belongsTo(Paises);
   Paises.hasMany(Provincias);
 
-  Caracteristicas_camping.belongsTo(Caracteristicas_parcela);
-  Caracteristicas_parcela.hasMany(Caracteristicas_camping);
+  //cambié 09/12 17:12
+  Caracteristicas_parcela.belongsTo(Caracteristicas_camping);
+  Caracteristicas_camping.hasOne(Caracteristicas_parcela);
 
   Caracteristicas_camping.belongsTo(Abierto_periodo);
   Abierto_periodo.hasMany(Caracteristicas_camping);
