@@ -1,9 +1,9 @@
 import { Router, Request, Response } from 'express';
 import { getLocalidades } from '../services/Localidades.service';
 
-const localidadesRouter: Router = Router();
+const LocalidadesRouter: Router = Router();
 
-localidadesRouter.get('/:idProvincia', async (req: Request<{idProvincia: string}>, res: Response) => {
+LocalidadesRouter.get('/:idProvincia', async (req: Request<{idProvincia: string}>, res: Response) => {
   const { idProvincia } = req.params;
 
   try {
@@ -13,4 +13,4 @@ localidadesRouter.get('/:idProvincia', async (req: Request<{idProvincia: string}
   }
 });
 
-export default localidadesRouter;
+export default LocalidadesRouter;

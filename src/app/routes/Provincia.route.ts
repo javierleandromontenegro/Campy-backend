@@ -1,9 +1,9 @@
 import { Router, Request, Response } from 'express';
 import { getProvincias } from '../services/Provincias.service';
 
-const provinciaRouter: Router = Router();
+const ProvinciaRouter: Router = Router();
 
-provinciaRouter.get('/:idPais', async (req: Request<{idPais: string}>, res: Response) => {
+ProvinciaRouter.get('/:idPais', async (req: Request<{idPais: string}>, res: Response) => {
   const { idPais } = req.params;
 
   try {
@@ -13,4 +13,4 @@ provinciaRouter.get('/:idPais', async (req: Request<{idPais: string}>, res: Resp
   }
 });
 
-export default provinciaRouter;
+export default ProvinciaRouter;
