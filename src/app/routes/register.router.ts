@@ -2,9 +2,9 @@ import { Router, Request, Response } from 'express';
 import { registerUser } from '../services/Register.service';
 import datosUsuario from '../types/datosUsuario';
 
-const registerRouter: Router = Router();
+const RegisterRouter: Router = Router();
 
-registerRouter.post('/', async (req: Request<datosUsuario>, res: Response) => {
+RegisterRouter.post('/', async (req: Request<datosUsuario>, res: Response) => {
   try {
     res.status(201).json(await registerUser(req.body));
   } catch(e) {
@@ -13,4 +13,4 @@ registerRouter.post('/', async (req: Request<datosUsuario>, res: Response) => {
   }
 });
 
-export default registerRouter;
+export default RegisterRouter;

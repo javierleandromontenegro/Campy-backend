@@ -2,9 +2,9 @@ import { Router, Request, Response } from 'express';
 import { getLocalidades, postLocalidades } from '../services/Localidades.service';
 import createLocalidad from '../types/datosLocalidad';
 
-const localidadesRouter: Router = Router();
+const LocalidadesRouter: Router = Router();
 
-localidadesRouter.get('/:idProvincia', async (req: Request<{idProvincia: string}>, res: Response) => {
+LocalidadesRouter.get('/:idProvincia', async (req: Request<{idProvincia: string}>, res: Response) => {
   const { idProvincia } = req.params;
 
   try {
@@ -14,7 +14,7 @@ localidadesRouter.get('/:idProvincia', async (req: Request<{idProvincia: string}
   }
 });
 
-localidadesRouter.post('/', async (req: Request<createLocalidad>, res: Response) => {
+LocalidadesRouter.post('/', async (req: Request<createLocalidad>, res: Response) => {
 
   try {
     res.status(200).json(await postLocalidades(req.body))
@@ -23,4 +23,4 @@ localidadesRouter.post('/', async (req: Request<createLocalidad>, res: Response)
   }
 });
 
-export default localidadesRouter;
+export default LocalidadesRouter;

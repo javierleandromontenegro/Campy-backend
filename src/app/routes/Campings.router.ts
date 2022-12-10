@@ -2,9 +2,9 @@ import { Router, Request, Response } from 'express';
 import { createCamping } from '../types/datosCamping';
 import { getCampingsPorLocalidad, getCampingsPorProvincia, getCampingsPorId, getCampingsImagenes, postCampingsCreate } from '../services/Campings.service';
 
-const campingsRouter: Router = Router();
+const CampingsRouter: Router = Router();
 
-campingsRouter.get('/provincias/:idProvincia', async (req: Request<{idProvincia: string}>, res: Response) => {
+CampingsRouter.get('/provincias/:idProvincia', async (req: Request<{idProvincia: string}>, res: Response) => {
   const { idProvincia } = req.params;
 
   try {
@@ -16,7 +16,7 @@ campingsRouter.get('/provincias/:idProvincia', async (req: Request<{idProvincia:
 
 
 
-campingsRouter.get('/localidades/:idLocalidad', async (req: Request<{idLocalidad: string}>, res: Response) => {
+CampingsRouter.get('/localidades/:idLocalidad', async (req: Request<{idLocalidad: string}>, res: Response) => {
   const { idLocalidad } = req.params;
 
   try {
@@ -28,7 +28,7 @@ campingsRouter.get('/localidades/:idLocalidad', async (req: Request<{idLocalidad
 
 
 
-campingsRouter.get('/:idCamping', async (req: Request<{idCamping: string}>, res: Response) => {
+CampingsRouter.get('/:idCamping', async (req: Request<{idCamping: string}>, res: Response) => {
   const { idCamping } = req.params;
 
   try {
@@ -39,7 +39,7 @@ campingsRouter.get('/:idCamping', async (req: Request<{idCamping: string}>, res:
 });
 
 
-campingsRouter.get('/imagenes/:idCamping', async (req: Request<{idCamping: string}>, res: Response) => {
+CampingsRouter.get('/imagenes/:idCamping', async (req: Request<{idCamping: string}>, res: Response) => {
   const { idCamping } = req.params;
 
   try {
@@ -49,7 +49,7 @@ campingsRouter.get('/imagenes/:idCamping', async (req: Request<{idCamping: strin
   }
 });
 
-campingsRouter.post('/', async (req: Request<createCamping>, res: Response) => {
+CampingsRouter.post('/', async (req: Request<createCamping>, res: Response) => {
 
   try {
     res.status(200).json(await postCampingsCreate(req.body))
@@ -58,4 +58,4 @@ campingsRouter.post('/', async (req: Request<createCamping>, res: Response) => {
   }
 });
 
-export default campingsRouter;
+export default CampingsRouter;
