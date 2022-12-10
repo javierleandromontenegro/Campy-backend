@@ -33,7 +33,7 @@ campingsRouter.get('/:idCamping', async (req: Request<{idCamping: string}>, res:
   try {
     res.status(200).json(await getCampingsPorId(idCamping))
   } catch {
-    res.status(404).json({error: `no se pudo en http://localhost/api/localidades/${idCamping}`});
+    res.status(404).json({error: `no se pudo en http://localhost/api/camping/${idCamping}`});
   }
 });
 
