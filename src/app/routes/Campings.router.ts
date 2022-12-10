@@ -1,9 +1,10 @@
 import { Router, Request, Response } from 'express';
-import { getCampingsPorLocalidad, getCampingsPorProvincia, getCampingsPorId } from '../services/Campings.service';
+import { createCamping } from '../types/datosCamping';
+import { getCampingsPorLocalidad, getCampingsPorProvincia, getCampingsPorId, getCampingsImagenes, postCampingsCreate } from '../services/Campings.service';
 
-const campingsRouter: Router = Router();
+const CampingsRouter: Router = Router();
 
-campingsRouter.get('/provincias/:idProvincia', async (req: Request<{idProvincia: string}>, res: Response) => {
+CampingsRouter.get('/provincias/:idProvincia', async (req: Request<{idProvincia: string}>, res: Response) => {
   const { idProvincia } = req.params;
 
   try {
@@ -15,7 +16,7 @@ campingsRouter.get('/provincias/:idProvincia', async (req: Request<{idProvincia:
 
 
 
-campingsRouter.get('/localidades/:idLocalidad', async (req: Request<{idLocalidad: string}>, res: Response) => {
+CampingsRouter.get('/localidades/:idLocalidad', async (req: Request<{idLocalidad: string}>, res: Response) => {
   const { idLocalidad } = req.params;
 
   try {
@@ -27,7 +28,7 @@ campingsRouter.get('/localidades/:idLocalidad', async (req: Request<{idLocalidad
 
 
 
-campingsRouter.get('/:idCamping', async (req: Request<{idCamping: string}>, res: Response) => {
+CampingsRouter.get('/:idCamping', async (req: Request<{idCamping: string}>, res: Response) => {
   const { idCamping } = req.params;
 
   try {
@@ -38,5 +39,23 @@ campingsRouter.get('/:idCamping', async (req: Request<{idCamping: string}>, res:
 });
 
 
+campingsRouter.get('/imagenes/:idCamping', async (req: Request<{idCamping: string}>, res: Response) => {
+  const { idCamping } = req.params;
 
-export default campingsRouter;
+  try {
+    res.status(200).json(await getCampingsImagenes(idCamping))
+  } catch {
+    res.status(404).json({error: `no se pudo en http://localhost/api/camping/imagenes/${idCamping}`});
+  }
+});
+
+campingsRouter.post('/', async (req: Request<createCamping>, res: Response) => {
+
+  try {
+    res.status(200).json(await postCampingsCreate(req.body))
+  } catch(error: any) {
+    res.status(error.error).json(error);
+  }
+});
+
+export default CampingsRouter;

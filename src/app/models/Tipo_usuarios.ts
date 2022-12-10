@@ -4,7 +4,7 @@ export default (sequelize: Sequelize) => {
   sequelize.define(
     'Tipo_usuarios',
     {
-      tipo_usuario: {
+      tipo: {
         type: DataTypes.STRING,
       }
     }

@@ -1,9 +1,10 @@
 import datosCamping from "../types/datosCamping";
+import { createCamping } from "../types/datosCamping";
 const { sequelize } = require("../db");
 
 export const getCampingsPorProvincia = async (id: string): Promise<datosCamping[]> => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
-    `SELECT C.id as id, C.nombre_camping as nombre, L.nombre as localidad, P.nombre as provincia, I.url AS imagen FROM Campings AS C INNER JOIN Localidades AS L INNER JOIN Provincias AS P ON L.ProvinciaId=P.id ON C.LocalidadeId=L.id INNER JOIN Camping_imagenes as I ON C.id=I.CampingId WHERE P.id=${id};`
+    `SELECT C.id as id, C.nombre_camping as nombre, L.nombre as localidad, P.nombre as provincia, I.url AS imagen FROM Campings AS C INNER JOIN Localidades AS L INNER JOIN Provincias AS P ON L.ProvinciaId=P.id ON C.LocalidadeId=L.id INNER JOIN Camping_imagenes as I ON C.id=I.CampingId WHERE C.habilitado=1 AND P.id=${id};`
   );
 
   return querySql;
@@ -11,7 +12,7 @@ export const getCampingsPorProvincia = async (id: string): Promise<datosCamping[
 
 export const getCampingsPorLocalidad = async (id: string): Promise<datosCamping[]> => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
-    `SELECT C.id as id, C.nombre_camping as nombre, L.nombre as localidad, P.nombre as provincia, I.url AS imagen FROM Campings AS C INNER JOIN Localidades AS L INNER JOIN Provincias AS P ON L.ProvinciaId=P.id ON C.LocalidadeId=L.id INNER JOIN Camping_imagenes as I ON C.id=I.CampingId WHERE L.id=${id};`
+    `SELECT C.id as id, C.nombre_camping as nombre, L.nombre as localidad, P.nombre as provincia, I.url AS imagen FROM Campings AS C INNER JOIN Localidades AS L INNER JOIN Provincias AS P ON L.ProvinciaId=P.id ON C.LocalidadeId=L.id INNER JOIN Camping_imagenes as I ON C.id=I.CampingId WHERE C.habilitado=1 AND L.id=${id};`
   );
 
   return querySql;
@@ -40,4 +41,35 @@ export const getCampingsPorId = async (id: string): Promise<datosCamping | strin
 
   //console.log(querySql);
   return querySql[0];
+}
+
+export const getCampingsImagenes= async (id: string): Promise<datosCamping[]> => {
+  const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
+    `SELECT C.ID,CI.url
+    from Campings as C
+    INNER JOIN Camping_imagenes AS CI ON CI.CampingId=C.id
+    WHERE C.habilitado=1 AND C.id=${id}`
+  );
+
+  return querySql;
+}
+
+export const postCampingsCreate = async ({
+  nombre_camping, descripcion_camping, direccion, telefono, longitud, latitud, cerrado_fecha_desde, cerrado_fecha_hasta, contacto_nombre, contacto_tel, UsuarioId, CategoriaCampingId, LocalidadeId 
+}: createCamping): Promise<createCamping[]> => {
+
+  if(!nombre_camping || !descripcion_camping || !direccion || !telefono || !longitud || !latitud || !cerrado_fecha_desde || !cerrado_fecha_hasta || !contacto_nombre || !contacto_tel || !UsuarioId || !CategoriaCampingId || !LocalidadeId) throw {
+    error: 406,
+    message: 'Faltan parámetros'
+  };
+
+  const [querySql]: [querySql: createCamping[]] = await sequelize.query(
+  
+      `INSERT INTO Campings(nombre_camping, descripcion_camping, direccion,telefono, longitud, latitud,cerrado_fecha_desde,cerrado_fecha_hasta, contacto_nombre, contacto_tel, createdAt, updatedAt, UsuarioId, CategoriaCampingId, LocalidadeId)
+      VALUES ('${nombre_camping}','${descripcion_camping}', '${direccion}','${telefono}','${longitud}','${latitud}',
+      DATE('${cerrado_fecha_desde}'), DATE('${cerrado_fecha_hasta}'),'${contacto_nombre}', '${contacto_tel}', NOW(),
+      NOW(), ${UsuarioId}, ${CategoriaCampingId}, ${LocalidadeId})`
+  );
+
+  return querySql;
 }
