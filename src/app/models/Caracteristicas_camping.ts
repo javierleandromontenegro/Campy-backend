@@ -4,6 +4,10 @@ export default (sequelize: Sequelize) => {
   sequelize.define(
     'Caracteristicas_camping',
     {
+      wifi: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false
+      },
       duchas: {
         type: DataTypes.INTEGER,
         allowNull: false

@@ -7,7 +7,7 @@ paisRouter.get('/', async (_req: Request, res: Response) => {
   try {
     res.status(200).json(await getPaises())
   } catch {
-    res.status(404).json({error: 'no se pudo en http://localhost/api/provincias'});
+    res.status(404).json({error: 'no se pudo en http://localhost/api/paises'});
   }
 });
 
