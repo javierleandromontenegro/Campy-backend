@@ -1,0 +1,16 @@
+import { Router, Request, Response } from 'express';
+import { registerUser } from '../services/register.service';
+import datosUsuario from '../types/datosUsuario';
+
+const registerRouter: Router = Router();
+
+registerRouter.post('/', async (req: Request<datosUsuario>, res: Response) => {
+  try {
+    res.status(201).json(await registerUser(req.body));
+  } catch(e) {
+    console.log("error", e)
+    res.status(400).json(e)
+  }
+});
+
+export default registerRouter;
