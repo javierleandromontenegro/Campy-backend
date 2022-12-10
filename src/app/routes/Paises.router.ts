@@ -1,9 +1,9 @@
 import { Router, Request, Response } from 'express';
 import { getPaises } from '../services/Paises.service';
 
-const paisRouter: Router = Router();
+const PaisRouter: Router = Router();
 
-paisRouter.get('/', async (_req: Request, res: Response) => {
+PaisRouter.get('/', async (_req: Request, res: Response) => {
   try {
     res.status(200).json(await getPaises())
   } catch {
@@ -11,4 +11,4 @@ paisRouter.get('/', async (_req: Request, res: Response) => {
   }
 });
 
-export default paisRouter;
+export default PaisRouter;

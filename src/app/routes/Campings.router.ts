@@ -1,9 +1,9 @@
 import { Router, Request, Response } from 'express';
 import { getCampingsPorLocalidad, getCampingsPorProvincia, getCampingsPorId } from '../services/Campings.service';
 
-const campingsRouter: Router = Router();
+const CampingsRouter: Router = Router();
 
-campingsRouter.get('/provincias/:idProvincia', async (req: Request<{idProvincia: string}>, res: Response) => {
+CampingsRouter.get('/provincias/:idProvincia', async (req: Request<{idProvincia: string}>, res: Response) => {
   const { idProvincia } = req.params;
 
   try {
@@ -15,7 +15,7 @@ campingsRouter.get('/provincias/:idProvincia', async (req: Request<{idProvincia:
 
 
 
-campingsRouter.get('/localidades/:idLocalidad', async (req: Request<{idLocalidad: string}>, res: Response) => {
+CampingsRouter.get('/localidades/:idLocalidad', async (req: Request<{idLocalidad: string}>, res: Response) => {
   const { idLocalidad } = req.params;
 
   try {
@@ -27,7 +27,7 @@ campingsRouter.get('/localidades/:idLocalidad', async (req: Request<{idLocalidad
 
 
 
-campingsRouter.get('/:idCamping', async (req: Request<{idCamping: string}>, res: Response) => {
+CampingsRouter.get('/:idCamping', async (req: Request<{idCamping: string}>, res: Response) => {
   const { idCamping } = req.params;
 
   try {
@@ -39,4 +39,4 @@ campingsRouter.get('/:idCamping', async (req: Request<{idCamping: string}>, res:
 
 
 
-export default campingsRouter;
+export default CampingsRouter;
