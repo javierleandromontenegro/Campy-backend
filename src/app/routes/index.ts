@@ -5,8 +5,8 @@ import ProvinciasRouter from './Provincia.route';
 import LocalidadesRouter from './Localidades.router';
 import RegisterRouter from './Register.router';
 import UsuariosRouter from './Usuario.router';
-
 // Importar todos los routers;
+
 const router: Router = Router();
 
 // 'http://localhost/api/provincias'
