@@ -34,7 +34,7 @@ export const getCampingsPorLocalidad = async (id: string): Promise<datosCamping[
   return results;
 }
 
-
+// QUERY SOLO 1 CAMPING POR ID CON DETALLE E IMAGENES
 export const getCampingsPorId = async (id: string): Promise<datosCamping | string> => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
     `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.cerrado_fecha_desde , C.cerrado_fecha_hasta, L.nombre AS localidad,P.nombre AS provincia,
@@ -61,6 +61,35 @@ export const getCampingsPorId = async (id: string): Promise<datosCamping | strin
   querySql[0].imagenes = imagenesQuery.data;
 
   return querySql[0];
+}
+
+// QUERY TODOS LOS CAMPINGS CON DETALLE E IMAGENES
+export const getCampingsTodos = async (): Promise<datosCamping[] > => {
+  const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
+    `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.cerrado_fecha_desde , C.cerrado_fecha_hasta, L.nombre AS localidad,P.nombre AS provincia,
+    CA.categoria,CA.cantidad_estrellas,CC.duchas,CC.baños,CC.mascotas,CC.rodantes,CC.proveduria,CC.salon_sum,CC.restaurant,CC.vigilancia,CC.pileta,CC.estacionamiento,CC.juegos_infantiles,CC.maquinas_gimnasia,CC.wifi,
+    CP.techada AS parcela_techada,CP.agua_en_parcela AS parcela_agua_en_parcela,CP.iluminacion_toma_corriente AS parcela_iluminacion_toma_corriente,CP.superficie AS parcela_superficie,
+    AP.descripcion_periodo,
+    PAC.descripcion_periodo_agua   
+    from Campings as C 
+    INNER JOIN Localidades AS L INNER JOIN Provincias as P ON P.Id=L.ProvinciaId ON C.LocalidadeId=L.id      
+    INNER JOIN Categoria_campings AS CA ON C.CategoriaCampingId=CA.id
+    INNER JOIN Caracteristicas_campings AS CC 
+    INNER JOIN Caracteristicas_parcelas AS CP ON CC.id=CP.CaracteristicasCampingId 
+     INNER JOIN Abierto_periodos AS AP ON CC.AbiertoPeriodoId=AP.id 
+     INNER JOIN Periodo_agua_calientes AS PAC ON CC.PeriodoAguaCalienteId=PAC.id
+     ON C.CategoriaCampingId =CC.id
+    WHERE C.habilitado=1;`
+  );
+
+  const imagenesQuery = await Promise.all(querySql.map(query => axios.get(`${process.env.HOST}/api/campings/imagenes/${query.id}`))).then(res => res.map(res => res.data));
+
+  const results:datosCamping[] = querySql.map((query, i) => {
+    query.imagenes = imagenesQuery[i];
+    return query;
+  });
+
+  return results;
 }
 
 export const getCampingsImagenes= async (id: string): Promise<string[]> => {
