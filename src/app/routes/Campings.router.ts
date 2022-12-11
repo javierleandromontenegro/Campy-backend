@@ -39,7 +39,7 @@ CampingsRouter.get('/:idCamping', async (req: Request<{idCamping: string}>, res:
 });
 
 
-campingsRouter.get('/imagenes/:idCamping', async (req: Request<{idCamping: string}>, res: Response) => {
+CampingsRouter.get('/imagenes/:idCamping', async (req: Request<{idCamping: string}>, res: Response) => {
   const { idCamping } = req.params;
 
   try {
@@ -49,7 +49,7 @@ campingsRouter.get('/imagenes/:idCamping', async (req: Request<{idCamping: strin
   }
 });
 
-campingsRouter.post('/', async (req: Request<createCamping>, res: Response) => {
+CampingsRouter.post('/', async (req: Request<createCamping>, res: Response) => {
 
   try {
     res.status(200).json(await postCampingsCreate(req.body))
