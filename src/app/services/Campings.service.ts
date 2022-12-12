@@ -1,5 +1,5 @@
 import datosCamping from "../types/datosCamping";
-import { createCamping } from "../types/datosCamping";
+import { createCamping} from "../types/datosCamping";
 import axios from "axios";
 
 const { sequelize } = require("../db");
@@ -34,7 +34,11 @@ export const getCampingsPorLocalidad = async (id: string): Promise<datosCamping[
   return results;
 }
 
-// QUERY SOLO 1 CAMPING POR ID CON DETALLE E IMAGENES
+
+
+
+// QUERY SOLO 1 CAMPING POR ID CON DETALLE E IMAGENES *******************
+
 export const getCampingsPorId = async (id: string): Promise<datosCamping | string> => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
     `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.cerrado_fecha_desde , C.cerrado_fecha_hasta, L.nombre AS localidad,P.nombre AS provincia,
@@ -103,22 +107,44 @@ export const getCampingsImagenes= async (id: string): Promise<string[]> => {
   return querySql.map((query: any):string => query.url);
 }
 
-export const postCampingsCreate = async ({
-  nombre_camping, descripcion_camping, direccion, telefono, longitud, latitud, cerrado_fecha_desde, cerrado_fecha_hasta, contacto_nombre, contacto_tel, UsuarioId, CategoriaCampingId, LocalidadeId 
-}: createCamping): Promise<createCamping[]> => {
 
-  if(!nombre_camping || !descripcion_camping || !direccion || !telefono || !longitud || !latitud || !cerrado_fecha_desde || !cerrado_fecha_hasta || !contacto_nombre || !contacto_tel || !UsuarioId || !CategoriaCampingId || !LocalidadeId) throw {
+
+//ALTA DE CAMPING *********************
+export const postCampingsCreate = async ({
+  nombre_camping, descripcion_camping, direccion, telefono, contacto_nombre, contacto_tel, CategoriaCampingId, LocalidadeId,wifi,duchas,baños,mascotas,rodantes,proveduria,salon_sum,restaurant,vigilancia,pileta,estacionamiento,juegos_infantiles,maquinas_gimnasia,AbiertoPeriodoId,PeriodoAguaCalienteId,techada,agua_en_parcela, iluminacion_toma_corriente,superficie,imagenes
+}: createCamping): Promise<number> => {
+
+  if(!nombre_camping || !descripcion_camping || !direccion || !telefono ||  !contacto_nombre || !contacto_tel || !CategoriaCampingId || !LocalidadeId) throw {
     error: 406,
     message: 'Faltan parámetros'
   };
 
-  const [querySql]: [querySql: createCamping[]] = await sequelize.query(
-  
-      `INSERT INTO Campings(nombre_camping, descripcion_camping, direccion,telefono, longitud, latitud,cerrado_fecha_desde,cerrado_fecha_hasta, contacto_nombre, contacto_tel, createdAt, updatedAt, UsuarioId, CategoriaCampingId, LocalidadeId)
-      VALUES ('${nombre_camping}','${descripcion_camping}', '${direccion}','${telefono}','${longitud}','${latitud}',
-      DATE('${cerrado_fecha_desde}'), DATE('${cerrado_fecha_hasta}'),'${contacto_nombre}', '${contacto_tel}', NOW(),
-      NOW(), ${UsuarioId}, ${CategoriaCampingId}, ${LocalidadeId})`
+
+  const [CaractCampingId]: [CaractCampingId:number[]] = await sequelize.query(  
+    `INSERT INTO Caracteristicas_campings(wifi,duchas,baños,mascotas,rodantes,proveduria,salon_sum,restaurant,vigilancia,pileta, estacionamiento,juegos_infantiles,maquinas_gimnasia,createdAt, updatedAt,AbiertoPeriodoId,PeriodoAguaCalienteId) VALUES (${wifi},${duchas},${baños},
+    ${mascotas},${rodantes},${proveduria},${salon_sum},
+    ${restaurant},${vigilancia},${pileta},${estacionamiento},${juegos_infantiles},${maquinas_gimnasia},NOW(),NOW(),${AbiertoPeriodoId},${PeriodoAguaCalienteId})`
+);
+console.log("DATO DE CARATCAMPIID= ",CaractCampingId)
+
+  const [CampingId]: [CampingId:number] = await sequelize.query(  
+      `INSERT INTO Campings(nombre_camping, descripcion_camping, direccion,telefono, longitud, latitud,cerrado_fecha_desde,cerrado_fecha_hasta, contacto_nombre, contacto_tel, createdAt, updatedAt, UsuarioId, CategoriaCampingId,CaracteristicasCampingId, LocalidadeId)
+      VALUES ('${nombre_camping}','${descripcion_camping}', '${direccion}','${telefono}','1234','1234', NOW(), NOW(),'${contacto_nombre}', 
+      '${contacto_tel}', NOW(), NOW(), 1, ${CategoriaCampingId},${CaractCampingId},${LocalidadeId})`
   );
 
-  return querySql;
+ await sequelize.query(  
+    `INSERT INTO Caracteristicas_parcelas(techada,agua_en_parcela, iluminacion_toma_corriente,superficie,createdAt,updatedAt, CaracteristicasCampingId) VALUES (${techada},${agua_en_parcela},${iluminacion_toma_corriente},${superficie},NOW(),NOW(),
+    ${CaractCampingId})`
+);
+
+await Promise.all(imagenes.map((imagen) => 
+ sequelize.query(   
+  `INSERT INTO Camping_imagenes(url,createdAt,updatedAt,CampingId) VALUES ('${imagen}',NOW(),NOW(),${CampingId})`
+
+)
+))
+
+
+  return CampingId;
 }
