@@ -60,7 +60,6 @@ CampingsRouter.get('/imagenes/:idCamping', async (req: Request<{idCamping: strin
 });
 
 
-
 CampingsRouter.post('/', async (req: Request<createCamping>, res: Response) => {
 
   try {
