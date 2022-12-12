@@ -30,7 +30,7 @@ export default (sequelize: Sequelize) => {
       },
       habilitado: {
         type: DataTypes.BOOLEAN,
-        defaultValue: true,
+        defaultValue: false,
       },
     }
   );
