@@ -1,4 +1,5 @@
 import datosLugares from "../types/datosBase";
+import createLocalidad from "../types/datosLocalidades";
 
 const { sequelize } = require("../db");
 
@@ -10,3 +11,20 @@ export const getLocalidades = async (id: string): Promise<datosLugares[]> => {
 
   return querySql;
 }
+
+export const postLocalidades = async ({
+  nombre, imagen, ProvinciaId
+}: createLocalidad): Promise<createLocalidad[]> => {
+
+  if (!nombre || !imagen || !ProvinciaId) throw {
+    error: 406,
+    message: 'Faltan parámetros'
+  };
+
+  const [querySql]: [querySql: createLocalidad[]] = await sequelize.query(
+    `INSERT INTO Localidades(nombre, imagen, createdAt, updatedAt, ProvinciaId)
+    VALUES ('${nombre}', '${imagen}', NOW(), NOW(), ${ProvinciaId})`
+  );
+
+  return querySql;
+};
