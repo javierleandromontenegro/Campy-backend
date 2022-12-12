@@ -47,7 +47,7 @@ CampingsRouter.get('/imagenes/:idCamping', async (req: Request<{idCamping: strin
   } catch {
     res.status(404).json({error: `no se pudo en http://localhost/api/camping/imagenes/${idCamping}`});
   }
-});
+});  
 
 CampingsRouter.post('/', async (req: Request<createCamping>, res: Response) => {
 
@@ -58,4 +58,4 @@ CampingsRouter.post('/', async (req: Request<createCamping>, res: Response) => {
   }
 });
 
-export default CampingsRouter;
+export default CampingsRouter; 

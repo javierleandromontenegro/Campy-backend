@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { registerUser } from '../services/register.service';
+import { registerUser } from '../services/Register.service';
 import datosUsuario from '../types/datosUsuario';
 
 const RegisterRouter: Router = Router();
