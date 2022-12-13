@@ -27,20 +27,20 @@ export const registerUser = async ({
     `INSERT INTO Usuarios (email, clave, nombre_completo, numero_celular, direccion, dni, TipoUsuarioId, createdAt, updatedAt) VALUES ('${email}', '${await hash(clave, 8)}', '${nombre_completo}', '${numero_celular}', '${direccion}', '${dni}', ${tipo}, NOW(), NOW())`
   );
 
-  const [createdUser]: [createdUser: datosUsuario[]] = await sequelize.query(
+  const [[createdUser]]: [createdUser: datosUsuario[]] = await sequelize.query(
     `SELECT id, email, clave, nombre_completo, numero_celular, direccion, dni, TipoUsuarioId AS tipo FROM Usuarios WHERE id=${userRegisteredId};`
   );
     console.log(createdUser);
-  const token: string = getToken(createdUser[0]);
+  const token: string = getToken(createdUser);
 
-  const templateHtml: string = getTemplateHtml(createdUser[0].nombre_completo, token);
+  const templateHtml: string = getTemplateHtml(createdUser.nombre_completo, token, Number(createdUser.id));
     
-  await sendEmail({userEmail: createdUser[0].email, subject:'Confirmá tu cuenta de google', templateHtml});
+  await sendEmail({userEmail: createdUser.email, subject:'Confirmá tu cuenta de google', templateHtml});
 
-  return createdUser[0];
+  return createdUser;
 };
 
-function getTemplateHtml(name: string, token: string): string {
+function getTemplateHtml(name: string, token: string, id: number): string {
   return (
     `
       <head>
@@ -69,6 +69,15 @@ function getTemplateHtml(name: string, token: string): string {
             margin: 15px 0;
           }
 
+          #warning {
+            width: 80%;
+            color: white;
+            font-size: 15px;
+            font-style: italic;
+            padding: 0;
+            margin: 15px auto;
+          }
+
           #confirm-link {
             color: #45433F;
             font-size: 15px;
@@ -91,7 +100,8 @@ function getTemplateHtml(name: string, token: string): string {
           <img style='height: 30px; width: auto' src='https://res.cloudinary.com/pfcampy/image/upload/v1670466096/logo_CAMPY_rjsp9a.png' alt='logo-campy' />
           <h2 id='greeting'>¡Felicidades ${name}!</h2>
           <p id='description'>Estás a un solo paso de ser un nuevo Campy...</p>
-          <a id='confirm-link' href='${process.env.HOST}/api/confirm/${token}' target='_blank'>
+          <p id='warning'>(Si han pasado más de 12hs desde el registro es probable que al apretar el botón 'verificar cuenta' dé un error. Si es así, volvé a registrarte en la página para obtener un nuevo correo de confirmación)</p>
+          <a id='confirm-link' href='${process.env.HOST}/api/confirm/${token}?id=${id}' target='_blank'>
             Verificar cuenta
           </a>
       </div>
@@ -101,7 +111,7 @@ function getTemplateHtml(name: string, token: string): string {
 
 function getToken(data: datosUsuario) {
 
-  return jwt.sign(data, String(process.env.SECRET), { expiresIn: "24h" });
+  return jwt.sign(data, String(process.env.SECRET), { expiresIn: "12hs" });
 }
 
 async function sendEmail({ userEmail, subject, templateHtml }: { userEmail: string, subject: string, templateHtml: string }): Promise<void> {

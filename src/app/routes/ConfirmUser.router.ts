@@ -6,6 +6,7 @@ const ConfirmUserRouter: Router = Router();
 
 ConfirmUserRouter.get('/:token', async (req: Request<{token: string}>, res: Response) => {
   const { token }: {token: string} = req.params;
+  const id: string = String(req.query.id);
 
   try {
     jwt.verify(token, String(process.env.SECRET), (err, result: any) => {
@@ -18,6 +19,13 @@ ConfirmUserRouter.get('/:token', async (req: Request<{token: string}>, res: Resp
       ).then(() => res.status(200).send(getTemplateConfirm(true)));
     });
   } catch(e: any) {
+    const { expiredAt }: { expiredAt: string } = e;
+    
+    if(expiredAt) 
+      await sequelize.query(
+        `DELETE FROM Usuarios WHERE id=${id} AND habilitado=0;`
+      )
+  
     res.status(406).send(getTemplateConfirm(false));
   }
 });
