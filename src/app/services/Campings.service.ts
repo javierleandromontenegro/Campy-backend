@@ -1,8 +1,28 @@
 import datosCamping from "../types/datosCamping";
-import { createCamping} from "../types/datosCamping";
+import { createCamping, campingCategorias} from "../types/datosCamping";
 import axios from "axios";
+/*import { Projectable } from "sequelize";
+const { Categoria_camping } = require("../db");*/
 
 const { sequelize } = require("../db");
+
+
+/* export const getCampingsCategorias  = async (): Promise<Projectable> => await Categoria_camping.findAll(
+    {
+      attributes: [ 'id','categoria', 'cantidad_estrellas','descripcion_categoria']
+    }
+);  */
+
+export const getCampingsCategorias = async (): Promise<campingCategorias[]> => {
+  console.log("hola_hola ")
+  const [querySql]: [querySql: campingCategorias[]] = await sequelize.query(
+    `SELECT id,categoria,cantidad_estrellas,descripcion_categoria FROM Categoria_campings`
+  ); 
+
+  return querySql;
+}
+
+
 
 export const getCampingsPorProvincia = async (id: string): Promise<datosCamping[]> => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
