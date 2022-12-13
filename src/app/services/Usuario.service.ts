@@ -1,6 +1,6 @@
 import datosUsuario from "../types/datosUsuario";
 
-const { sequelize } = require('../db.ts');
+const { sequelize } = require('../db');
 
 
 export const getUser = async (id: string): Promise<datosUsuario> => {
