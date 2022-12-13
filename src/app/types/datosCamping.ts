@@ -40,3 +40,9 @@ export interface createCaratCamping {
     imagenes:[]    
 }
 
+export interface campingCategorias {
+id:number,
+categoria:string,
+cantidad_estrellas:number,
+descripcion_categoria:string
+}
