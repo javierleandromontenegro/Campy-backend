@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { createCamping } from '../types/datosCamping';
-import { getCampingsPorLocalidad, getCampingsPorProvincia, getCampingsPorId, getCampingsImagenes, postCampingsCreate,getCampingsTodos } from '../services/Campings.service';
+import { getCampingsPorLocalidad, getCampingsPorProvincia, getCampingsPorId, getCampingsImagenes, postCampingsCreate,getCampingsTodos,getCampingsCategorias } from '../services/Campings.service';
 
 const CampingsRouter: Router = Router();
 
@@ -14,6 +14,13 @@ CampingsRouter.get('/provincias/:idProvincia', async (req: Request<{idProvincia:
   }
 });
 
+CampingsRouter.get('/categorias', async (_req: Request, res: Response) => { 
+  try {
+    res.status(200).json(await getCampingsCategorias())
+  } catch {
+    res.status(404).json({error: `no se pudo en http://localhost/api/camping/categorias`});
+  }
+});
 
 
 CampingsRouter.get('/localidades/:idLocalidad', async (req: Request<{idLocalidad: string}>, res: Response) => {
@@ -47,6 +54,8 @@ CampingsRouter.get('/', async (_req: Request, res: Response) => {
     res.status(404).json({error: `no se pudo en http://localhost/api/camping`});
   }
 });
+
+
 
 
 CampingsRouter.get('/imagenes/:idCamping', async (req: Request<{idCamping: string}>, res: Response) => {
