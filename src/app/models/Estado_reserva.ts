@@ -2,14 +2,11 @@ import { Sequelize, DataTypes } from 'sequelize';
 
 export default (sequelize: Sequelize) => {
   sequelize.define(
-    'usuarios',
+    'Estado_reserva',
     {
-      nombre: {
-        type: DataTypes.STRING
-      }
-    },
-    {
-      timestamps: false,
+      descrip_estado: {
+        type: DataTypes.TEXT,
+      },
     }
-    )
-}
+  );
+};
