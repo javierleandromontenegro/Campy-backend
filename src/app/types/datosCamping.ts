@@ -49,3 +49,17 @@ cantidad_estrellas:number,
 descripcion_categoria:string
 }
 
+export interface campingTarifas {
+    id: number,
+    descrip_tarifa: string
+}
+
+export interface campingAbiertoPeriodo {
+    id: number,
+    descripcion_periodo: string
+}
+
+export interface campingPeriodoAguaCaliente {
+    id: number,
+    descripcion_periodo_agua: string
+}

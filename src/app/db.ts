@@ -30,7 +30,7 @@ const modelDefiners: modelTable[] = [];
 fs.readdirSync(path.join(__dirname, "/models"))
   .filter(
     (file: string): boolean =>
-      file.indexOf(".") !== 0 && file !== basename && file.slice(-3) === ".ts"
+      file.indexOf(".") !== 0 && file !== basename && (file.slice(-3) === ".ts" || file.slice(-3) === ".js")
   )
   .forEach((file: string) => {
     modelDefiners.push(require(path.join(__dirname, "/models", file)).default);

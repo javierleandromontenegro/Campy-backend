@@ -2,14 +2,18 @@ import { compare } from 'bcrypt';
 import { NextFunction, Request, Response } from 'express';
 import { verify } from 'jsonwebtoken';
 
-const { Usuarios } = require('../db'); 
+const { sequelize } = require('../db'); 
 
 export const searchUser = async (email: string, clave: string) => {
-    const findUser = await Usuarios.findOne({ where: { email } });
-
+    const [[findUser]] = await sequelize.query(
+      `SELECT id, email, clave, nombre_completo, numero_celular, direccion, dni, habilitado, TipoUsuarioId AS tipo FROM Usuarios WHERE email='${email}';`
+    );
+    
     const verifyPassword = findUser && await compare(clave, findUser.clave);
 
     if(!findUser || !verifyPassword) throw { error: 401, message: 'Usuario Inválido' };
+
+    if(!findUser.habilitado) throw { error: 401, message: 'Cuenta deshabilitada' };
 
     return findUser;
 }

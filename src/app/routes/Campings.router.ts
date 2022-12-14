@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { createCamping } from '../types/datosCamping';
-import { getCampingsPorLocalidad, getCampingsPorProvincia, getCampingsPorId, getCampingsImagenes, postCampingsCreate,getCampingsTodos,getCampingsCategorias } from '../services/Campings.service';
+import { getCampingsPorLocalidad, getCampingsPorProvincia, getCampingsPorId, getCampingsImagenes, postCampingsCreate,getCampingsTodos,getCampingsCategorias, getCampingTarifas, getCampingAbiertoPeriodo, getCampingPeriodoAguaCaliente } from '../services/Campings.service';
 
 const CampingsRouter: Router = Router();
 
@@ -19,6 +19,30 @@ CampingsRouter.get('/categorias', async (_req: Request, res: Response) => {
     res.status(200).json(await getCampingsCategorias())
   } catch {
     res.status(404).json({error: `no se pudo en http://localhost/api/camping/categorias`});
+  }
+});
+
+CampingsRouter.get('/tarifas', async (_req: Request, res: Response) => { 
+  try {
+    res.status(200).json(await getCampingTarifas())
+  } catch {
+    res.status(404).json({error: `no se pudo en http://localhost/api/camping/tarifas`});
+  }
+});
+
+CampingsRouter.get('/abierto', async (_req: Request, res: Response) => { 
+  try {
+    res.status(200).json(await getCampingAbiertoPeriodo())
+  } catch {
+    res.status(404).json({error: `no se pudo en http://localhost/api/camping/abierto`});
+  }
+});
+
+CampingsRouter.get('/agua_caliente', async (_req: Request, res: Response) => { 
+  try {
+    res.status(200).json(await getCampingPeriodoAguaCaliente())
+  } catch {
+    res.status(404).json({error: `no se pudo en http://localhost/api/camping/agua_caliente`});
   }
 });
 

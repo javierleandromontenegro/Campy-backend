@@ -1,5 +1,5 @@
 import datosCamping from "../types/datosCamping";
-import { createCamping, campingCategorias} from "../types/datosCamping";
+import { createCamping, campingCategorias, campingTarifas, campingAbiertoPeriodo, campingPeriodoAguaCaliente} from "../types/datosCamping";
 import axios from "axios";
 
 const { sequelize } = require("../db");
@@ -7,13 +7,36 @@ const { sequelize } = require("../db");
 
 
 export const getCampingsCategorias = async (): Promise<campingCategorias[]> => {
-
   const [querySql]: [querySql: campingCategorias[]] = await sequelize.query(
     `SELECT id,categoria,cantidad_estrellas,descripcion_categoria FROM Categoria_campings`
   ); 
 
   return querySql;
 }
+
+export const getCampingTarifas = async (): Promise<campingTarifas[]> => {
+  const [querySql]: [querySql: campingTarifas[]] = await sequelize.query(
+    `SELECT id, descrip_tarifa FROM Tarifas`
+  ); 
+
+  return querySql;
+};
+
+export const getCampingAbiertoPeriodo = async (): Promise<campingAbiertoPeriodo[]> => {
+  const [querySql]: [querySql: campingAbiertoPeriodo[]] = await sequelize.query(
+    `SELECT id, descripcion_periodo FROM Abierto_periodos`
+  ); 
+
+  return querySql;
+};
+
+export const getCampingPeriodoAguaCaliente = async (): Promise<campingPeriodoAguaCaliente[]> => {
+  const [querySql]: [querySql: campingPeriodoAguaCaliente[]] = await sequelize.query(
+    `SELECT id, descripcion_periodo_agua FROM Periodo_agua_calientes`
+  ); 
+
+  return querySql;
+};
 
 
 
@@ -144,7 +167,6 @@ export const postCampingsCreate = async ({
     ${mascotas},${rodantes},${proveduria},${salon_sum},
     ${restaurant},${vigilancia},${pileta},${estacionamiento},${juegos_infantiles},${maquinas_gimnasia},NOW(),NOW(),${AbiertoPeriodoId},${PeriodoAguaCalienteId})`
 );
-
 
   const [CampingId]: [CampingId:number] = await sequelize.query(  
       `INSERT INTO Campings(nombre_camping, descripcion_camping, direccion,telefono, longitud, latitud,abierto_fecha_desde,abierto_fecha_hasta, contacto_nombre, contacto_tel, createdAt, updatedAt, UsuarioId, CategoriaCampingId,CaracteristicasCampingId, LocalidadeId)
