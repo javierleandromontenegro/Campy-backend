@@ -1,9 +1,9 @@
 import { Router, Request, Response } from 'express';
-import { loginUser } from '../services/Login.service';
+import { loginUser, loginUserWithToken } from '../services/Login.service';
 
 const LoginRouter: Router = Router();
 
-LoginRouter.post('/', async (req: Request, res: Response) => {
+LoginRouter.post('/', loginUserWithToken, async (req: Request, res: Response) => {
     try {
       res.status(200).json(await loginUser(req.body));
     } catch(e: any) {

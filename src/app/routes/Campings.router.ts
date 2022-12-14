@@ -57,8 +57,6 @@ CampingsRouter.get('/localidades/:idLocalidad', async (req: Request<{idLocalidad
   }
 });
 
-
-
 CampingsRouter.get('/:idCamping', async (req: Request<{idCamping: string}>, res: Response) => {
   const { idCamping } = req.params;
 
@@ -71,7 +69,6 @@ CampingsRouter.get('/:idCamping', async (req: Request<{idCamping: string}>, res:
 
 //TODOS LOS CAMPING CON DETALLE E IMAGENES
 CampingsRouter.get('/', async (_req: Request, res: Response) => {
- 
   try {
     res.status(200).json(await getCampingsTodos())
   } catch {
