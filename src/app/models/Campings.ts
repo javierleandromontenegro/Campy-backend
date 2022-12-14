@@ -26,11 +26,11 @@ export default (sequelize: Sequelize) => {
       latitud: {
         type: DataTypes.STRING,
       },
-      cerrado_fecha_desde: {
+      abierto_fecha_desde: {
         type: DataTypes.DATE,
         allowNull: false,
       },
-      cerrado_fecha_hasta: {
+      abierto_fecha_hasta: {
         type: DataTypes.DATE,
         allowNull: false,
       },
@@ -44,7 +44,7 @@ export default (sequelize: Sequelize) => {
       },
       habilitado: {
         type: DataTypes.BOOLEAN,
-        defaultValue: false,
+        defaultValue: true,
       },
     }
   );

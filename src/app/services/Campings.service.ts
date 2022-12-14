@@ -1,17 +1,10 @@
 import datosCamping from "../types/datosCamping";
 import { createCamping, campingCategorias, campingTarifas, campingAbiertoPeriodo, campingPeriodoAguaCaliente} from "../types/datosCamping";
 import axios from "axios";
-/*import { Projectable } from "sequelize";
-const { Categoria_camping } = require("../db");*/
 
 const { sequelize } = require("../db");
 
 
-/* export const getCampingsCategorias  = async (): Promise<Projectable> => await Categoria_camping.findAll(
-    {
-      attributes: [ 'id','categoria', 'cantidad_estrellas','descripcion_categoria']
-    }
-);  */
 
 export const getCampingsCategorias = async (): Promise<campingCategorias[]> => {
   const [querySql]: [querySql: campingCategorias[]] = await sequelize.query(
@@ -62,6 +55,8 @@ export const getCampingsPorProvincia = async (id: string): Promise<datosCamping[
   return results;
 }
 
+
+
 export const getCampingsPorLocalidad = async (id: string): Promise<datosCamping[]> => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
     `SELECT C.id as id, C.nombre_camping as nombre, L.nombre as localidad, P.nombre as provincia FROM Campings AS C INNER JOIN Localidades AS L INNER JOIN Provincias AS P ON L.ProvinciaId=P.id ON C.LocalidadeId=L.id WHERE C.habilitado=1 AND L.id=${id};`
@@ -84,7 +79,7 @@ export const getCampingsPorLocalidad = async (id: string): Promise<datosCamping[
 
 export const getCampingsPorId = async (id: string): Promise<datosCamping | string> => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
-    `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.cerrado_fecha_desde , C.cerrado_fecha_hasta, L.nombre AS localidad,P.nombre AS provincia,
+    `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.abieto_fecha_desde , C.abierto_fecha_hasta, L.nombre AS localidad,P.nombre AS provincia,
     CA.categoria,CA.cantidad_estrellas,CC.duchas,CC.baños,CC.mascotas,CC.rodantes,CC.proveduria,CC.salon_sum,CC.restaurant,CC.vigilancia,CC.pileta,CC.estacionamiento,CC.juegos_infantiles,CC.maquinas_gimnasia,CC.wifi,
     CP.techada AS parcela_techada,CP.agua_en_parcela AS parcela_agua_en_parcela,CP.iluminacion_toma_corriente AS parcela_iluminacion_toma_corriente,CP.superficie AS parcela_superficie,
     AP.descripcion_periodo,
@@ -110,15 +105,19 @@ export const getCampingsPorId = async (id: string): Promise<datosCamping | strin
   return querySql[0];
 }
 
+
+
 // QUERY TODOS LOS CAMPINGS CON DETALLE E IMAGENES
 export const getCampingsTodos = async (): Promise<datosCamping[] > => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
-    `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.cerrado_fecha_desde , C.cerrado_fecha_hasta, L.nombre AS localidad, L.id AS id_localidad, P.nombre AS provincia,P.id as id_provincia,
+    `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.abierto_fecha_desde , C.abierto_fecha_hasta, L.nombre AS localidad, L.id AS id_localidad, P.nombre AS provincia,P.id as id_provincia,
     CA.categoria,CA.id AS id_categoria,CA.cantidad_estrellas,CC.duchas,CC.baños,CC.mascotas,CC.rodantes,CC.proveduria,CC.salon_sum,CC.restaurant,CC.vigilancia,CC.pileta,CC.estacionamiento,CC.juegos_infantiles,CC.maquinas_gimnasia,CC.wifi,
        CP.techada AS parcela_techada,CP.agua_en_parcela AS parcela_agua_en_parcela,CP.iluminacion_toma_corriente AS parcela_iluminacion_toma_corriente,CP.superficie AS parcela_superficie,
        AP.descripcion_periodo,
-       PAC.descripcion_periodo_agua  
+       PAC.descripcion_periodo_agua,
+       RT.precio
     from Campings as C 
+    INNER JOIN Relacion_campo_tarifas AS RT ON RT.CampingId=C.id AND RT.TarifaId=1
     INNER JOIN Localidades AS L INNER JOIN Provincias as P ON P.Id=L.ProvinciaId ON C.LocalidadeId=L.id      
     INNER JOIN Categoria_campings AS CA ON C.CategoriaCampingId=CA.id
     INNER JOIN Caracteristicas_campings AS CC 
@@ -154,7 +153,7 @@ export const getCampingsImagenes= async (id: string): Promise<string[]> => {
 
 //ALTA DE CAMPING *********************
 export const postCampingsCreate = async ({
-  nombre_camping, descripcion_camping, direccion, telefono, contacto_nombre, contacto_tel, CategoriaCampingId, LocalidadeId,wifi,duchas,baños,mascotas,rodantes,proveduria,salon_sum,restaurant,vigilancia,pileta,estacionamiento,juegos_infantiles,maquinas_gimnasia,AbiertoPeriodoId,PeriodoAguaCalienteId,techada,agua_en_parcela, iluminacion_toma_corriente,superficie,imagenes
+  nombre_camping, descripcion_camping, direccion, telefono, contacto_nombre, contacto_tel, CategoriaCampingId, LocalidadeId,wifi,duchas,baños,mascotas,rodantes,proveduria,salon_sum,restaurant,vigilancia,pileta,estacionamiento,juegos_infantiles,maquinas_gimnasia,AbiertoPeriodoId,PeriodoAguaCalienteId,techada,agua_en_parcela, iluminacion_toma_corriente,superficie,imagenes,precios
 }: createCamping): Promise<number> => {
 
   if(!nombre_camping || !descripcion_camping || !direccion || !telefono ||  !contacto_nombre || !contacto_tel || !CategoriaCampingId || !LocalidadeId) throw {
@@ -170,7 +169,7 @@ export const postCampingsCreate = async ({
 );
 
   const [CampingId]: [CampingId:number] = await sequelize.query(  
-      `INSERT INTO Campings(nombre_camping, descripcion_camping, direccion,telefono, longitud, latitud,cerrado_fecha_desde,cerrado_fecha_hasta, contacto_nombre, contacto_tel, createdAt, updatedAt, UsuarioId, CategoriaCampingId,CaracteristicasCampingId, LocalidadeId)
+      `INSERT INTO Campings(nombre_camping, descripcion_camping, direccion,telefono, longitud, latitud,abierto_fecha_desde,abierto_fecha_hasta, contacto_nombre, contacto_tel, createdAt, updatedAt, UsuarioId, CategoriaCampingId,CaracteristicasCampingId, LocalidadeId)
       VALUES ('${nombre_camping}','${descripcion_camping}', '${direccion}','${telefono}','1234','1234', NOW(), NOW(),'${contacto_nombre}', 
       '${contacto_tel}', NOW(), NOW(), 1, ${CategoriaCampingId},${CaractCampingId},${LocalidadeId})`
   );
@@ -185,8 +184,15 @@ await Promise.all(imagenes.map((imagen) =>
   `INSERT INTO Camping_imagenes(url,createdAt,updatedAt,CampingId) VALUES ('${imagen}',NOW(),NOW(),${CampingId})`
 
 )
-))
+));
 
+
+precios.forEach((e: any,i:number) => 
+  sequelize.query(
+          `INSERT INTO Relacion_campo_tarifas(precio, createdAt,updatedAt, TarifaId, CampingId) VALUES (${e},NOW(),NOW(),
+    '${i+1}',${CampingId})`
+  ) 
+  )
 
   return CampingId;
 }
