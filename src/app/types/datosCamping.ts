@@ -3,7 +3,7 @@ import datosBase from "./datosBase"
 export default interface datosCamping extends datosBase {
     provincia: string,
     localidad: string,
-    imagenes: string[]
+    imagenes: string[]       
 }
 
 export interface createCamping extends createCaratCamping{
@@ -37,12 +37,15 @@ export interface createCaratCamping {
     agua_en_parcela:boolean,
     iluminacion_toma_corriente:boolean,
     superficie:number,
-    imagenes:[]    
+    imagenes:[],
+    precios:[]  
 }
 
+    
 export interface campingCategorias {
 id:number,
 categoria:string,
 cantidad_estrellas:number,
 descripcion_categoria:string
 }
+
