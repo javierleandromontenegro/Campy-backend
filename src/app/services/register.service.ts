@@ -10,17 +10,17 @@ export const registerUser = async ({
   }: datosUsuario): Promise<datosUsuario> => {
 
   if(!email || !clave || !nombre_completo || !numero_celular || !direccion || !dni || !tipo) throw {
-    error: 406, message: 'Faltan parámetros necesarios'
+    error: 406, message: 'Faltan parámetros necesarios.'
   }
 
   if(tipo !== 2 && tipo !== 3) throw {
-    error: 406, message: 'Tipo de usuario incorrecto'
+    error: 406, message: 'Tipo de usuario incorrecto.'
   }
 
   const findUser = await Usuarios.findOne({ where: { email } });
 
   if(findUser) throw {
-    error: 406, message: 'Ese correo ya se encuentra registrado'
+    error: 406, message: 'Ese correo ya se encuentra registrado.'
   };
 
   const [userRegisteredId]: [userRegisteredId: number] = await sequelize.query(
@@ -111,7 +111,7 @@ function getTemplateHtml(name: string, token: string, id: number): string {
 
 function getToken(data: datosUsuario) {
 
-  return jwt.sign(data, String(process.env.SECRET), { expiresIn: "12hs" });
+  return jwt.sign(data, String(process.env.SECRET), { expiresIn: "12h" });
 }
 
 async function sendEmail({ userEmail, subject, templateHtml }: { userEmail: string, subject: string, templateHtml: string }): Promise<void> {

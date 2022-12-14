@@ -26,8 +26,6 @@ export const checkoutUser = async (req: Request, res: Response, next: NextFuncti
     const { email, clave }: { email: string, clave: string} = result;
       
     const findUser = await searchUser(email, clave);
-      
-    if(!findUser) throw {};
 
     req.body.user = findUser;
       
