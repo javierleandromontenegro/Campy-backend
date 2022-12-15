@@ -102,6 +102,11 @@ export const getCampingsPorId = async (id: string): Promise<datosCamping | strin
 
   querySql[0].imagenes = imagenesQuery.data;
 
+  const preciosQuery = 
+    await axios.get(`${process.env.HOST}/api/campings/tarifas/${querySql[0].id}`);
+
+    querySql[0].precios = preciosQuery.data;
+
   return querySql[0];
 }
 
@@ -149,7 +154,16 @@ export const getCampingsImagenes= async (id: string): Promise<string[]> => {
   return querySql.map((query: any):string => query.url);
 }
 
-
+export const getPreciosCamping = async (id: string): Promise<datosCamping[]> => {
+  const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
+    `SELECT T.id, RT.precio, T.descrip_tarifa 
+    FROM Relacion_campo_tarifas AS RT 
+    INNER JOIN Tarifas AS T ON T.id=RT.TarifaId
+    INNER JOIN Campings AS C ON C.id=RT.CampingId
+    WHERE C.id=${id}`
+  );
+  return querySql;
+}
 
 //ALTA DE CAMPING *********************
 export const postCampingsCreate = async ({
