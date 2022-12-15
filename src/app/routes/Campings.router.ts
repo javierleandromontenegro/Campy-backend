@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { createCamping } from '../types/datosCamping';
-import { getCampingsPorLocalidad, getCampingsPorProvincia, getCampingsPorId, getCampingsImagenes, postCampingsCreate,getCampingsTodos,getCampingsCategorias, getCampingTarifas, getCampingAbiertoPeriodo, getCampingPeriodoAguaCaliente } from '../services/Campings.service';
+import { getCampingsPorLocalidad, getCampingsPorProvincia, getCampingsPorId, getCampingsImagenes, postCampingsCreate,getCampingsTodos,getCampingsCategorias, getCampingTarifas, getCampingAbiertoPeriodo, getCampingPeriodoAguaCaliente, getPreciosCamping } from '../services/Campings.service';
 
 const CampingsRouter: Router = Router();
 
@@ -89,6 +89,15 @@ CampingsRouter.get('/imagenes/:idCamping', async (req: Request<{idCamping: strin
   }
 });
 
+CampingsRouter.get('/tarifas/:idCamping', async (req: Request<{idCamping: string}>, res: Response) => {
+  const { idCamping } = req.params;
+
+  try {
+    res.status(200).json(await getPreciosCamping(idCamping))
+  } catch {
+    res.status(404).json({error: `no se pudo en http://localhost/api/camping/tarifas/${idCamping}`});
+  }
+});
 
 CampingsRouter.post('/', async (req: Request<createCamping>, res: Response) => {
 
