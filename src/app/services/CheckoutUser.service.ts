@@ -6,11 +6,11 @@ const { sequelize } = require('../db');
 
 export const searchUser = async (email: string, clave: string) => {
     const [[findUser]] = await sequelize.query(
-      `SELECT id, email, clave, nombre_completo, numero_celular, direccion, dni, habilitado, TipoUsuarioId AS tipo FROM Usuarios WHERE email='${email}';`
+      `SELECT id, email, clave, username, numero_celular, direccion, dni, habilitado, TipoUsuarioId AS tipo FROM Usuarios WHERE email='${email}';`
     );
     
     const verifyPassword = findUser && await compare(clave, findUser.clave);
-
+      
     if(!findUser || !verifyPassword) throw { error: 401, message: 'Usuario Inválido' };
 
     if(!findUser.habilitado) throw { error: 401, message: 'Cuenta deshabilitada' };
@@ -26,8 +26,6 @@ export const checkoutUser = async (req: Request, res: Response, next: NextFuncti
     const { email, clave }: { email: string, clave: string} = result;
       
     const findUser = await searchUser(email, clave);
-      
-    if(!findUser) throw {};
 
     req.body.user = findUser;
       

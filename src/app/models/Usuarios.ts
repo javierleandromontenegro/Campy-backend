@@ -12,7 +12,7 @@ export default (sequelize: Sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      nombre_completo: {
+      username: {
         type: DataTypes.STRING,
         allowNull: false,
       },
