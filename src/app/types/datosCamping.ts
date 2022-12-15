@@ -1,10 +1,11 @@
 import datosBase from "./datosBase"
+import datosPrecios from "./datosPrecios"
 
 export default interface datosCamping extends datosBase {
     provincia: string,
     localidad: string,
     imagenes: string[],
-    precios: number[]   
+    precios: datosPrecios[]   
 }
 
 export interface createCamping extends createCaratCamping{
@@ -44,10 +45,10 @@ export interface createCaratCamping {
 
     
 export interface campingCategorias {
-id:number,
-categoria:string,
-cantidad_estrellas:number,
-descripcion_categoria:string
+    id:number,
+    categoria:string,
+    cantidad_estrellas:number,
+    descripcion_categoria:string
 }
 
 export interface campingTarifas {
