@@ -6,6 +6,7 @@ import nodemailer from 'nodemailer';
 const { sequelize, Usuarios } = require('../db');
 
 export const registerUser = async ({
+
     email, clave, username
   }: datosUsuario): Promise<datosUsuario> => {
 
@@ -16,6 +17,7 @@ export const registerUser = async ({
   const findUser = await Usuarios.findOne({ where: { email } });
 
   if(findUser) throw {
+
     error: 406, message: 'Ese correo ya se encuentra registrado.'
   };
 
@@ -25,11 +27,14 @@ export const registerUser = async ({
 
   const [[createdUser]]: [createdUser: datosUsuario[]] = await sequelize.query(
     `SELECT id, email, clave, username, numero_celular, direccion, dni, TipoUsuarioId AS tipo FROM Usuarios WHERE id=${userRegisteredId};`
+
   );
     console.log(createdUser);
   const token: string = getToken(createdUser);
 
+
   const templateHtml: string = getTemplateHtml(createdUser.username, token, Number(createdUser.id));
+
     
   await sendEmail({userEmail: createdUser.email, subject:'Confirmá tu cuenta de google', templateHtml});
 
@@ -108,6 +113,7 @@ function getTemplateHtml(name: string, token: string, id: number): string {
 function getToken(data: datosUsuario) {
 
   return jwt.sign(data, String(process.env.SECRET), { expiresIn: "12h" });
+
 }
 
 async function sendEmail({ userEmail, subject, templateHtml }: { userEmail: string, subject: string, templateHtml: string }): Promise<void> {
