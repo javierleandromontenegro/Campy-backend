@@ -7,7 +7,7 @@ LoginRouter.post('/', loginUserWithToken, async (req: Request, res: Response) =>
     try {
       res.status(200).json(await loginUser(req.body));
     } catch(e: any) {
-      res.status(e.error).json(e);
+      res.status(e.error || 404).json(e);
     }
 });
 
@@ -15,7 +15,7 @@ LoginRouter.post('/google', async (req: Request, res: Response) => {
     try {
       res.status(200).json(await loginUserWithGoogle(req.body));
     } catch(e: any) {
-      res.status(e.error).json(e);
+      res.status(e.error || 404).json(e);
     }
 })
 

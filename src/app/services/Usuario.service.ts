@@ -1,4 +1,5 @@
 import datosUsuario from "../types/datosUsuario";
+import { allPropertiesUsuario } from "../types/Properties";
 
 const { sequelize } = require('../db');
 
@@ -28,3 +29,26 @@ export const disableUser = async (id: string, habilitar: number): Promise<{succe
 
   return {success: !!updatedUser.changedRows}
 };
+
+export const updateUser = async (data: datosUsuario, id: number) => {
+  const entries: [key: string, value: string][] = Object.entries(data);
+
+  if(!entries.length || entries.length > allPropertiesUsuario.length) 
+    throw { error: 406, message: 'Información errónea en el query.' }
+
+  for(let [key] of entries) 
+    if(!allPropertiesUsuario.includes(key)) 
+      throw { error: 406, message: 'Propiedades inexistentes.' }
+
+
+  const querySentence = entries.map(entry => {
+    entry[1] = `'${entry[1]}'`;
+    return entry.join('=')
+  }).join(', ');
+
+  await sequelize.query(
+        `UPDATE Usuarios SET ${querySentence} WHERE id=${id}`
+      );
+
+  return { success: true }
+}
