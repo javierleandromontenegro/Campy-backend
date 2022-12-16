@@ -36,17 +36,17 @@ export const checkoutUser = async (req: Request, res: Response, next: NextFuncti
 };
 
 export const checkoutOwner = (req: Request, res: Response, next: NextFunction): any => {
-  const tipo : number = Number(req.body.user.tipo);
+  const tipo: string = req.body.user.tipo;
 
-  if(tipo !== 2) return res.status(401).json({ error: 401, message: 'Autorización denegada' });
+  if(tipo !== process.env.TIPO_PROPIETARIO) return res.status(401).json({ error: 401, message: 'Autorización denegada' });
 
   next();
 }
 
 export const checkoutAdmin = (req: Request, res: Response, next: NextFunction): any => {
-  const tipo : number = Number(req.body.user.tipo);
+  const tipo: string = req.body.user.tipo;
 
-  if(tipo !== 1) return res.status(401).json({ error: 401, message: 'Autorización denegada' });
+  if(tipo !== process.env.TIPO_ADMIN) return res.status(401).json({ error: 401, message: 'Autorización denegada' });
 
   next();
 }

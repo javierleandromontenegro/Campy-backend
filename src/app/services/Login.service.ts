@@ -73,7 +73,7 @@ export const loginUserWithToken = async (req: Request, res: Response, next: Next
 
 export const loginUserWithGoogle = async ({ email, nickname, sub, apikey }: { email: string, nickname: string, sub: string, apikey: string }) => {
   try {
-    if(apikey !== process.env.API_KEY) throw {};
+    if(apikey !== process.env.API_KEY) throw { error: 401, message: 'Acceso no autorizado' };
 
     const findUser = await
       searchUser(email, sub)
@@ -90,7 +90,7 @@ export const loginUserWithGoogle = async ({ email, nickname, sub, apikey }: { em
         if(findUser) throw { error: 406, message: 'Ese correo ya se encuentra registrado' }
 
         await sequelize.query(
-          `INSERT INTO Usuarios (email, clave, username, habilitado, TipoUsuarioId, createdAt, updatedAt) VALUES ('${email}', '${await hash(sub, 8)}', '${nickname}', 1, 1, NOW(), NOW())`
+          `INSERT INTO Usuarios (email, clave, username, habilitado, TipoUsuarioId, createdAt, updatedAt) VALUES ('${email}', '${await hash(sub, 8)}', '${nickname}', 1, 3, NOW(), NOW())`
         );
 
         const token = sign({ email, clave: sub }, String(process.env.SECRET));
