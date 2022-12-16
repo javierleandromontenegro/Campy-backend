@@ -20,7 +20,7 @@ export const registerUser = async ({
   };
 
   const [userRegisteredId]: [userRegisteredId: number] = await sequelize.query(
-    `INSERT INTO Usuarios (email, clave, username, TipoUsuarioId, createdAt, updatedAt) VALUES ('${email}', '${await hash(clave, 8)}', '${username}', 3, NOW(), NOW())`
+    `INSERT INTO Usuarios (email, clave, username, TipoUsuarioId, createdAt, updatedAt) VALUES ('${email}', '${await hash(clave, 8)}', '${username}', ${process.env.TIPO_USUARIO}, NOW(), NOW())`
   );
 
   const [[createdUser]]: [createdUser: datosUsuario[]] = await sequelize.query(
