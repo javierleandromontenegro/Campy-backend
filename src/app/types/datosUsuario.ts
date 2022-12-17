@@ -6,5 +6,6 @@ export default interface datosUsuario {
   numero_celular: string,
   direccion: string,
   dni: string,
+  foto: string,
   tipo?: string
 }

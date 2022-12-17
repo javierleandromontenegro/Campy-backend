@@ -26,7 +26,7 @@ export const registerUser = async ({
   );
 
   const [[createdUser]]: [createdUser: datosUsuario[]] = await sequelize.query(
-    `SELECT id, email, clave, username, numero_celular, direccion, dni, TipoUsuarioId AS tipo FROM Usuarios WHERE id=${userRegisteredId};`
+    `SELECT id, email, clave, username, numero_celular, direccion, dni, foto, TipoUsuarioId AS tipo FROM Usuarios WHERE id=${userRegisteredId};`
 
   );
     console.log(createdUser);
