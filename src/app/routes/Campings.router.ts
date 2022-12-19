@@ -11,6 +11,7 @@ import {
   getCampingAbiertoPeriodo, 
   getCampingPeriodoAguaCaliente 
 } from '../services/Campings.service';
+import {datosFiltros} from "../types/datosFiltros"
 
 const CampingsRouter: Router = Router();
 
@@ -78,9 +79,11 @@ CampingsRouter.get('/:idCamping', async (req: Request<{idCamping: string}>, res:
 });
 
 //TODOS LOS CAMPING CON DETALLE E IMAGENES
-CampingsRouter.get('/', async (_req: Request, res: Response) => {
+CampingsRouter.get('/', async (req: Request<datosFiltros>, res: Response) => {
+
+
   try {
-    res.status(200).json(await getCampingsTodos())
+    res.status(200).json(await getCampingsTodos(req.body))
   } catch {
     res.status(404).json({error: `no se pudo en http://localhost/api/camping`});
   }

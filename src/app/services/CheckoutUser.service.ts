@@ -6,7 +6,7 @@ const { sequelize } = require('../db');
 
 export const searchUser = async (email: string, clave: string) => {
     const [[findUser]] = await sequelize.query(
-      `SELECT id, email, clave, username, numero_celular, direccion, dni, habilitado, TipoUsuarioId AS tipo FROM Usuarios WHERE email='${email}';`
+      `SELECT id, email, clave, username, numero_celular, direccion, dni, habilitado, foto, TipoUsuarioId AS tipo FROM Usuarios WHERE email='${email}';`
     );
     
     const verifyPassword = findUser && await compare(clave, findUser.clave);
