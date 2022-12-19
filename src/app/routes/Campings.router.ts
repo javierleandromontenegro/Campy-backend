@@ -79,7 +79,7 @@ CampingsRouter.get('/:idCamping', async (req: Request<{idCamping: string}>, res:
 });
 
 //TODOS LOS CAMPING CON DETALLE E IMAGENES
-CampingsRouter.get('/', async (req: Request<datosFiltros>, res: Response) => {
+CampingsRouter.post('/', async (req: Request<datosFiltros>, res: Response) => {
 
 
   try {
@@ -109,7 +109,7 @@ CampingsRouter.get('/', async (req: Request<datosFiltros>, res: Response) => {
 //   }
 // });
 
-CampingsRouter.post('/', async (req: Request<createCamping>, res: Response) => {
+CampingsRouter.post('/create', async (req: Request<createCamping>, res: Response) => {
 
   try {
     res.status(200).json(await postCampingsCreate(req.body))

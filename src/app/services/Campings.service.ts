@@ -169,7 +169,7 @@ export const getCampingsTodos = async ({ id_provincia,
     }
 
 
-   /*   console.log("LONGITUD ARRAY categorias ES= ",id_categoria.length);  */
+      console.log("LONGITUD ARRAY categorias ES= ",id_categoria.length);  
     
       if (id_categoria.length==1){
        /*  console.log("TIENE UN SOLO VALOR") */
