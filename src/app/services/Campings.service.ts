@@ -16,7 +16,7 @@ const getCampingsImagenes= async (id: number): Promise<string[]> => {
   return querySql.map((query: any):string => query.url);
 }
 
-const getPreciosCamping = async (id: number): Promise<datosPrecios[]> => {
+export const getPreciosCamping = async (id: number): Promise<datosPrecios[]> => {
   const [querySql]: [querySql: datosPrecios[]] = await sequelize.query(
     `SELECT T.id, RT.precio, T.descrip_tarifa 
     FROM Relacion_campo_tarifas AS RT 

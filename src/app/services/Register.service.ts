@@ -22,11 +22,11 @@ export const registerUser = async ({
   };
 
   const [userRegisteredId]: [userRegisteredId: number] = await sequelize.query(
-    `INSERT INTO Usuarios (email, clave, username, TipoUsuarioId, createdAt, updatedAt) VALUES ('${email}', '${await hash(clave, 8)}', '${username}', ${process.env.TIPO_USUARIO}, NOW(), NOW())`
+    `INSERT INTO Usuarios (email, clave, username, TipoUsuarioId, createdAt, updatedAt) VALUES ('${email}', '${await hash(clave, 8)}', '${username}', '${process.env.TIPO_USUARIO}', NOW(), NOW())`
   );
 
   const [[createdUser]]: [createdUser: datosUsuario[]] = await sequelize.query(
-    `SELECT id, email, clave, username, numero_celular, direccion, dni, TipoUsuarioId AS tipo FROM Usuarios WHERE id=${userRegisteredId};`
+    `SELECT id, email, clave, username, numero_celular, direccion, dni, foto, TipoUsuarioId AS tipo FROM Usuarios WHERE id=${userRegisteredId};`
 
   );
     console.log(createdUser);
@@ -102,7 +102,7 @@ function getTemplateHtml(name: string, token: string, id: number): string {
           <h2 id='greeting'>¡Felicidades ${name}!</h2>
           <p id='description'>Estás a un solo paso de ser un nuevo Campy...</p>
           <p id='warning'>(Si han pasado más de 12hs desde el registro es probable que al apretar el botón 'verificar cuenta' dé un error. Si es así, volvé a registrarte en la página para obtener un nuevo correo de confirmación)</p>
-          <a id='confirm-link' href='${process.env.HOST}/api/confirm/${token}?id=${id}' target='_blank'>
+          <a id='confirm-link' href='${process.env.HOST || 'http://localhost:3001'}/api/confirm/${token}?id=${id}' target='_blank'>
             Verificar cuenta
           </a>
       </div>

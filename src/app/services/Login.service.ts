@@ -9,12 +9,13 @@ const { sequelize } = require('../db');
 export const loginUser = async ({ email, clave}: {email: string, clave: string}) => {
   if(!email || !clave) throw { error: 406, message: 'Faltan parámetros' };
 
-  const { 
+  const {
     username, 
     id,
     dni, 
     numero_celular, 
     direccion,
+    foto,
     tipo
   }: datosUsuario = await searchUser(email, clave);
 
@@ -27,6 +28,7 @@ export const loginUser = async ({ email, clave}: {email: string, clave: string})
     dni, 
     numero_celular, 
     direccion,
+    foto,
     tipo,
     token
   };
@@ -50,16 +52,19 @@ export const loginUserWithToken = async (req: Request, res: Response, next: Next
           dni, 
           numero_celular, 
           direccion,
+          foto,
           tipo
         }: datosUsuario = result
 
 
-        res.status(200).json({ 
+        res.status(200).json({
+          email,
           id,
           username,
           dni, 
           numero_celular, 
           direccion,
+          foto,
           tipo,
           token
         });
@@ -71,7 +76,7 @@ export const loginUserWithToken = async (req: Request, res: Response, next: Next
   }
 };
 
-export const loginUserWithGoogle = async ({ email, nickname, sub, apikey }: { email: string, nickname: string, sub: string, apikey: string }) => {
+export const loginUserWithGoogle = async ({ email, nickname, sub, apikey, picture }: { email: string, nickname: string, sub: string, apikey: string, picture: string }) => {
   try {
     if(apikey !== process.env.API_KEY) throw { error: 401, message: 'Acceso no autorizado' };
 
@@ -84,13 +89,13 @@ export const loginUserWithGoogle = async ({ email, nickname, sub, apikey }: { em
       })
       .catch(async () => {
         const [[findUser]] = await sequelize.query(
-        `SELECT id, email, clave, username, numero_celular, direccion, dni, habilitado, TipoUsuarioId AS tipo FROM Usuarios WHERE email='${email}';`
+        `SELECT id, email, clave, username, numero_celular, direccion, dni, habilitado, foto, TipoUsuarioId AS tipo FROM Usuarios WHERE email='${email}';`
         );
 
         if(findUser) throw { error: 406, message: 'Ese correo ya se encuentra registrado' }
 
         await sequelize.query(
-          `INSERT INTO Usuarios (email, clave, username, habilitado, TipoUsuarioId, createdAt, updatedAt) VALUES ('${email}', '${await hash(sub, 8)}', '${nickname}', 1, 3, NOW(), NOW())`
+          `INSERT INTO Usuarios (email, clave, username, foto, habilitado, TipoUsuarioId, createdAt, updatedAt) VALUES ('${email}', '${await hash(sub, 8)}', '${nickname}', '${picture}', 1, '${process.env.TIPO_USUARIO}', NOW(), NOW())`
         );
 
         const token = sign({ email, clave: sub }, String(process.env.SECRET));
