@@ -107,7 +107,6 @@ export const loginUserWithGoogle = async ({ email, nickname, sub, apikey, pictur
     
       return findUser;
   } catch(e: any) {
-    console.log('error', e)
-    throw { error: e.error, message: e.message }
+    if(e.error) throw { error: e.error, message: e.message }
   }
 }
