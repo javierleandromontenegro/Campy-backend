@@ -43,6 +43,12 @@ export interface createCaratCamping {
     precios:[]  
 }
 
+
+export interface campingHabilitado {
+    id:number,
+    nombre:string,    
+    habilitado:boolean
+}
     
 export interface campingCategorias {
     id:number,

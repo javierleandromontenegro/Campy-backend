@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { createCamping } from '../types/datosCamping';
+import {checkoutUser,checkoutAdmin} from '../services/CheckoutUser.service';
 import { 
   getCampingsPorLocalidad, 
   getCampingsPorProvincia, 
@@ -9,11 +10,12 @@ import {
   getCampingsCategorias, 
   getCampingTarifas, 
   getCampingAbiertoPeriodo, 
-  getCampingPeriodoAguaCaliente 
+  getCampingPeriodoAguaCaliente,getCampingsHabilitacion,disableCamping 
 } from '../services/Campings.service';
 import {datosFiltros} from "../types/datosFiltros"
 
 const CampingsRouter: Router = Router();
+
 
 CampingsRouter.get('/provincias/:idProvincia', async (req: Request<{idProvincia: string}>, res: Response) => {
   const { idProvincia } = req.params;
@@ -25,6 +27,7 @@ CampingsRouter.get('/provincias/:idProvincia', async (req: Request<{idProvincia:
   }
 });
 
+
 CampingsRouter.get('/categorias', async (_req: Request, res: Response) => { 
   try {
     res.status(200).json(await getCampingsCategorias())
@@ -32,6 +35,27 @@ CampingsRouter.get('/categorias', async (_req: Request, res: Response) => {
     res.status(404).json({error: `no se pudo en http://localhost/api/camping/categorias`});
   }
 });
+
+CampingsRouter.get('/habilitacion', async (_req: Request, res: Response) => { 
+  try {
+    res.status(200).json(await getCampingsHabilitacion())
+  } catch {
+    res.status(404).json({error: `no se pudo en http://localhost/api/camping/categorias`});
+  }
+});
+
+CampingsRouter.put('/habilitacion/:idCamping', checkoutUser, checkoutAdmin, async (req: Request<{idCamping: string}, {}, {}, {habilitar: string}>, res: Response) => {
+  const { idCamping }: {idCamping: string} = req.params;
+  const { habilitar }: {habilitar: string} = req.query;
+
+  try {
+    res.status(200).json(await disableCamping(idCamping, +habilitar));
+  } catch(e: any) {
+    res.status(e.error || 404).json(e);
+  }
+});
+
+
 
 CampingsRouter.get('/tarifas', async (_req: Request, res: Response) => { 
   try {
@@ -79,8 +103,7 @@ CampingsRouter.get('/:idCamping', async (req: Request<{idCamping: string}>, res:
 });
 
 //TODOS LOS CAMPING CON DETALLE E IMAGENES
-CampingsRouter.get('/', async (req: Request<datosFiltros>, res: Response) => {
-
+CampingsRouter.post('/', async (req: Request<datosFiltros>, res: Response) => {
 
   try {
     res.status(200).json(await getCampingsTodos(req.body))
@@ -89,27 +112,8 @@ CampingsRouter.get('/', async (req: Request<datosFiltros>, res: Response) => {
   }
 });
 
-// CampingsRouter.get('/imagenes/:idCamping', async (req: Request<{idCamping: string}>, res: Response) => {
-//   const { idCamping } = req.params;
 
-//   try {
-//     res.status(200).json(await getCampingsImagenes(idCamping))
-//   } catch {
-//     res.status(404).json({error: `no se pudo en http://localhost/api/camping/imagenes/${idCamping}`});
-//   }
-// });
-
-// CampingsRouter.get('/tarifas/:idCamping', async (req: Request<{idCamping: string}>, res: Response) => {
-//   const { idCamping } = req.params;
-
-//   try {
-//     res.status(200).json(await getPreciosCamping(idCamping))
-//   } catch {
-//     res.status(404).json({error: `no se pudo en http://localhost/api/camping/tarifas/${idCamping}`});
-//   }
-// });
-
-CampingsRouter.post('/', async (req: Request<createCamping>, res: Response) => {
+CampingsRouter.post('/create', async (req: Request<createCamping>, res: Response) => {
 
   try {
     res.status(200).json(await postCampingsCreate(req.body))
@@ -117,5 +121,25 @@ CampingsRouter.post('/', async (req: Request<createCamping>, res: Response) => {
     res.status(error.error).json(error);
   }
 });
+
+/* CampingsRouter.get('/imagenes/:idCamping', async (req: Request<{idCamping: string}>, res: Response) => {
+  const { idCamping } = req.params;
+
+  try {
+    res.status(200).json(await getCampingsImagenes(idCamping))
+  } catch {
+    res.status(404).json({error: `no se pudo en http://localhost/api/camping/imagenes/${idCamping}`});
+  }
+}); */
+
+/* CampingsRouter.get('/tarifas/:idCamping', async (req: Request<{idCamping: string}>, res: Response) => {
+  const { idCamping } = req.params;
+
+  try {
+    res.status(200).json(await getPreciosCamping(idCamping))
+  } catch {
+    res.status(404).json({error: `no se pudo en http://localhost/api/camping/tarifas/${idCamping}`});
+  }
+}); */
 
 export default CampingsRouter;

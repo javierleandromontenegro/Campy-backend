@@ -1,5 +1,5 @@
 import datosCamping from "../types/datosCamping";
-import { createCamping, campingCategorias, campingTarifas, campingAbiertoPeriodo, campingPeriodoAguaCaliente} from "../types/datosCamping";
+import { createCamping, campingCategorias, campingTarifas, campingAbiertoPeriodo, campingPeriodoAguaCaliente, campingHabilitado} from "../types/datosCamping";
 import { datosFiltros } from "../types/datosFiltros";
 import datosPrecios from "../types/datosPrecios";
 
@@ -35,6 +35,27 @@ export const getCampingsCategorias = async (): Promise<campingCategorias[]> => {
 
   return querySql;
 }
+
+export const getCampingsHabilitacion = async (): Promise<campingHabilitado[]> => {
+  const [querySql]: [querySql: campingHabilitado[]] = await sequelize.query(
+    `SELECT id,nombre_camping,habilitado FROM Campings`
+  ); 
+
+  return querySql;
+}
+
+export const disableCamping = async (id: string, habilitar: number): Promise<{success: boolean}> => {
+  if(habilitar < 0 || habilitar > 1) throw {
+    error: 406, message: 'tipo de habilitación inválida'
+  }
+
+  const [updatedCamping] = await sequelize.query(
+    `UPDATE Campings SET habilitado=${habilitar} WHERE id=${id};`
+  );
+
+  return {success: !!updatedCamping.changedRows}
+};
+
 
 export const getCampingTarifas = async (): Promise<campingTarifas[]> => {
   const [querySql]: [querySql: campingTarifas[]] = await sequelize.query(
@@ -169,7 +190,7 @@ export const getCampingsTodos = async ({ id_provincia,
     }
 
 
-   /*   console.log("LONGITUD ARRAY categorias ES= ",id_categoria.length);  */
+      console.log("LONGITUD ARRAY categorias ES= ",id_categoria.length);  
     
       if (id_categoria.length==1){
        /*  console.log("TIENE UN SOLO VALOR") */
