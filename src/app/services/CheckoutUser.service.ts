@@ -6,11 +6,11 @@ const { sequelize } = require('../db');
 
 export const searchUser = async (email: string, clave: string) => {
     const [[findUser]] = await sequelize.query(
-      `SELECT id, email, clave, nombre_completo, numero_celular, direccion, dni, habilitado, TipoUsuarioId AS tipo FROM Usuarios WHERE email='${email}';`
+      `SELECT id, email, clave, username, numero_celular, direccion, dni, habilitado, foto, TipoUsuarioId AS tipo FROM Usuarios WHERE email='${email}';`
     );
     
     const verifyPassword = findUser && await compare(clave, findUser.clave);
-
+      
     if(!findUser || !verifyPassword) throw { error: 401, message: 'Usuario Inválido' };
 
     if(!findUser.habilitado) throw { error: 401, message: 'Cuenta deshabilitada' };
@@ -26,8 +26,6 @@ export const checkoutUser = async (req: Request, res: Response, next: NextFuncti
     const { email, clave }: { email: string, clave: string} = result;
       
     const findUser = await searchUser(email, clave);
-      
-    if(!findUser) throw {};
 
     req.body.user = findUser;
       
@@ -38,17 +36,17 @@ export const checkoutUser = async (req: Request, res: Response, next: NextFuncti
 };
 
 export const checkoutOwner = (req: Request, res: Response, next: NextFunction): any => {
-  const tipo : number = Number(req.body.user.tipo);
+  const tipo: string = req.body.user.tipo;
 
-  if(tipo !== 2) return res.status(401).json({ error: 401, message: 'Autorización denegada' });
+  if(tipo !== process.env.TIPO_PROPIETARIO) return res.status(401).json({ error: 401, message: 'Autorización denegada' });
 
   next();
 }
 
 export const checkoutAdmin = (req: Request, res: Response, next: NextFunction): any => {
-  const tipo : number = Number(req.body.user.tipo);
+  const tipo: string = req.body.user.tipo;
 
-  if(tipo !== 1) return res.status(401).json({ error: 401, message: 'Autorización denegada' });
+  if(tipo !== process.env.TIPO_ADMIN) return res.status(401).json({ error: 401, message: 'Autorización denegada' });
 
   next();
 }

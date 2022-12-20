@@ -12,21 +12,25 @@ export default (sequelize: Sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      nombre_completo: {
+      username: {
         type: DataTypes.STRING,
         allowNull: false,
+      },
+      foto: {
+        type: DataTypes.STRING,
+        allowNull: true
       },
       numero_celular: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true
       },
       direccion: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true
       },
       dni: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true
       },
       habilitado: {
         type: DataTypes.BOOLEAN,

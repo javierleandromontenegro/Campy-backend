@@ -7,7 +7,7 @@ import RegisterRouter from './Register.router';
 import LoginRouter from './Login.router';
 import UsuariosRouter from './Usuario.router';
 import ConfirmUserRouter from './ConfirmUser.router';
-import CheckoutRouter from './Checkout';
+import ReservasRouter from './Reservas.router';
 // Importar todos los routers;
 
 const router: Router = Router();
@@ -21,7 +21,7 @@ router.use('/register', RegisterRouter);
 router.use('/login', LoginRouter);
 router.use('/usuarios', UsuariosRouter);
 router.use('/confirm', ConfirmUserRouter);
-router.use('/', CheckoutRouter)
+router.use('/reservas', ReservasRouter);
 // Configurar los routers
 
 export default router;
