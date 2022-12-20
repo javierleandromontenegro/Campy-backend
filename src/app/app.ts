@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import morgan from 'morgan';
 import routes from './routes/index';
 
+
 require("./db");
 
 const app = express();
