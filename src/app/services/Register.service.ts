@@ -1,4 +1,4 @@
-import datosUsuario from '../types/datosUsuario';
+import { datosUsuario } from '../types/datosUsuario';
 import jwt from 'jsonwebtoken';
 import { hash } from 'bcrypt';
 import nodemailer from 'nodemailer';
@@ -7,16 +7,16 @@ const { sequelize, Usuarios } = require('../db');
 
 export const registerUser = async ({
 
-    email, clave, username
-  }: datosUsuario): Promise<datosUsuario> => {
+  email, clave, username
+}: datosUsuario): Promise<datosUsuario> => {
 
-  if(!email || !clave || !username) throw {
+  if (!email || !clave || !username) throw {
     error: 406, message: 'Faltan parámetros necesarios.'
   }
 
   const findUser = await Usuarios.findOne({ where: { email } });
 
-  if(findUser) throw {
+  if (findUser) throw {
 
     error: 406, message: 'Ese correo ya se encuentra registrado.'
   };
@@ -29,14 +29,14 @@ export const registerUser = async ({
     `SELECT id, email, clave, username, numero_celular, direccion, dni, foto, TipoUsuarioId AS tipo FROM Usuarios WHERE id=${userRegisteredId};`
 
   );
-    console.log(createdUser);
+  console.log(createdUser);
   const token: string = getToken(createdUser);
 
 
   const templateHtml: string = getTemplateHtml(createdUser.username, token, Number(createdUser.id));
 
-    
-  await sendEmail({userEmail: createdUser.email, subject:'Confirmá tu cuenta de google', templateHtml});
+
+  await sendEmail({ userEmail: createdUser.email, subject: 'Confirmá tu cuenta de google', templateHtml });
 
   return createdUser;
 };
