@@ -1,5 +1,7 @@
 import datosUsuario from "../types/datosUsuario";
 import { allPropertiesUsuario } from "../types/Properties";
+import { hash } from "bcrypt";
+import { sign } from "jsonwebtoken";
 
 const { sequelize } = require('../db');
 
@@ -30,30 +32,53 @@ export const disableUser = async (id: string, habilitar: number): Promise<{succe
   return {success: !!updatedUser.changedRows}
 };
 
-export const updateUser = async (data: datosUsuario, id: number): 
-  Promise<datosUsuario> => {
+export const updateUser = async (data: datosUsuario, userId: number, token: string) => {
     const entries: [key: string, value: string][] = Object.entries(data);
-
+    console.log("a", await hash('gaby', 8))
     if(!entries.length || entries.length > allPropertiesUsuario.length) 
       throw { error: 406, message: 'Información errónea en el query.' }
 
     for(let [key] of entries) 
       if(!allPropertiesUsuario.includes(key)) 
         throw { error: 406, message: 'Propiedades inexistentes.' }
+    
+    let clave: string = '';
 
+    const querySentence = await Promise.all(entries.map(async entry => {
+      if(entry[0] === 'clave') clave = entry[1];
+      entry[1] = `'${entry[0] === 'clave' ? await hash(entry[1], 8) : entry[1]}'`;
 
-    const querySentence = entries.map(entry => {
-      entry[1] = `'${entry[1]}'`;
       return entry.join('=')
-    }).join(', ');
+    })).then(res => res.join(', '));
 
     await sequelize.query(
-          `UPDATE Usuarios SET ${querySentence} WHERE id=${id}`
+          `UPDATE Usuarios SET ${querySentence} WHERE id=${userId}`
         );
-      console.log(1)
-    const [[updatedUser]] = await sequelize.query(
-          `SELECT id, email, username, foto, numero_celular, habilitado, direccion, dni, TipoUsuarioId FROM Usuarios WHERE id=${id}`
+
+    const [[{
+      id,
+      email, 
+      username, 
+      foto, 
+      numero_celular, 
+      direccion, 
+      dni, 
+      TipoUsuarioId
+    }]] = await sequelize.query(
+          `SELECT id, email, clave, username, foto, numero_celular direccion, dni, TipoUsuarioId FROM Usuarios WHERE id=${userId}`
         );
-      console.log(2)
-    return updatedUser;
+
+    if(clave) token = sign({email, clave}, String(process.env.SECRET));
+
+    return { 
+      id,
+      email, 
+      username, 
+      foto, 
+      numero_celular, 
+      direccion, 
+      dni, 
+      tipo: TipoUsuarioId,
+      token
+    };
 }

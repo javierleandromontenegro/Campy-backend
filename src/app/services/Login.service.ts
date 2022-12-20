@@ -68,7 +68,7 @@ export const loginUserWithToken = async (req: Request, res: Response, next: Next
           tipo,
           token
         });
-      })
+      }).catch(err => res.status(err.error).json(err))
   
     });
   } catch(e: any) {
