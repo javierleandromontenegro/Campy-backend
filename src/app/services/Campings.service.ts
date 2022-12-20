@@ -42,7 +42,7 @@ export const getCampingsCategorias = async (): Promise<campingCategorias[]> => {
 // MUESTRA TODOS LOS CAMPINGS INDICANDO EL ESTADO DE HABILITACION
 export const getCampingsHabilitacion = async (): Promise<campingHabilitado[]> => {
   const [querySql]: [querySql: campingHabilitado[]] = await sequelize.query(
-    `SELECT id,nombre_camping,habilitado FROM Campings`
+    `SELECT C.id, C.nombre_camping, C.habilitado, L.nombre AS localidad, P.nombre AS provincia FROM Campings AS C INNER JOIN Localidades AS L INNER JOIN Provincias AS P ON L.ProvinciaId=P.id ON C.LocalidadeId=L.id`
   ); 
 
   return querySql;
