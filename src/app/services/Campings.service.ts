@@ -143,15 +143,15 @@ export const getCampingsPorId = async (id: string): Promise<datosCamping> => {
     CP.techada AS parcela_techada,CP.agua_en_parcela AS parcela_agua_en_parcela,CP.iluminacion_toma_corriente AS parcela_iluminacion_toma_corriente,CP.superficie AS parcela_superficie,
     AP.descripcion_periodo,
     PAC.descripcion_periodo_agua   
-    from Campings as C 
-    INNER JOIN Localidades AS L INNER JOIN Provincias as P ON P.Id=L.ProvinciaId ON C.LocalidadeId=L.id      
-    INNER JOIN Categoria_campings AS CA ON C.CategoriaCampingId=CA.id
-    INNER JOIN Caracteristicas_campings AS CC 
-    INNER JOIN Caracteristicas_parcelas AS CP ON CC.id=CP.CaracteristicasCampingId 
-     INNER JOIN Abierto_periodos AS AP ON CC.AbiertoPeriodoId=AP.id 
-     INNER JOIN Periodo_agua_calientes AS PAC ON CC.PeriodoAguaCalienteId=PAC.id
-     ON C.CategoriaCampingId =CC.id
-    WHERE C.habilitado=1 AND C.id=${id};`
+from Campings as C
+INNER JOIN Categoria_campings AS CA ON C.CategoriaCampingId=CA.id
+INNER JOIN Caracteristicas_campings AS CC 
+INNER JOIN Caracteristicas_parcelas AS CP ON CP.CaracteristicasCampingId=CC.id ON C.CaracteristicasCampingId=CC.id  
+INNER JOIN Abierto_periodos AS AP ON CC.AbiertoPeriodoId=AP.id 
+INNER JOIN Periodo_agua_calientes AS PAC ON CC.PeriodoAguaCalienteId=PAC.id
+INNER JOIN Localidades AS L 
+INNER JOIN Provincias AS P ON L.ProvinciaId=P.id ON C.LocalidadeId=L.id
+WHERE C.habilitado=1 AND C.id=${id};`
   );
 
     if(!querySql[0]) throw { error: 404, message: 'No se encontró un camping con ese ID' };
@@ -231,16 +231,16 @@ export const getCampingsTodos = async ({ id_provincia,
       console.log("PARCELA SUPERFICIE = ",parcela_superficie.length)
       filtros = filtros + ` AND (CP.superficie>=${parcela_superficie[0]} AND CP.superficie<=${parcela_superficie[1]})`;
     }
-     if (parcela_techada){
+     if (parcela_techada===true){
       /* parcela_techada=('1') */
-      filtros = filtros + ` AND CP.techada=('${parcela_techada}')`;
+      filtros = filtros + ` AND CP.techada=('1')`;
     }
 
-    if (parcela_agua_en_parcela){
-      filtros = filtros + ` AND CP.agua_en_parcela=('${parcela_agua_en_parcela}')`;
+    if (parcela_agua_en_parcela===true){
+      filtros = filtros + ` AND CP.agua_en_parcela=('1')`;
     }
-    if (parcela_iluminacion_toma_corriente){
-      filtros = filtros + ` AND CP.iluminacion_toma_corriente=('${parcela_iluminacion_toma_corriente}')`;
+    if (parcela_iluminacion_toma_corriente=== true){
+      filtros = filtros + ` AND CP.iluminacion_toma_corriente=('1')`;
     }
     if (mascotas===true){
       // mascotas=true or =1 solo los que aceptan
