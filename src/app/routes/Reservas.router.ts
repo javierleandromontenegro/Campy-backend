@@ -31,9 +31,10 @@ ReservasRouter.get('/usuarios/:userId', async (req: Request<{ userId: string }>,
   }
 });
 
-ReservasRouter.get('/detalle', async (_req: Request, res: Response) => {
+ReservasRouter.get('/detalle/:reservaId', async (req: Request<{ reservaId: string }>, res: Response) => {
+  const { reservaId }: {reservaId: string } = req.params;
   try {
-    res.status(200).json(await getReservaDetalle())
+    res.status(200).json(await getReservaDetalle(reservaId))
   } catch {
     res.status(404).json({ error: `no se pudo en http://localhost/api/reservas` });
   }

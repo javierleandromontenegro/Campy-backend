@@ -37,12 +37,12 @@ export const getReservasByUserId = async (id: string): Promise<reservas[]> => {
   return querySql;
 }
 
-export const getReservaDetalle = async (): Promise<reservasdetalle[]> => {
+export const getReservaDetalle = async (id: string): Promise<reservasdetalle[]> => {
   const [querySql]: [querySql: reservasdetalle[]] = await sequelize.query(
     `SELECT T.descrip_tarifa, D.cantidad, D.subtotal
-          FROM Detalle_reservas AS D 
-          INNER JOIN Reservas AS R ON D.ReservaId=R.id
-          INNER JOIN Tarifas AS T ON D.TarifaId=T.id`
+    FROM Detalle_reservas AS D 
+    INNER JOIN Reservas AS R ON D.ReservaId=R.id
+    INNER JOIN Tarifas AS T ON D.TarifaId=T.id WHERE D.ReservaId=${id}`
   );
 
   return querySql;
