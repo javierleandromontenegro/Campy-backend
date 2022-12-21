@@ -1,3 +1,4 @@
+import datosBase from "../types/datosBase";
 import datosCamping from "../types/datosCamping";
 import { createCamping, campingCategorias, campingTarifas, campingAbiertoPeriodo, campingPeriodoAguaCaliente, campingHabilitado} from "../types/datosCamping";
 import { datosFiltros } from "../types/datosFiltros";
@@ -365,4 +366,36 @@ precios.forEach((e: any,i:number) =>
   )
 
   return CampingId;
+}
+
+
+export const getUserFavoritesCampings = async (userId: string): Promise<datosBase[]> => {
+  const [querySql]: [querySql: datosBase[]] = await sequelize.query(
+    `SELECT C.id, C.nombre_camping AS nombre FROM Favoritos AS F INNER JOIN Campings AS C ON C.id=F.CampingId INNER JOIN Usuarios AS U ON U.id=F.UsuarioId WHERE U.id=${userId};`
+  );
+    
+  const imagenesQuery: string[][] = await Promise.all(querySql.map(query => getCampingsImagenes(query.id)));
+   
+  const resultsWithImagenes: datosBase[] = querySql.map((query, i) => {
+    query.imagen = imagenesQuery[i][0];
+    return query;
+  });
+
+  return resultsWithImagenes;
+}
+
+export const addFavoriteCamping = async (campingId: string, userId: string): Promise<datosBase[]> => {
+  await sequelize.query(
+    `INSERT INTO Favoritos (CampingId, UsuarioId, createdAt, updatedAt) VALUES (${campingId}, ${userId}, NOW(), NOW());`
+  );
+
+  return await getUserFavoritesCampings(userId);
+}
+
+export const removeFavoriteCamping = async (campingId: string, userId: string): Promise<number> => {
+  await sequelize.query(
+    `DELETE FROM Favoritos WHERE UsuarioId=${userId} AND CampingId=${campingId}; `
+  );
+
+  return +campingId;
 }

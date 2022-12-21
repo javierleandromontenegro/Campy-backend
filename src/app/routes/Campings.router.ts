@@ -12,7 +12,10 @@ import {
   getCampingAbiertoPeriodo, 
   getCampingPeriodoAguaCaliente,
   getCampingsHabilitacion,
-  disableCamping,
+  disableCamping, 
+  getUserFavoritesCampings, 
+  addFavoriteCamping, 
+  removeFavoriteCamping,
   getCampingsCantReservas 
 } from '../services/Campings.service';
 import {datosFiltros} from "../types/datosFiltros"
@@ -150,5 +153,47 @@ CampingsRouter.post('/create', async (req: Request<createCamping>, res: Response
     res.status(404).json({error: `no se pudo en http://localhost/api/camping/tarifas/${idCamping}`});
   }
 }); */
+CampingsRouter.post(
+  '/favoritos/obtener/:userId', 
+  checkoutUser, 
+  async (req: Request<{userId: string}>, res: Response) => {
+  const { userId }: {userId: string} = req.params;
+
+  try {
+    res.status(200).json(await getUserFavoritesCampings(userId));
+  } catch(e: any) {
+    console.log(e)
+    res.status(e.error || 400).json(e);
+  }
+});
+
+CampingsRouter.post(
+  '/favoritos/agregar/:campingId', 
+  checkoutUser, 
+  async (req: Request<{campingId: string}, { id: string }>, res: Response) => {
+  const { campingId }: {campingId: string} = req.params;
+  const { id }: {id: string} = req.body.user;
+
+  try {
+    res.status(200).json(await addFavoriteCamping(campingId, id));
+  } catch(e: any) {
+    res.status(e.error || 400).json(e);
+  }
+});
+
+CampingsRouter.delete(
+  '/favoritos/remover/:campingId', 
+  checkoutUser, 
+  async (req: Request<{campingId: string}, { id: string }>, res: Response) => {
+  const { campingId }: {campingId: string} = req.params;
+  const { id }: {id: string} = req.body.user;
+
+  try {
+    res.status(200).json(await removeFavoriteCamping(campingId, id));
+  } catch(e: any) {
+    res.status(e.error || 400).json(e);
+  }
+});
+
 
 export default CampingsRouter;

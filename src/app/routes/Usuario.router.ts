@@ -24,24 +24,24 @@ UsuariosRouter.put('/tipo/:userId', checkoutUser, checkoutAdmin, async (req: Req
 });
 
 //OBTENER USUARIO
-UsuariosRouter.get('/:idUser', async (req: Request<{ idUser: string }>, res: Response) => {
-  const { idUser }: { idUser: string } = req.params;
+UsuariosRouter.get('/:userId', async (req: Request<{userId: string}>, res: Response) => {
+  const { userId }: {userId: string} = req.params;
 
   try {
-    res.status(200).json(await getUser(idUser));
-  } catch (e: any) {
+    res.status(200).json(await getUser(userId));
+  } catch(e: any) {
     res.status(e.error || 404).json(e);
   }
 });
 
 //DESHABILITAR USUARIO
-UsuariosRouter.put('/deshabilitar/:idUser', checkoutUser, checkoutAdmin, async (req: Request<{ idUser: string }, {}, {}, { habilitar: string }>, res: Response) => {
-  const { idUser }: { idUser: string } = req.params;
-  const { habilitar }: { habilitar: string } = req.query;
+UsuariosRouter.put('/deshabilitar/:userId', checkoutUser, checkoutAdmin, async (req: Request<{userId: string}, {}, {}, {habilitar: string}>, res: Response) => {
+  const { userId }: {userId: string} = req.params;
+  const { habilitar }: {habilitar: string} = req.query;
 
   try {
-    res.status(200).json(await disableUser(idUser, +habilitar));
-  } catch (e: any) {
+    res.status(200).json(await disableUser(userId, +habilitar));
+  } catch(e: any) {
     res.status(e.error || 404).json(e);
   }
 });
