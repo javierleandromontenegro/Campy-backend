@@ -8,12 +8,9 @@ import { campingsCantReservas } from "../types/datosBase";
 const { sequelize } = require("../db");
 
 // IMAGENES DE UN DETERMINADO CAMPING
-const getCampingsImagenes = async (id: number): Promise<string[]> => {
+export const getCampingsImagenes = async (id: number): Promise<string[]> => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
-    `SELECT C.ID,CI.url
-    from Campings as C
-    INNER JOIN Camping_imagenes AS CI ON CI.CampingId=C.id
-    WHERE C.habilitado=1 AND C.id=${id}`
+    `SELECT C.ID,CI.url from Campings as C INNER JOIN Camping_imagenes AS CI ON CI.CampingId=C.id WHERE C.habilitado=1 AND C.id=${id}`
   );
 
   return querySql.map((query: any): string => query.url);
