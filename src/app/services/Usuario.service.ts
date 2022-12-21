@@ -95,7 +95,7 @@ export const getAllUsuariosState = async (): Promise<stateUsuario[]> => {
 export const changeUserType = async (id: string, tipo: string): Promise<{success: boolean}> => {
   
   await sequelize.query(
-    `UPDATE Usuarios SET TipoUsuarioId='${tipo}'  WHERE id=${id};`
+    `UPDATE Usuarios SET TipoUsuarioId='${tipo}' WHERE id=${id};`
   );
 
   return {success: true}

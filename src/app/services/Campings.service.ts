@@ -1,7 +1,9 @@
+import datosBase from "../types/datosBase";
 import datosCamping from "../types/datosCamping";
 import { createCamping, campingCategorias, campingTarifas, campingAbiertoPeriodo, campingPeriodoAguaCaliente, campingHabilitado} from "../types/datosCamping";
 import { datosFiltros } from "../types/datosFiltros";
 import datosPrecios from "../types/datosPrecios";
+import { campingsCantReservas } from "../types/datosBase";
 
 const { sequelize } = require("../db");
 
@@ -60,6 +62,16 @@ export const disableCamping = async (id: string, habilitar: number): Promise<{su
 
   return {success: !!updatedCamping.changedRows}
 };
+
+export const getCampingsCantReservas= async (): Promise<campingsCantReservas[]> => {
+  const [querySql]: [querySql: campingsCantReservas[]] = await sequelize.query(
+    `SELECT C.nombre_camping, COUNT(R.id) AS cant_reservas FROM Reservas AS R 
+    INNER JOIN Campings AS C ON R.CampingId=C.id
+    GROUP BY C.nombre_camping ORDER BY cant_reservas DESC`
+  ); 
+
+  return querySql;
+}
 
 // MUESTRA LOS TIPOS DE TARIFAS
 export const getCampingTarifas = async (): Promise<campingTarifas[]> => {
@@ -122,25 +134,25 @@ export const getCampingsPorLocalidad = async (id: string): Promise<datosCamping[
 
 
 
-// verificar camping santa rita id ° 8 porque mascotas no trae bien el dato
+
 // QUERY SOLO 1 CAMPING POR ID CON DETALLE E IMAGENES *******************
 
 export const getCampingsPorId = async (id: string): Promise<datosCamping> => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
-      `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.abierto_fecha_desde , C.abierto_fecha_hasta, L.nombre AS localidad,P.nombre AS provincia,
-      CA.categoria,CA.cantidad_estrellas,CC.duchas,CC.baños,CC.mascotas,CC.rodantes,CC.proveduria,CC.salon_sum,CC.restaurant,CC.vigilancia,CC.pileta,CC.estacionamiento,CC.juegos_infantiles,CC.maquinas_gimnasia,CC.wifi,
-      CP.techada AS parcela_techada,CP.agua_en_parcela AS parcela_agua_en_parcela,CP.iluminacion_toma_corriente AS parcela_iluminacion_toma_corriente,CP.superficie AS parcela_superficie,
-      AP.descripcion_periodo,
-      PAC.descripcion_periodo_agua   
-      from Campings as C 
-      INNER JOIN Localidades AS L INNER JOIN Provincias as P ON P.Id=L.ProvinciaId ON C.LocalidadeId=L.id      
-      INNER JOIN Categoria_campings AS CA ON C.CategoriaCampingId=CA.id
-      INNER JOIN Caracteristicas_campings AS CC 
-      INNER JOIN Caracteristicas_parcelas AS CP ON CC.id=CP.CaracteristicasCampingId 
-      INNER JOIN Abierto_periodos AS AP ON CC.AbiertoPeriodoId=AP.id 
-      INNER JOIN Periodo_agua_calientes AS PAC ON CC.PeriodoAguaCalienteId=PAC.id
-      ON C.CategoriaCampingId =CC.id
-      WHERE C.habilitado=1 AND C.id=${id};`
+    `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.abierto_fecha_desde , C.abierto_fecha_hasta, L.nombre AS localidad,P.nombre AS provincia,
+    CA.categoria,CA.cantidad_estrellas,CC.duchas,CC.baños,CC.mascotas,CC.rodantes,CC.proveduria,CC.salon_sum,CC.restaurant,CC.vigilancia,CC.pileta,CC.estacionamiento,CC.juegos_infantiles,CC.maquinas_gimnasia,CC.wifi,
+    CP.techada AS parcela_techada,CP.agua_en_parcela AS parcela_agua_en_parcela,CP.iluminacion_toma_corriente AS parcela_iluminacion_toma_corriente,CP.superficie AS parcela_superficie,
+    AP.descripcion_periodo,
+    PAC.descripcion_periodo_agua   
+from Campings as C
+INNER JOIN Categoria_campings AS CA ON C.CategoriaCampingId=CA.id
+INNER JOIN Caracteristicas_campings AS CC 
+INNER JOIN Caracteristicas_parcelas AS CP ON CP.CaracteristicasCampingId=CC.id ON C.CaracteristicasCampingId=CC.id  
+INNER JOIN Abierto_periodos AS AP ON CC.AbiertoPeriodoId=AP.id 
+INNER JOIN Periodo_agua_calientes AS PAC ON CC.PeriodoAguaCalienteId=PAC.id
+INNER JOIN Localidades AS L 
+INNER JOIN Provincias AS P ON L.ProvinciaId=P.id ON C.LocalidadeId=L.id
+WHERE C.habilitado=1 AND C.id=${id};`
   );
 
     if(!querySql[0]) throw { error: 404, message: 'No se encontró un camping con ese ID' };
@@ -228,7 +240,7 @@ export const getCampingsTodos = async ({ id_provincia,
     if (parcela_agua_en_parcela===true){
       filtros = filtros + ` AND CP.agua_en_parcela=('1')`;
     }
-    if (parcela_iluminacion_toma_corriente===true){
+    if (parcela_iluminacion_toma_corriente=== true){
       filtros = filtros + ` AND CP.iluminacion_toma_corriente=('1')`;
     }
     if (mascotas===true){
@@ -354,4 +366,36 @@ precios.forEach((e: any,i:number) =>
   )
 
   return CampingId;
+}
+
+
+export const getUserFavoritesCampings = async (userId: string): Promise<datosBase[]> => {
+  const [querySql]: [querySql: datosBase[]] = await sequelize.query(
+    `SELECT C.id, C.nombre_camping AS nombre FROM Favoritos AS F INNER JOIN Campings AS C ON C.id=F.CampingId INNER JOIN Usuarios AS U ON U.id=F.UsuarioId WHERE U.id=${userId};`
+  );
+    
+  const imagenesQuery: string[][] = await Promise.all(querySql.map(query => getCampingsImagenes(query.id)));
+   
+  const resultsWithImagenes: datosBase[] = querySql.map((query, i) => {
+    query.imagen = imagenesQuery[i][0];
+    return query;
+  });
+
+  return resultsWithImagenes;
+}
+
+export const addFavoriteCamping = async (campingId: string, userId: string): Promise<datosBase[]> => {
+  await sequelize.query(
+    `INSERT INTO Favoritos (CampingId, UsuarioId, createdAt, updatedAt) VALUES (${campingId}, ${userId}, NOW(), NOW());`
+  );
+
+  return await getUserFavoritesCampings(userId);
+}
+
+export const removeFavoriteCamping = async (campingId: string, userId: string): Promise<number> => {
+  await sequelize.query(
+    `DELETE FROM Favoritos WHERE UsuarioId=${userId} AND CampingId=${campingId}; `
+  );
+
+  return +campingId;
 }

@@ -20,7 +20,8 @@ export default (models: any):void => {
     Paises,
     Caracteristicas_parcela,
     Abierto_periodo,
-    Periodo_agua_caliente
+    Periodo_agua_caliente,
+    Favoritos
 } = models;
 
 
@@ -99,4 +100,7 @@ export default (models: any):void => {
 
   Campings.belongsToMany(Usuarios, { through: Puntaje });
   Usuarios.belongsToMany(Campings, { through: Puntaje });
+
+  Campings.belongsToMany(Usuarios, { through: Favoritos });
+  Usuarios.belongsToMany(Campings, { through: Favoritos });
 }
