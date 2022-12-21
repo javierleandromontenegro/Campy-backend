@@ -3,6 +3,7 @@ import datosCamping from "../types/datosCamping";
 import { createCamping, campingCategorias, campingTarifas, campingAbiertoPeriodo, campingPeriodoAguaCaliente, campingHabilitado} from "../types/datosCamping";
 import { datosFiltros } from "../types/datosFiltros";
 import datosPrecios from "../types/datosPrecios";
+import { campingsCantReservas } from "../types/datosBase";
 
 const { sequelize } = require("../db");
 
@@ -61,6 +62,16 @@ export const disableCamping = async (id: string, habilitar: number): Promise<{su
 
   return {success: !!updatedCamping.changedRows}
 };
+
+export const getCampingsCantReservas= async (): Promise<campingsCantReservas[]> => {
+  const [querySql]: [querySql: campingsCantReservas[]] = await sequelize.query(
+    `SELECT C.nombre_camping, COUNT(R.id) AS cant_reservas FROM Reservas AS R 
+    INNER JOIN Campings AS C ON R.CampingId=C.id
+    GROUP BY C.nombre_camping ORDER BY cant_reservas DESC`
+  ); 
+
+  return querySql;
+}
 
 // MUESTRA LOS TIPOS DE TARIFAS
 export const getCampingTarifas = async (): Promise<campingTarifas[]> => {

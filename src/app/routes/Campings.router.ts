@@ -10,7 +10,13 @@ import {
   getCampingsCategorias, 
   getCampingTarifas, 
   getCampingAbiertoPeriodo, 
-  getCampingPeriodoAguaCaliente,getCampingsHabilitacion,disableCamping, getUserFavoritesCampings, addFavoriteCamping, removeFavoriteCamping 
+  getCampingPeriodoAguaCaliente,
+  getCampingsHabilitacion,
+  disableCamping, 
+  getUserFavoritesCampings, 
+  addFavoriteCamping, 
+  removeFavoriteCamping,
+  getCampingsCantReservas 
 } from '../services/Campings.service';
 import {datosFiltros} from "../types/datosFiltros"
 
@@ -55,7 +61,13 @@ CampingsRouter.put('/habilitacion/:idCamping', checkoutUser, checkoutAdmin, asyn
   }
 });
 
-
+CampingsRouter.get('/reservas', async (_req: Request, res: Response) => { 
+  try {
+    res.status(200).json(await getCampingsCantReservas())
+  } catch {
+    res.status(404).json({error: `no se pudo en http://localhost/api/campings/reservas`});
+  }
+});
 
 CampingsRouter.get('/tarifas', async (_req: Request, res: Response) => { 
   try {
