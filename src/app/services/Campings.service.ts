@@ -2,6 +2,7 @@ import datosCamping from "../types/datosCamping";
 import { createCamping, campingCategorias, campingTarifas, campingAbiertoPeriodo, campingPeriodoAguaCaliente, campingHabilitado} from "../types/datosCamping";
 import { datosFiltros } from "../types/datosFiltros";
 import datosPrecios from "../types/datosPrecios";
+import { campingsCantReservas } from "../types/datosBase";
 
 const { sequelize } = require("../db");
 
@@ -60,6 +61,16 @@ export const disableCamping = async (id: string, habilitar: number): Promise<{su
 
   return {success: !!updatedCamping.changedRows}
 };
+
+export const getCampingsCantReservas= async (): Promise<campingsCantReservas[]> => {
+  const [querySql]: [querySql: campingsCantReservas[]] = await sequelize.query(
+    `SELECT C.nombre_camping, COUNT(R.id) AS cant_reservas FROM Reservas AS R 
+    INNER JOIN Campings AS C ON R.CampingId=C.id
+    GROUP BY C.nombre_camping ORDER BY cant_reservas DESC`
+  ); 
+
+  return querySql;
+}
 
 // MUESTRA LOS TIPOS DE TARIFAS
 export const getCampingTarifas = async (): Promise<campingTarifas[]> => {
@@ -122,25 +133,25 @@ export const getCampingsPorLocalidad = async (id: string): Promise<datosCamping[
 
 
 
-// verificar camping santa rita id ° 8 porque mascotas no trae bien el dato
+
 // QUERY SOLO 1 CAMPING POR ID CON DETALLE E IMAGENES *******************
 
 export const getCampingsPorId = async (id: string): Promise<datosCamping> => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
-      `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.abierto_fecha_desde , C.abierto_fecha_hasta, L.nombre AS localidad,P.nombre AS provincia,
-      CA.categoria,CA.cantidad_estrellas,CC.duchas,CC.baños,CC.mascotas,CC.rodantes,CC.proveduria,CC.salon_sum,CC.restaurant,CC.vigilancia,CC.pileta,CC.estacionamiento,CC.juegos_infantiles,CC.maquinas_gimnasia,CC.wifi,
-      CP.techada AS parcela_techada,CP.agua_en_parcela AS parcela_agua_en_parcela,CP.iluminacion_toma_corriente AS parcela_iluminacion_toma_corriente,CP.superficie AS parcela_superficie,
-      AP.descripcion_periodo,
-      PAC.descripcion_periodo_agua   
-      from Campings as C 
-      INNER JOIN Localidades AS L INNER JOIN Provincias as P ON P.Id=L.ProvinciaId ON C.LocalidadeId=L.id      
-      INNER JOIN Categoria_campings AS CA ON C.CategoriaCampingId=CA.id
-      INNER JOIN Caracteristicas_campings AS CC 
-      INNER JOIN Caracteristicas_parcelas AS CP ON CC.id=CP.CaracteristicasCampingId 
-      INNER JOIN Abierto_periodos AS AP ON CC.AbiertoPeriodoId=AP.id 
-      INNER JOIN Periodo_agua_calientes AS PAC ON CC.PeriodoAguaCalienteId=PAC.id
-      ON C.CategoriaCampingId =CC.id
-      WHERE C.habilitado=1 AND C.id=${id};`
+    `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.abierto_fecha_desde , C.abierto_fecha_hasta, L.nombre AS localidad,P.nombre AS provincia,
+    CA.categoria,CA.cantidad_estrellas,CC.duchas,CC.baños,CC.mascotas,CC.rodantes,CC.proveduria,CC.salon_sum,CC.restaurant,CC.vigilancia,CC.pileta,CC.estacionamiento,CC.juegos_infantiles,CC.maquinas_gimnasia,CC.wifi,
+    CP.techada AS parcela_techada,CP.agua_en_parcela AS parcela_agua_en_parcela,CP.iluminacion_toma_corriente AS parcela_iluminacion_toma_corriente,CP.superficie AS parcela_superficie,
+    AP.descripcion_periodo,
+    PAC.descripcion_periodo_agua   
+    from Campings as C 
+    INNER JOIN Localidades AS L INNER JOIN Provincias as P ON P.Id=L.ProvinciaId ON C.LocalidadeId=L.id      
+    INNER JOIN Categoria_campings AS CA ON C.CategoriaCampingId=CA.id
+    INNER JOIN Caracteristicas_campings AS CC 
+    INNER JOIN Caracteristicas_parcelas AS CP ON CC.id=CP.CaracteristicasCampingId 
+     INNER JOIN Abierto_periodos AS AP ON CC.AbiertoPeriodoId=AP.id 
+     INNER JOIN Periodo_agua_calientes AS PAC ON CC.PeriodoAguaCalienteId=PAC.id
+     ON C.CategoriaCampingId =CC.id
+    WHERE C.habilitado=1 AND C.id=${id};`
   );
 
     if(!querySql[0]) throw { error: 404, message: 'No se encontró un camping con ese ID' };
@@ -220,16 +231,16 @@ export const getCampingsTodos = async ({ id_provincia,
       console.log("PARCELA SUPERFICIE = ",parcela_superficie.length)
       filtros = filtros + ` AND (CP.superficie>=${parcela_superficie[0]} AND CP.superficie<=${parcela_superficie[1]})`;
     }
-     if (parcela_techada===true){
+     if (parcela_techada){
       /* parcela_techada=('1') */
-      filtros = filtros + ` AND CP.techada=('1')`;
+      filtros = filtros + ` AND CP.techada=('${parcela_techada}')`;
     }
 
-    if (parcela_agua_en_parcela===true){
-      filtros = filtros + ` AND CP.agua_en_parcela=('1')`;
+    if (parcela_agua_en_parcela){
+      filtros = filtros + ` AND CP.agua_en_parcela=('${parcela_agua_en_parcela}')`;
     }
-    if (parcela_iluminacion_toma_corriente===true){
-      filtros = filtros + ` AND CP.iluminacion_toma_corriente=('1')`;
+    if (parcela_iluminacion_toma_corriente){
+      filtros = filtros + ` AND CP.iluminacion_toma_corriente=('${parcela_iluminacion_toma_corriente}')`;
     }
     if (mascotas===true){
       // mascotas=true or =1 solo los que aceptan
