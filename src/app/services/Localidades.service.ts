@@ -3,10 +3,11 @@ import createLocalidad from "../types/datosLocalidades";
 
 const { sequelize } = require("../db");
 
+//http://localhost:3001/api/localidades/idprovincia
 export const getLocalidades = async (id: string): Promise<datosBase[]> => {
   const [querySql]: [querySql: datosBase[]] = await sequelize.query(
     `SELECT L.id AS id, L.nombre AS nombre, L.imagen AS imagen FROM Localidades AS L
-    INNER JOIN Provincias AS P ON P.id=L.ProvinciaId WHERE P.id=${id}`
+    INNER JOIN Provincias AS P ON P.id=L.ProvinciaId WHERE P.id=${id} ORDER BY nombre `
   );
 
   return querySql;

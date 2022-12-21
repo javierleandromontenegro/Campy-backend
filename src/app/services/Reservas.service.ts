@@ -1,7 +1,7 @@
 import { reservas, reservasdetalle } from "../types/reservas";
 const { sequelize } = require("../db");
 
-
+//http://localhost:3001/api/campings/reservas
 export const getReservas = async (): Promise<reservas[]> => {
   const [querySql]: [querySql: reservas[]] = await sequelize.query(
     `SELECT R.id,R.fecha_desde_reserva, R.fecha_hasta_reserva, R.cant_noches, R.total, ER.descrip_estado, U.id, U.username, C.id, C.nombre_camping, C.id AS id_campings
