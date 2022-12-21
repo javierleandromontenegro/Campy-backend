@@ -14,6 +14,10 @@ export default (sequelize: Sequelize) => {
       },
       fecha: {
         type: DataTypes.DATE
+      },
+      puntaje: {
+        type: DataTypes.INTEGER,
+        allowNull: false
       }
     }
   );
