@@ -1,4 +1,4 @@
-export default interface datosUsuario {
+export interface datosUsuario {
   id?: number,
   email: string,
   clave?: string,
@@ -8,4 +8,11 @@ export default interface datosUsuario {
   dni: string,
   foto: string,
   tipo?: string
+}
+
+export interface stateUsuario {
+  id: string,
+  email: string,
+  tipo: string,
+  habilitado: boolean
 }

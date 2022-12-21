@@ -6,6 +6,7 @@ import datosPrecios from "../types/datosPrecios";
 
 const { sequelize } = require("../db");
 
+// IMAGENES DE UN DETERMINADO CAMPING
 const getCampingsImagenes= async (id: number): Promise<string[]> => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
     `SELECT C.ID,CI.url
@@ -17,6 +18,7 @@ const getCampingsImagenes= async (id: number): Promise<string[]> => {
   return querySql.map((query: any):string => query.url);
 }
 
+// ESTA ES LA LISTA DE PRECIOS DE UN DETERMINADO CAMPING
 export const getPreciosCamping = async (id: number): Promise<datosPrecios[]> => {
   const [querySql]: [querySql: datosPrecios[]] = await sequelize.query(
     `SELECT T.id, RT.precio, T.descrip_tarifa 
@@ -29,6 +31,7 @@ export const getPreciosCamping = async (id: number): Promise<datosPrecios[]> => 
   return querySql;
 }
 
+// MUESTRA TODAS LAS CATEGORIAS DE CAMPING QUE HAY 
 export const getCampingsCategorias = async (): Promise<campingCategorias[]> => {
   const [querySql]: [querySql: campingCategorias[]] = await sequelize.query(
     `SELECT id,categoria,cantidad_estrellas,descripcion_categoria FROM Categoria_campings`
@@ -37,14 +40,16 @@ export const getCampingsCategorias = async (): Promise<campingCategorias[]> => {
   return querySql;
 }
 
+// MUESTRA TODOS LOS CAMPINGS INDICANDO EL ESTADO DE HABILITACION
 export const getCampingsHabilitacion = async (): Promise<campingHabilitado[]> => {
   const [querySql]: [querySql: campingHabilitado[]] = await sequelize.query(
-    `SELECT id,nombre_camping,habilitado FROM Campings`
+    `SELECT C.id, C.nombre_camping, C.habilitado, L.nombre AS localidad, P.nombre AS provincia FROM Campings AS C INNER JOIN Localidades AS L INNER JOIN Provincias AS P ON L.ProvinciaId=P.id ON C.LocalidadeId=L.id`
   ); 
 
   return querySql;
 }
 
+// HABILITA O DESHABILITA UN DETERMINADO CAMPING
 export const disableCamping = async (id: string, habilitar: number): Promise<{success: boolean}> => {
   if(habilitar < 0 || habilitar > 1) throw {
     error: 406, message: 'tipo de habilitación inválida'
@@ -57,7 +62,7 @@ export const disableCamping = async (id: string, habilitar: number): Promise<{su
   return {success: !!updatedCamping.changedRows}
 };
 
-
+// MUESTRA LOS TIPOS DE TARIFAS
 export const getCampingTarifas = async (): Promise<campingTarifas[]> => {
   const [querySql]: [querySql: campingTarifas[]] = await sequelize.query(
     `SELECT id, descrip_tarifa FROM Tarifas`
@@ -83,10 +88,10 @@ export const getCampingPeriodoAguaCaliente = async (): Promise<campingPeriodoAgu
 };
 
 
-
+// MUESTRA TODOS LOS CAMPINGS POR PROVINCIA
 export const getCampingsPorProvincia = async (id: string): Promise<datosCamping[]> => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
-    `SELECT C.id as id, C.nombre_camping as nombre, L.nombre as localidad, P.nombre as provincia FROM Campings AS C INNER JOIN Localidades AS L INNER JOIN Provincias AS P ON L.ProvinciaId=P.id ON C.LocalidadeId=L.id WHERE C.habilitado=1 AND P.id=${id};`
+    `SELECT C.id as id, C.nombre_camping as nombre, L.nombre as localidad, P.nombre as provincia FROM Campings AS C INNER JOIN Localidades AS L INNER JOIN Provincias AS P ON L.ProvinciaId=P.id ON C.LocalidadeId=L.id WHERE C.habilitado=1 AND P.id=${id} ORDER BY L.nombre, C.nombre_camping;`
   );
 
   const imagenesQuery = await Promise.all(querySql.map(query => getCampingsImagenes(query.id)));
@@ -100,10 +105,10 @@ export const getCampingsPorProvincia = async (id: string): Promise<datosCamping[
 }
 
 
-
+// MUESTRA TODOS LOS CAMPINGS POR LOCALIDAD
 export const getCampingsPorLocalidad = async (id: string): Promise<datosCamping[]> => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
-    `SELECT C.id as id, C.nombre_camping as nombre, L.nombre as localidad, P.nombre as provincia FROM Campings AS C INNER JOIN Localidades AS L INNER JOIN Provincias AS P ON L.ProvinciaId=P.id ON C.LocalidadeId=L.id WHERE C.habilitado=1 AND L.id=${id};`
+    `SELECT C.id as id, C.nombre_camping as nombre, L.nombre as localidad, P.nombre as provincia FROM Campings AS C INNER JOIN Localidades AS L INNER JOIN Provincias AS P ON L.ProvinciaId=P.id ON C.LocalidadeId=L.id WHERE C.habilitado=1 AND L.id=${id}  ORDER BY L.nombre, C.nombre_camping;`
   );
 
   const imagenesQuery: string[][] = await Promise.all(querySql.map(query => getCampingsImagenes(query.id)))
@@ -227,38 +232,50 @@ export const getCampingsTodos = async ({ id_provincia,
     if (parcela_iluminacion_toma_corriente){
       filtros = filtros + ` AND CP.iluminacion_toma_corriente=('${parcela_iluminacion_toma_corriente}')`;
     }
-    if (mascotas){
-      filtros = filtros + ` AND  CC.mascotas=('${mascotas}')`;
+    if (mascotas===true){
+      // mascotas=true or =1 solo los que aceptan
+      filtros = filtros + ` AND  CC.mascotas=('1')`;
+      /*filtros = filtros + ` AND  CC.mascotas=('${mascotas}')`;*/
     }
-    if (rodantes){
-      filtros = filtros + ` AND  CC.rodantes=('${rodantes}')`;
+    if (rodantes===true){
+      filtros = filtros + ` AND  CC.rodantes=('1')`;
+      /*filtros = filtros + ` AND  CC.rodantes=('${rodantes}')`;*/
     }
-    if (proveduria){
-      filtros = filtros + ` AND  CC.proveduria=('${proveduria}')`;
+    if (proveduria===true){
+      filtros = filtros + ` AND  CC.proveduria=('1')`;
+     /*filtros = filtros + ` AND  CC.proveduria=('${proveduria}')`;*/
     }
-    if (restaurant){
-      filtros = filtros + ` AND  CC.restaurant=('${restaurant}')`;
+    if (restaurant===true){
+      filtros = filtros + ` AND  CC.restaurant=('1')`;
+      /*filtros = filtros + ` AND  CC.restaurant=('${restaurant}')`;*/
     }
-    if (pileta){
-      filtros = filtros + ` AND  CC.pileta=('${pileta}')`;
+    if (pileta===true){
+      filtros = filtros + ` AND  CC.pileta=('1')`;
+      /*filtros = filtros + ` AND  CC.pileta=('${pileta}')`;*/
     }
-    if (vigilancia){
-      filtros = filtros + ` AND  CC.vigilancia=('${vigilancia}')`;
+    if (vigilancia===true){
+      filtros = filtros + ` AND  CC.vigilancia=('1')`;
+      /*filtros = filtros + ` AND  CC.vigilancia=('${vigilancia}')`;*/
     }
-    if (maquinas_gimnasia){
-      filtros = filtros + ` AND  CC.maquinas_gimnasia=('${maquinas_gimnasia}')`;
+    if (maquinas_gimnasia===true){
+      filtros = filtros + ` AND  CC.maquinas_gimnasia=('1')`;
+      /*filtros = filtros + ` AND  CC.maquinas_gimnasia=('${maquinas_gimnasia}')`;*/
     }
-    if (juegos_infantiles){
-      filtros = filtros + ` AND  CC.juegos_infantiles=('${juegos_infantiles}')`;
+    if (juegos_infantiles===true){
+      filtros = filtros + ` AND  CC.juegos_infantiles=('1')`;
+      /*filtros = filtros + ` AND  CC.juegos_infantiles=('${juegos_infantiles}')`;*/
     }
-    if (salon_sum){
-      filtros = filtros + ` AND  CC.salon_sum=('${salon_sum}')`;
+    if (salon_sum===true){
+      filtros = filtros + ` AND  CC.salon_sum=('1')`;
+     /* filtros = filtros + ` AND  CC.salon_sum=('${salon_sum}')`;*/
     }
-    if (wifi){
-      filtros = filtros + ` AND  CC.wifi=('${wifi}')`;
+    if (wifi===true){
+      filtros = filtros + ` AND  CC.wifi=('1')`;
+      /*filtros = filtros + ` AND  CC.wifi=('${wifi}')`;*/
     }
-    if (estacionamiento){
-      filtros = filtros + ` AND  CC.estacionamiento=('${estacionamiento}')`;
+    if (estacionamiento===true){
+      filtros = filtros + ` AND  CC.estacionamiento=('1')`;
+      /*filtros = filtros + ` AND  CC.estacionamiento=('${estacionamiento}')`;*/
     } 
    /*  if reviews){
       filtros = filtros + ` AND  parcela_techada=('${reviews}')`;
