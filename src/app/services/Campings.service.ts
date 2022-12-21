@@ -1,4 +1,4 @@
-import datosBase from "../types/datosBase";
+import {datosBase} from "../types/datosBase";
 import datosCamping from "../types/datosCamping";
 import { createCamping, campingCategorias, campingTarifas, campingAbiertoPeriodo, campingPeriodoAguaCaliente, campingHabilitado} from "../types/datosCamping";
 import { datosFiltros } from "../types/datosFiltros";
@@ -63,6 +63,7 @@ export const disableCamping = async (id: string, habilitar: number): Promise<{su
   return {success: !!updatedCamping.changedRows}
 };
 
+//http://localhost:3001/api/campings/reservas
 export const getCampingsCantReservas= async (): Promise<campingsCantReservas[]> => {
   const [querySql]: [querySql: campingsCantReservas[]] = await sequelize.query(
     `SELECT C.nombre_camping, COUNT(R.id) AS cant_reservas FROM Reservas AS R 
