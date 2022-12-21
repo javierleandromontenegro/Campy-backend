@@ -1,4 +1,4 @@
-import datosBase from "../types/datosBase";
+import { datosBase } from "../types/datosBase";
 import datosCamping from "../types/datosCamping";
 import { createCamping, campingCategorias, campingTarifas, campingAbiertoPeriodo, campingPeriodoAguaCaliente, campingHabilitado} from "../types/datosCamping";
 import { datosFiltros } from "../types/datosFiltros";
