@@ -30,7 +30,7 @@ CheckoutRouter.post('/', async (req: Request<datosMerca>, res: Response) => {
           pending: "http://localhost:3000/booking/camping/1"
       },
       auto_return: "approved",
-    };
+    }; 
 
     mercadopago.preferences.create(preference)
     .then(function(response){
