@@ -8,9 +8,8 @@ import LoginRouter from './Login.router';
 import UsuariosRouter from './Usuario.router';
 import ConfirmUserRouter from './ConfirmUser.router';
 import ReservasRouter from './Reservas.router';
-import CheckoutRouter from './Checkout';
 import ReviewsRouter from './Reviews.router';
-
+import CheckoutRouter from './Checkout';
 // Importar todos los routers;
 
 const router: Router = Router();
@@ -25,8 +24,8 @@ router.use('/login', LoginRouter);
 router.use('/usuarios', UsuariosRouter);
 router.use('/confirm', ConfirmUserRouter);
 router.use('/reservas', ReservasRouter);
-router.use('/checkout', CheckoutRouter)
 router.use('/reviews', ReviewsRouter);
+router.use('/checkout', CheckoutRouter)
 // Configurar los routers
 
 export default router;
