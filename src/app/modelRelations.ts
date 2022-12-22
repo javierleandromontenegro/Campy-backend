@@ -13,14 +13,14 @@ export default (models: any):void => {
     Categoria_camping,
     Caracteristicas_camping,
     Reviews,
-    Puntaje,
     Relacion_campo_tarifa,
     Localidades,
     Provincias,
     Paises,
     Caracteristicas_parcela,
     Abierto_periodo,
-    Periodo_agua_caliente
+    Periodo_agua_caliente,
+    Favoritos
 } = models;
 
 
@@ -97,6 +97,6 @@ export default (models: any):void => {
   Campings.belongsToMany(Usuarios, { through: Reviews });
   Usuarios.belongsToMany(Campings, { through: Reviews });
 
-  Campings.belongsToMany(Usuarios, { through: Puntaje });
-  Usuarios.belongsToMany(Campings, { through: Puntaje });
+  Campings.belongsToMany(Usuarios, { through: Favoritos });
+  Usuarios.belongsToMany(Campings, { through: Favoritos });
 }
