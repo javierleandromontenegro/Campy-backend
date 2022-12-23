@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 // import { registerUser } from '../services/Register.service';
-import datosMerca from '../types/datosUsuario';
+import datosMerca from '../types/datosMerca';
 import mercadopago from 'mercadopago';
 
 const CheckoutRouter: Router = Router();

@@ -34,7 +34,7 @@ export const disableUser = async (id: string, habilitar: number): Promise<{ succ
 
 export const updateUser = async (data: datosUsuario, userId: number, token: string) => {
   const entries: [key: string, value: string][] = Object.entries(data);
-  console.log("a", await hash('gaby', 8))
+  
   if (!entries.length || entries.length > allPropertiesUsuario.length)
     throw { error: 406, message: 'Información errónea en el query.' }
 
@@ -65,7 +65,7 @@ export const updateUser = async (data: datosUsuario, userId: number, token: stri
     dni,
     TipoUsuarioId
   }]] = await sequelize.query(
-    `SELECT id, email, clave, username, foto, numero_celular direccion, dni, TipoUsuarioId FROM Usuarios WHERE id=${userId}`
+    `SELECT id, email, clave, username, foto, numero_celular, direccion, dni, TipoUsuarioId FROM Usuarios WHERE id=${userId}`
   );
 
   if (clave) token = sign({ email, clave }, String(process.env.SECRET));
