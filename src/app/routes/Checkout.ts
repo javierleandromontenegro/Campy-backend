@@ -7,7 +7,6 @@ const CheckoutRouter: Router = Router();
 let accessToken : any = process.env.ACCESS_TOKEN; 
 mercadopago.configure({
    access_token: accessToken
-    ,
   });
 
 CheckoutRouter.post('/', async (req: Request<datosMerca>, res: Response) => {

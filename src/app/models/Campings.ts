@@ -46,6 +46,10 @@ export default (sequelize: Sequelize) => {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
       },
+      puntuacion_promedio: {
+        type: DataTypes.FLOAT,
+        defaultValue: 0,
+      },
     }
   );
 };
