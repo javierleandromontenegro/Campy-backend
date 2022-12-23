@@ -162,7 +162,36 @@ WHERE C.habilitado=1 AND C.id=${id};`
   return querySql[0];
 }
 
+// GET -> http://localhost:3001/api/campings
+export const getCampingsTodosDatos = async (): Promise<datosCamping[]> => {
+  const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
+    `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.abierto_fecha_desde , C.abierto_fecha_hasta,L.nombre AS localidad, L.id AS id_localidad, P.nombre AS provincia,P.id as id_provincia,CA.categoria,CA.id AS id_categoria,
+    CC.duchas,CC.baños,CC.mascotas,CC.rodantes,CC.proveduria,CC.salon_sum,CC.restaurant,CC.vigilancia,CC.pileta,CC.estacionamiento,CC.juegos_infantiles,CC.maquinas_gimnasia,CC.wifi,
+    CP.techada AS parcela_techada,CP.agua_en_parcela AS parcela_agua_en_parcela,CP.iluminacion_toma_corriente AS parcela_iluminacion_toma_corriente,CP.superficie AS parcela_superficie, AP.descripcion_periodo,
+    PAC.descripcion_periodo_agua,
+     RT.precio,C.puntuacion_promedio
+    FROM Campings AS C
+    INNER JOIN Relacion_campo_tarifas AS RT ON RT.CampingId=C.id AND RT.TarifaId=1
+    INNER JOIN Localidades AS L INNER JOIN Provincias as P ON P.Id=L.ProvinciaId ON C.LocalidadeId=L.id  
+    INNER JOIN Categoria_campings AS CA ON C.CategoriaCampingId=CA.id
+    INNER JOIN Caracteristicas_campings AS CC INNER JOIN Caracteristicas_parcelas AS CP ON CP.CaracteristicasCampingId=CC.id ON C.CaracteristicasCampingId=CC.id
+    INNER JOIN Abierto_periodos AS AP ON CC.AbiertoPeriodoId=AP.id
+    INNER JOIN Periodo_agua_calientes AS PAC ON CC.PeriodoAguaCalienteId=PAC.id
+    WHERE C.habilitado=1 ;`
+  );
+  const imagenesQuery: string[][] = await Promise.all(querySql.map(query => getCampingsImagenes(query.id)));
 
+  const resultsWithImagenes: datosCamping[] = querySql.map((query, i) => {
+    query.imagenes = imagenesQuery[i];
+    return query;
+  });
+
+  return resultsWithImagenes;
+}
+
+
+// FILTROS
+// POST -> http://localhost:3001/api/campings
 // QUERY TODOS LOS CAMPINGS CON DETALLE E IMAGENES
 export const getCampingsTodos = async ({ id_provincia,
   id_localidad, parcela_techada, parcela_agua_en_parcela, abierto_fecha_desde,
@@ -205,7 +234,7 @@ export const getCampingsTodos = async ({ id_provincia,
   }
 
 
-  console.log("LONGITUD ARRAY categorias ES= ", id_categoria.length);
+  //console.log("LONGITUD ARRAY categorias ES= ", id_categoria.length);
 
   if (id_categoria.length == 1) {
     /*  console.log("TIENE UN SOLO VALOR") */
@@ -227,7 +256,7 @@ export const getCampingsTodos = async ({ id_provincia,
   }
 
   if (parcela_superficie.length > 0) {
-    console.log("PARCELA SUPERFICIE = ", parcela_superficie.length)
+    //console.log("PARCELA SUPERFICIE = ", parcela_superficie.length)
     filtros = filtros + ` AND (CP.superficie>=${parcela_superficie[0]} AND CP.superficie<=${parcela_superficie[1]})`;
   }
   if (parcela_techada === true) {
