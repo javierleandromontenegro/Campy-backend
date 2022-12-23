@@ -141,7 +141,7 @@ export const getCampingsPorId = async (id: string): Promise<datosCamping> => {
     CA.categoria,CA.cantidad_estrellas,CC.duchas,CC.baños,CC.mascotas,CC.rodantes,CC.proveduria,CC.salon_sum,CC.restaurant,CC.vigilancia,CC.pileta,CC.estacionamiento,CC.juegos_infantiles,CC.maquinas_gimnasia,CC.wifi,
     CP.techada AS parcela_techada,CP.agua_en_parcela AS parcela_agua_en_parcela,CP.iluminacion_toma_corriente AS parcela_iluminacion_toma_corriente,CP.superficie AS parcela_superficie,
     AP.descripcion_periodo,
-    PAC.descripcion_periodo_agua   
+    PAC.descripcion_periodo_agua,C.puntuacion_promedio   
 from Campings as C
 INNER JOIN Categoria_campings AS CA ON C.CategoriaCampingId=CA.id
 INNER JOIN Caracteristicas_campings AS CC 
@@ -195,7 +195,7 @@ export const getCampingsTodosDatos = async (): Promise<datosCamping[]> => {
 // QUERY TODOS LOS CAMPINGS CON DETALLE E IMAGENES
 export const getCampingsTodos = async ({ id_provincia,
   id_localidad, parcela_techada, parcela_agua_en_parcela, abierto_fecha_desde,
-  abierto_fecha_hasta, parcela_iluminacion_toma_corriente, precio, id_categoria, parcela_superficie,
+  abierto_fecha_hasta, parcela_iluminacion_toma_corriente, precio,reviews,id_categoria, parcela_superficie,
   mascotas,
   rodantes,
   proveduria,
@@ -206,7 +206,7 @@ export const getCampingsTodos = async ({ id_provincia,
   juegos_infantiles,
   salon_sum,
   wifi,
-  estacionamiento }: datosFiltros): Promise<datosCamping[]> => {
+  estacionamiento}: datosFiltros): Promise<datosCamping[]> => {
 
 
   let filtros = " ";
@@ -233,9 +233,29 @@ export const getCampingsTodos = async ({ id_provincia,
     filtros = filtros + ` AND (RT.precio>=${precio[0]} AND RT.precio<=${precio[1]})`;
   }
 
+  //console.log("LONGITUD ARRAY Review ES= ", reviews.length);
+  if (reviews.length <= 1) {
+    //console.log("TIENE UN SOLO VALOR");
+    reviews.forEach(element => {
+      filtros = filtros + ` AND C.puntuacion_promedio=('${element}')`;
+    });
+   }
+ 
+   if (reviews.length > 1) {
+    //console.log("TIENE MAS DE 1 VALOR")
+    filtros = filtros + ` AND `;
+    let ban: number = 0;
+    reviews.forEach(element => {
+      /* console.log("BANDA ES = ",ban); */
+      if (ban == 1) filtros = filtros + ` OR `;
+      filtros = filtros + ` C.puntuacion_promedio=('${element}')`;
+      ban = 1;
+    })
+  }
+  
+
 
   //console.log("LONGITUD ARRAY categorias ES= ", id_categoria.length);
-
   if (id_categoria.length == 1) {
     /*  console.log("TIENE UN SOLO VALOR") */
     id_categoria.forEach(element => {
@@ -315,10 +335,7 @@ export const getCampingsTodos = async ({ id_provincia,
     filtros = filtros + ` AND  CC.estacionamiento=('1')`;
     /*filtros = filtros + ` AND  CC.estacionamiento=('${estacionamiento}')`;*/
   }
-  /*  if reviews){
-     filtros = filtros + ` AND  parcela_techada=('${reviews}')`;
-   }
-     */
+  
   console.log("FILTROS ES = ", filtros);
 
 
@@ -327,7 +344,7 @@ export const getCampingsTodos = async ({ id_provincia,
     CC.duchas,CC.baños,CC.mascotas,CC.rodantes,CC.proveduria,CC.salon_sum,CC.restaurant,CC.vigilancia,CC.pileta,CC.estacionamiento,CC.juegos_infantiles,CC.maquinas_gimnasia,CC.wifi,
     CP.techada AS parcela_techada,CP.agua_en_parcela AS parcela_agua_en_parcela,CP.iluminacion_toma_corriente AS parcela_iluminacion_toma_corriente,CP.superficie AS parcela_superficie, AP.descripcion_periodo,
     PAC.descripcion_periodo_agua,
-     RT.precio
+     RT.precio, C.puntuacion_promedio
     FROM Campings AS C
     INNER JOIN Relacion_campo_tarifas AS RT ON RT.CampingId=C.id AND RT.TarifaId=1
     INNER JOIN Localidades AS L INNER JOIN Provincias as P ON P.Id=L.ProvinciaId ON C.LocalidadeId=L.id  

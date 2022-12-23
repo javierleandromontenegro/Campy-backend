@@ -19,9 +19,6 @@ export interface datosFiltros {
     estacionamiento: boolean,    
     precio:number[],
     id_categoria:Number[], 
-    parcela_superficie:Number[]
-}
-/* 
-        
+    parcela_superficie:Number[],
     reviews:[],
-     */
+}
