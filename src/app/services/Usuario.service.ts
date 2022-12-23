@@ -86,7 +86,7 @@ export const updateUser = async (data: datosUsuario, userId: number, token: stri
 export const getAllUsuariosState = async (): Promise<stateUsuario[]> => {
   const [user]: [user: stateUsuario[]] =
     await sequelize.query(
-      `SELECT U.id, U.username, U.email, T.tipo, U.habilitado FROM Usuarios AS U INNER JOIN Tipo_usuarios AS T ON T.id=U.TipoUsuarioId`
+      `SELECT U.id, U.username, U.email, T.tipo, U.habilitado, U.createdAt FROM Usuarios AS U INNER JOIN Tipo_usuarios AS T ON T.id=U.TipoUsuarioId`
     );
 
   return user;
