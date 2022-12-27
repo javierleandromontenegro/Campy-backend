@@ -8,7 +8,8 @@ export const getReservas = async (): Promise<reservas[]> => {
       FROM Reservas AS R
       INNER JOIN Estado_reservas AS ER ON ER.id=R.EstadoReservaId
       INNER JOIN Usuarios AS U ON U.id=R.UsuarioId
-      INNER JOIN Campings AS C ON C.id=R.CampingId`
+      INNER JOIN Campings AS C ON C.id=R.CampingId ORDER BY R.createdAt`
+      
   );
   return querySql;
 }
