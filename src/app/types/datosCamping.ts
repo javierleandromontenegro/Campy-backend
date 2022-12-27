@@ -13,12 +13,17 @@ export interface createCamping extends createCaratCamping {
     descripcion_camping: string,
     direccion: string,
     telefono: string,
+    longitud:string,
+    latitud:string,
+    abierto_fecha_desde:Date,
+    abierto_fecha_hasta:Date,
     contacto_nombre: string,
     contacto_tel: string,
     CategoriaCampingId: number,
     LocalidadeId: number
+    
 }
-
+//UsuarioId:string
 export interface createCaratCamping {
     wifi: boolean,
     duchas: number,
@@ -40,7 +45,10 @@ export interface createCaratCamping {
     iluminacion_toma_corriente: boolean,
     superficie: number,
     imagenes: [],
-    precios: []
+    mayores:number,
+    menores:number,
+    rodante:number,
+    UsuarioId:number    
 }
 
 

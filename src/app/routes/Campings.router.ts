@@ -116,7 +116,8 @@ CampingsRouter.get('/:idCamping', async (req: Request<{idCamping: string}>, res:
   }
 });
 
-// POST -TODOS LOS CAMPING CON DETALLE E IMAGENES SE ENVIA POR BODY UN ARCHIVO CON LOS FILTROS ACTIVOS
+// POST FILTROS DE BOOKING
+//http://localhost:3001/api/campings
 CampingsRouter.post('/', async (req: Request<datosFiltros>, res: Response) => {
 
   try {
@@ -136,7 +137,7 @@ CampingsRouter.get('/', async (_req: Request, res: Response) => {
   }
 });
 
-
+//// CREA UN NUEVO CAMPING
 CampingsRouter.post('/create', async (req: Request<createCamping>, res: Response) => {
 
   try {
@@ -157,6 +158,7 @@ CampingsRouter.get('/imagenes/:idCamping', async (req: Request<{idCamping: numbe
   }
 });
 
+// lista de precios de un determinado campings
 CampingsRouter.get('/tarifas/:idCamping', async (req: Request<{idCamping: number}>, res: Response) => {
   const { idCamping } = req.params;
 
