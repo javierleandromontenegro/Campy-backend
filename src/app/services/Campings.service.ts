@@ -366,10 +366,10 @@ export const getCampingsTodos = async ({ id_provincia,
   return resultsWithImagenes;
 }
 
+
 //ALTA DE CAMPING *********************
 export const postCampingsCreate = async ({
-  nombre_camping, descripcion_camping, direccion, telefono, contacto_nombre, contacto_tel, CategoriaCampingId, LocalidadeId, wifi, duchas, baños, mascotas, rodantes, proveduria, salon_sum, restaurant, vigilancia, pileta, estacionamiento, juegos_infantiles, maquinas_gimnasia, AbiertoPeriodoId, PeriodoAguaCalienteId, techada, agua_en_parcela, iluminacion_toma_corriente, superficie, imagenes, precios
-}: createCamping): Promise<number> => {
+  nombre_camping, descripcion_camping, direccion, telefono,longitud, latitud,abierto_fecha_desde,abierto_fecha_hasta, contacto_nombre, contacto_tel, CategoriaCampingId, LocalidadeId, wifi, duchas, baños, mascotas, rodantes, proveduria, salon_sum, restaurant, vigilancia, pileta, estacionamiento, juegos_infantiles, maquinas_gimnasia, AbiertoPeriodoId, PeriodoAguaCalienteId, techada, agua_en_parcela, iluminacion_toma_corriente, superficie, imagenes, mayores,menores,rodante,UsuarioId}: createCamping): Promise<number> => {
 
   if (!nombre_camping || !descripcion_camping || !direccion || !telefono || !contacto_nombre || !contacto_tel || !CategoriaCampingId || !LocalidadeId) throw {
     error: 406,
@@ -383,10 +383,11 @@ export const postCampingsCreate = async ({
     ${restaurant},${vigilancia},${pileta},${estacionamiento},${juegos_infantiles},${maquinas_gimnasia},NOW(),NOW(),${AbiertoPeriodoId},${PeriodoAguaCalienteId})`
   );
 
+
   const [CampingId]: [CampingId: number] = await sequelize.query(
     `INSERT INTO Campings(nombre_camping, descripcion_camping, direccion,telefono, longitud, latitud,abierto_fecha_desde,abierto_fecha_hasta, contacto_nombre, contacto_tel, createdAt, updatedAt, UsuarioId, CategoriaCampingId,CaracteristicasCampingId, LocalidadeId)
-      VALUES ('${nombre_camping}','${descripcion_camping}', '${direccion}','${telefono}','1234','1234', NOW(), NOW(),'${contacto_nombre}', 
-      '${contacto_tel}', NOW(), NOW(), 1, ${CategoriaCampingId},${CaractCampingId},${LocalidadeId})`
+      VALUES ('${nombre_camping}','${descripcion_camping}', '${direccion}','${telefono}','${longitud}','${latitud}', '${abierto_fecha_desde}', '${abierto_fecha_hasta}','${contacto_nombre}', 
+      '${contacto_tel}', NOW(), NOW(),${UsuarioId}, ${CategoriaCampingId},${CaractCampingId},${LocalidadeId})`
   );
 
   await sequelize.query(
@@ -401,13 +402,18 @@ export const postCampingsCreate = async ({
     )
   ));
 
-
-  precios.forEach((e: any, i: number) =>
+  let precios=[];
+  precios.push(mayores);
+  precios.push(menores);
+  precios.push(rodante);
+  console.log("PRECIOS",precios);
+ 
+   precios.forEach((e: any, i: number) =>
     sequelize.query(
       `INSERT INTO Relacion_campo_tarifas(precio, createdAt,updatedAt, TarifaId, CampingId) VALUES (${e},NOW(),NOW(),
     '${i + 1}',${CampingId})`
     )
-  )
+  ) 
 
   return CampingId;
 }
