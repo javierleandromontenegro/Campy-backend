@@ -20,7 +20,7 @@ export const searchUser = async (email: string, clave: string) => {
 
 export const checkoutUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { token }: { token: string } = req.body;
+    const token: string = req.headers.authorization as string;
 
     let result: any = verify(token, String(process.env.SECRET));
     const { email, clave }: { email: string, clave: string} = result;

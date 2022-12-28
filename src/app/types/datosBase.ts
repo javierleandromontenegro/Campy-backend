@@ -14,3 +14,9 @@ export interface campingsCantReservas {
   cant_reservas: number
 }
 
+export const stateBooking = {
+    PENDIENTE: process.env.PENDIENTE,
+    RECHAZADA: process.env.RECHAZADA,
+    REALIZADA: process.env.REALIZADA,
+    FINALIZADA: process.env.FINALIZADA,
+}
