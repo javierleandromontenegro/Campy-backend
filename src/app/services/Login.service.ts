@@ -35,7 +35,7 @@ export const loginUser = async ({ email, clave }: { email: string, clave: string
 }
 
 export const loginUserWithToken = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const token = req.body.token;
+  const token = req.headers.authorization;
 
   if (!token) return next();
 
