@@ -21,7 +21,7 @@ export const getUser = async (id: string): Promise<datosUsuario> => {
 
 
 export const disableUser = async (id: string, habilitar: number): Promise<{ success: boolean }> => {
-  if (habilitar < 0 || habilitar > 1) throw {
+  if (habilitar !== 0 && habilitar !== 1) throw {
     error: 406, message: 'tipo de habilitación inválida'
   }
 

@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { getReservas, getReservaDetalle, getReservasByUserId, getReservasByCampingId } from '../services/Reservas.service';
+import { checkoutUser } from '../services/CheckoutUser.service';
 
 const ReservasRouter: Router = Router();
 
@@ -11,21 +12,21 @@ ReservasRouter.get('/', async (_req: Request, res: Response) => {
   }
 });
 
-ReservasRouter.get('/:campingId', async (req: Request<{ campingId: string }>, res: Response) => {
-  const { campingId }: { campingId: string } = req.params;
+ReservasRouter.get('/usuarios/:userId', checkoutUser, async (req: Request<{ userId: string }>, res: Response) => {
+  const { userId }: { userId: string } = req.params;
 
   try {
-    res.status(200).json(await getReservasByCampingId(campingId))
+    res.status(200).json(await getReservasByUserId(userId))
   } catch {
     res.status(404).json({ error: `no se pudo en http://localhost/api/reservas` });
   }
 });
 
-ReservasRouter.get('/usuarios/:userId', async (req: Request<{ userId: string }>, res: Response) => {
-  const { userId }: { userId: string } = req.params;
+ReservasRouter.get('/:campingId', async (req: Request<{ campingId: string }>, res: Response) => {
+  const { campingId }: { campingId: string } = req.params;
 
   try {
-    res.status(200).json(await getReservasByUserId(userId))
+    res.status(200).json(await getReservasByCampingId(campingId))
   } catch {
     res.status(404).json({ error: `no se pudo en http://localhost/api/reservas` });
   }

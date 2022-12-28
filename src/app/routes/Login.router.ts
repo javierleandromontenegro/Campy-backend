@@ -4,6 +4,8 @@ import { loginUser, loginUserWithGoogle, loginUserWithToken } from '../services/
 const LoginRouter: Router = Router();
 
 LoginRouter.post('/', loginUserWithToken, async (req: Request, res: Response) => {
+
+  
     try {
       res.status(200).json(await loginUser(req.body));
     } catch(e: any) {

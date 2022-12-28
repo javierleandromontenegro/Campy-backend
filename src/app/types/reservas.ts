@@ -4,11 +4,11 @@ export interface reservas {
     fecha_hasta_reserva:Date,
     cant_noches:number,
     total:number, 
-    descrip_estado:string,
-     Usuario_id:number,
-     username:string,
-     Ccamping_id:number,
-     nombre_camping:string    
+    id_estado:string,
+    Usuario_id:number,
+    username:string,
+    camping_id:number,
+    nombre_camping:string    
   }
 
   export interface reservasdetalle {
