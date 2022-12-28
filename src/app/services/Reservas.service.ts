@@ -1,4 +1,4 @@
-import { reservas, reservasdetalle } from "../types/reservas";
+import { reservas, reservasdetalle , reservaCreate} from "../types/reservas";
 const { sequelize } = require("../db");
 
 // http://localhost:3001/api/reservas
@@ -57,3 +57,46 @@ export const getReservaDetalle = async (id: string): Promise<reservasdetalle[]> 
 }
 
 // hacer el POST DE RESERVAS Y POST DE DETALLE DE RESERVA
+
+//http://localhost:3001/api/reservas/create
+export const postReservaCreate = async ({fecha_desde_reserva, fecha_hasta_reserva, cant_noches, total, UsuarioId, CampingId
+  }: reservaCreate): Promise<number> => {
+
+  /* if (!nombre_camping || !descripcion_camping || !direccion || !telefono || !contacto_nombre || !contacto_tel || !CategoriaCampingId || !LocalidadeId) throw {
+    error: 406,
+    message: 'Faltan parámetros'
+  };
+ */
+
+
+  const [ReservaId]: [ReservaId: number] = await sequelize.query(
+    `INSERT INTO Reservas(fecha_desde_reserva, fecha_hasta_reserva, cant_noches, total, createdAt, updatedAt, EstadoReservaId, UsuarioId, CampingId) VALUES ('${fecha_desde_reserva}','${fecha_hasta_reserva}',${cant_noches},${total},NOW(),NOW(),1,${UsuarioId},${CampingId})`
+  );
+
+  /* await sequelize.query(
+    `INSERT INTO Caracteristicas_parcelas(techada,agua_en_parcela, iluminacion_toma_corriente,superficie,createdAt,updatedAt, CaracteristicasCampingId) VALUES (${techada},${agua_en_parcela},${iluminacion_toma_corriente},${superficie},NOW(),NOW(),
+    ${CaractCampingId})`
+  ); */
+
+  /* await Promise.all(imagenes.map((imagen) =>
+    sequelize.query(
+      `INSERT INTO Camping_imagenes(url,createdAt,updatedAt,CampingId) VALUES ('${imagen}',NOW(),NOW(),${CampingId})`
+
+    )
+  )); */
+
+  /* let precios=[];
+  precios.push(mayores);
+  precios.push(menores);
+  precios.push(rodante);
+  console.log("PRECIOS",precios);
+ 
+   precios.forEach((e: any, i: number) =>
+    sequelize.query(
+      `INSERT INTO Relacion_campo_tarifas(precio, createdAt,updatedAt, TarifaId, CampingId) VALUES (${e},NOW(),NOW(),
+    '${i + 1}',${CampingId})`
+    )
+  )  */
+
+  return ReservaId;
+}

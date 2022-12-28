@@ -133,8 +133,7 @@ export const getCampingsPorLocalidad = async (id: string): Promise<datosCamping[
 
 
 
-// QUERY SOLO 1 CAMPING POR ID CON DETALLE E IMAGENES *******************
-
+// MUESTRA UN DETERMINADO CAMPING CON DETALLE E IMAGENES *******************
 export const getCampingsPorId = async (id: string): Promise<datosCamping> => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
     `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.abierto_fecha_desde , C.abierto_fecha_hasta, L.nombre AS localidad,P.nombre AS provincia,
@@ -162,6 +161,7 @@ WHERE C.habilitado=1 AND C.id=${id};`
   return querySql[0];
 }
 
+//MUESTRA TODOS LOS CAMPING CON DETALLES E IMAGENES
 // GET -> http://localhost:3001/api/campings
 export const getCampingsTodosDatos = async (): Promise<datosCamping[]> => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
