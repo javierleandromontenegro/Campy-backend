@@ -5,3 +5,12 @@ export const allPropertiesUsuario = [
   'dni',
   'clave'
 ]
+
+export const allPropertiesPost = [
+  'texto',
+  'imagenes'
+]
+
+export const allPropertiesComentario = [
+  'comentario'
+]
