@@ -2,7 +2,6 @@ import { reservas, reservasdetalle } from "../types/reservas";
 import { stateBooking } from "../types/datosBase";
 const { sequelize } = require("../db");
 
-
 const sortReservas = (reservas: reservas[]): reservas[] => 
   reservas.sort((prev: reservas, next: reservas): number => {
     const statePrev: string = prev.id_estado;
@@ -28,6 +27,7 @@ export const getReservas = async (): Promise<reservas[]> => {
   return sortReservas(querySql);
 }
 
+//http://localhost:3001/api/reservas/1
 export const getReservasByCampingId = async (id: string): Promise<reservas[]> => {
   const [querySql]: [querySql: reservas[]] = await sequelize.query(
     `SELECT R.id,R.fecha_desde_reserva, R.fecha_hasta_reserva, R.cant_noches, R.total, ER.id AS id_estado, U.id, U.email, C.id, C.nombre_camping, C.id AS id_campings
@@ -41,6 +41,8 @@ export const getReservasByCampingId = async (id: string): Promise<reservas[]> =>
   return sortReservas(querySql);
 }
 
+
+//http://localhost:3001/api/reservas/usuarios/:userId
 export const getReservasByUserId = async (id: string): Promise<reservas[]> => {
   const [querySql]: [querySql: reservas[]] = await sequelize.query(
     `SELECT R.id,R.fecha_desde_reserva, R.fecha_hasta_reserva, R.cant_noches, R.total, ER.id AS id_estado, P.email, C.nombre_camping, C.id AS id_campings
@@ -56,6 +58,7 @@ export const getReservasByUserId = async (id: string): Promise<reservas[]> => {
   return sortReservas(querySql);
 }
 
+//http://localhost:3001/api/reservas/detalle/2
 export const getReservaDetalle = async (id: string): Promise<reservasdetalle[]> => {
   const [querySql]: [querySql: reservasdetalle[]] = await sequelize.query(
     `SELECT T.descrip_tarifa, D.cantidad, D.subtotal
@@ -66,3 +69,5 @@ export const getReservaDetalle = async (id: string): Promise<reservasdetalle[]> 
 
   return querySql;
 }
+
+// hacer el POST DE RESERVAS Y POST DE DETALLE DE RESERVA

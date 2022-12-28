@@ -20,7 +20,8 @@ export default (models: any):void => {
     Caracteristicas_parcela,
     Abierto_periodo,
     Periodo_agua_caliente,
-    Favoritos
+    Favoritos,
+    Posts_imagenes
 } = models;
 
 
@@ -38,6 +39,9 @@ export default (models: any):void => {
 
   Posts_comentario.belongsTo(Posts_usuario);
   Posts_usuario.hasMany(Posts_comentario);
+
+  Posts_imagenes.belongsTo(Posts_usuario);
+  Posts_usuario.hasMany(Posts_imagenes);
   
   //Reservas
 

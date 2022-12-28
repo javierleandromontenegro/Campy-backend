@@ -8,12 +8,9 @@ import { campingsCantReservas } from "../types/datosBase";
 const { sequelize } = require("../db");
 
 // IMAGENES DE UN DETERMINADO CAMPING
-const getCampingsImagenes = async (id: number): Promise<string[]> => {
+export const getCampingsImagenes = async (id: number): Promise<string[]> => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
-    `SELECT C.ID,CI.url
-    from Campings as C
-    INNER JOIN Camping_imagenes AS CI ON CI.CampingId=C.id
-    WHERE C.habilitado=1 AND C.id=${id}`
+    `SELECT C.ID,CI.url from Campings as C INNER JOIN Camping_imagenes AS CI ON CI.CampingId=C.id WHERE C.habilitado=1 AND C.id=${id}`
   );
 
   return querySql.map((query: any): string => query.url);
@@ -144,7 +141,7 @@ export const getCampingsPorId = async (id: string): Promise<datosCamping> => {
     CA.categoria,CA.cantidad_estrellas,CC.duchas,CC.baños,CC.mascotas,CC.rodantes,CC.proveduria,CC.salon_sum,CC.restaurant,CC.vigilancia,CC.pileta,CC.estacionamiento,CC.juegos_infantiles,CC.maquinas_gimnasia,CC.wifi,
     CP.techada AS parcela_techada,CP.agua_en_parcela AS parcela_agua_en_parcela,CP.iluminacion_toma_corriente AS parcela_iluminacion_toma_corriente,CP.superficie AS parcela_superficie,
     AP.descripcion_periodo,
-    PAC.descripcion_periodo_agua   
+    PAC.descripcion_periodo_agua,C.puntuacion_promedio   
 from Campings as C
 INNER JOIN Categoria_campings AS CA ON C.CategoriaCampingId=CA.id
 INNER JOIN Caracteristicas_campings AS CC 
@@ -173,11 +170,40 @@ export const getCampingsPorUserId = async (userId: string): Promise<datosCamping
   return querySql;
 }
 
+// GET -> http://localhost:3001/api/campings
+export const getCampingsTodosDatos = async (): Promise<datosCamping[]> => {
+  const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
+    `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.abierto_fecha_desde , C.abierto_fecha_hasta,L.nombre AS localidad, L.id AS id_localidad, P.nombre AS provincia,P.id as id_provincia,CA.categoria,CA.id AS id_categoria,
+    CC.duchas,CC.baños,CC.mascotas,CC.rodantes,CC.proveduria,CC.salon_sum,CC.restaurant,CC.vigilancia,CC.pileta,CC.estacionamiento,CC.juegos_infantiles,CC.maquinas_gimnasia,CC.wifi,
+    CP.techada AS parcela_techada,CP.agua_en_parcela AS parcela_agua_en_parcela,CP.iluminacion_toma_corriente AS parcela_iluminacion_toma_corriente,CP.superficie AS parcela_superficie, AP.descripcion_periodo,
+    PAC.descripcion_periodo_agua,
+     RT.precio,C.puntuacion_promedio
+    FROM Campings AS C
+    INNER JOIN Relacion_campo_tarifas AS RT ON RT.CampingId=C.id AND RT.TarifaId=1
+    INNER JOIN Localidades AS L INNER JOIN Provincias as P ON P.Id=L.ProvinciaId ON C.LocalidadeId=L.id  
+    INNER JOIN Categoria_campings AS CA ON C.CategoriaCampingId=CA.id
+    INNER JOIN Caracteristicas_campings AS CC INNER JOIN Caracteristicas_parcelas AS CP ON CP.CaracteristicasCampingId=CC.id ON C.CaracteristicasCampingId=CC.id
+    INNER JOIN Abierto_periodos AS AP ON CC.AbiertoPeriodoId=AP.id
+    INNER JOIN Periodo_agua_calientes AS PAC ON CC.PeriodoAguaCalienteId=PAC.id
+    WHERE C.habilitado=1 ;`
+  );
+  const imagenesQuery: string[][] = await Promise.all(querySql.map(query => getCampingsImagenes(query.id)));
 
+  const resultsWithImagenes: datosCamping[] = querySql.map((query, i) => {
+    query.imagenes = imagenesQuery[i];
+    return query;
+  });
+
+  return resultsWithImagenes;
+}
+
+
+// FILTROS
+// POST -> http://localhost:3001/api/campings
 // QUERY TODOS LOS CAMPINGS CON DETALLE E IMAGENES
 export const getCampingsTodos = async ({ id_provincia,
   id_localidad, parcela_techada, parcela_agua_en_parcela, abierto_fecha_desde,
-  abierto_fecha_hasta, parcela_iluminacion_toma_corriente, precio, id_categoria, parcela_superficie,
+  abierto_fecha_hasta, parcela_iluminacion_toma_corriente, precio,reviews,id_categoria, parcela_superficie,
   mascotas,
   rodantes,
   proveduria,
@@ -188,7 +214,7 @@ export const getCampingsTodos = async ({ id_provincia,
   juegos_infantiles,
   salon_sum,
   wifi,
-  estacionamiento }: datosFiltros): Promise<datosCamping[]> => {
+  estacionamiento}: datosFiltros): Promise<datosCamping[]> => {
 
 
   let filtros = " ";
@@ -215,9 +241,29 @@ export const getCampingsTodos = async ({ id_provincia,
     filtros = filtros + ` AND (RT.precio>=${precio[0]} AND RT.precio<=${precio[1]})`;
   }
 
+  //console.log("LONGITUD ARRAY Review ES= ", reviews.length);
+  if (reviews.length <= 1) {
+    //console.log("TIENE UN SOLO VALOR");
+    reviews.forEach(element => {
+      filtros = filtros + ` AND C.puntuacion_promedio=('${element}')`;
+    });
+   }
+ 
+   if (reviews.length > 1) {
+    //console.log("TIENE MAS DE 1 VALOR")
+    filtros = filtros + ` AND `;
+    let ban: number = 0;
+    reviews.forEach(element => {
+      /* console.log("BANDA ES = ",ban); */
+      if (ban == 1) filtros = filtros + ` OR `;
+      filtros = filtros + ` C.puntuacion_promedio=('${element}')`;
+      ban = 1;
+    })
+  }
+  
 
-  console.log("LONGITUD ARRAY categorias ES= ", id_categoria.length);
 
+  //console.log("LONGITUD ARRAY categorias ES= ", id_categoria.length);
   if (id_categoria.length == 1) {
     /*  console.log("TIENE UN SOLO VALOR") */
     id_categoria.forEach(element => {
@@ -238,7 +284,7 @@ export const getCampingsTodos = async ({ id_provincia,
   }
 
   if (parcela_superficie.length > 0) {
-    console.log("PARCELA SUPERFICIE = ", parcela_superficie.length)
+    //console.log("PARCELA SUPERFICIE = ", parcela_superficie.length)
     filtros = filtros + ` AND (CP.superficie>=${parcela_superficie[0]} AND CP.superficie<=${parcela_superficie[1]})`;
   }
   if (parcela_techada === true) {
@@ -297,10 +343,7 @@ export const getCampingsTodos = async ({ id_provincia,
     filtros = filtros + ` AND  CC.estacionamiento=('1')`;
     /*filtros = filtros + ` AND  CC.estacionamiento=('${estacionamiento}')`;*/
   }
-  /*  if reviews){
-     filtros = filtros + ` AND  parcela_techada=('${reviews}')`;
-   }
-     */
+  
   console.log("FILTROS ES = ", filtros);
 
 
@@ -309,7 +352,7 @@ export const getCampingsTodos = async ({ id_provincia,
     CC.duchas,CC.baños,CC.mascotas,CC.rodantes,CC.proveduria,CC.salon_sum,CC.restaurant,CC.vigilancia,CC.pileta,CC.estacionamiento,CC.juegos_infantiles,CC.maquinas_gimnasia,CC.wifi,
     CP.techada AS parcela_techada,CP.agua_en_parcela AS parcela_agua_en_parcela,CP.iluminacion_toma_corriente AS parcela_iluminacion_toma_corriente,CP.superficie AS parcela_superficie, AP.descripcion_periodo,
     PAC.descripcion_periodo_agua,
-     RT.precio
+     RT.precio, C.puntuacion_promedio
     FROM Campings AS C
     INNER JOIN Relacion_campo_tarifas AS RT ON RT.CampingId=C.id AND RT.TarifaId=1
     INNER JOIN Localidades AS L INNER JOIN Provincias as P ON P.Id=L.ProvinciaId ON C.LocalidadeId=L.id  
@@ -331,10 +374,10 @@ export const getCampingsTodos = async ({ id_provincia,
   return resultsWithImagenes;
 }
 
+
 //ALTA DE CAMPING *********************
 export const postCampingsCreate = async ({
-  nombre_camping, descripcion_camping, direccion, telefono, contacto_nombre, contacto_tel, CategoriaCampingId, LocalidadeId, wifi, duchas, baños, mascotas, rodantes, proveduria, salon_sum, restaurant, vigilancia, pileta, estacionamiento, juegos_infantiles, maquinas_gimnasia, AbiertoPeriodoId, PeriodoAguaCalienteId, techada, agua_en_parcela, iluminacion_toma_corriente, superficie, imagenes, precios
-}: createCamping): Promise<number> => {
+  nombre_camping, descripcion_camping, direccion, telefono,longitud, latitud,abierto_fecha_desde,abierto_fecha_hasta, contacto_nombre, contacto_tel, CategoriaCampingId, LocalidadeId, wifi, duchas, baños, mascotas, rodantes, proveduria, salon_sum, restaurant, vigilancia, pileta, estacionamiento, juegos_infantiles, maquinas_gimnasia, AbiertoPeriodoId, PeriodoAguaCalienteId, techada, agua_en_parcela, iluminacion_toma_corriente, superficie, imagenes, mayores,menores,rodante,UsuarioId}: createCamping): Promise<number> => {
 
   if (!nombre_camping || !descripcion_camping || !direccion || !telefono || !contacto_nombre || !contacto_tel || !CategoriaCampingId || !LocalidadeId) throw {
     error: 406,
@@ -348,10 +391,11 @@ export const postCampingsCreate = async ({
     ${restaurant},${vigilancia},${pileta},${estacionamiento},${juegos_infantiles},${maquinas_gimnasia},NOW(),NOW(),${AbiertoPeriodoId},${PeriodoAguaCalienteId})`
   );
 
+
   const [CampingId]: [CampingId: number] = await sequelize.query(
     `INSERT INTO Campings(nombre_camping, descripcion_camping, direccion,telefono, longitud, latitud,abierto_fecha_desde,abierto_fecha_hasta, contacto_nombre, contacto_tel, createdAt, updatedAt, UsuarioId, CategoriaCampingId,CaracteristicasCampingId, LocalidadeId)
-      VALUES ('${nombre_camping}','${descripcion_camping}', '${direccion}','${telefono}','1234','1234', NOW(), NOW(),'${contacto_nombre}', 
-      '${contacto_tel}', NOW(), NOW(), 1, ${CategoriaCampingId},${CaractCampingId},${LocalidadeId})`
+      VALUES ('${nombre_camping}','${descripcion_camping}', '${direccion}','${telefono}','${longitud}','${latitud}', '${abierto_fecha_desde}', '${abierto_fecha_hasta}','${contacto_nombre}', 
+      '${contacto_tel}', NOW(), NOW(),${UsuarioId}, ${CategoriaCampingId},${CaractCampingId},${LocalidadeId})`
   );
 
   await sequelize.query(
@@ -366,13 +410,18 @@ export const postCampingsCreate = async ({
     )
   ));
 
-
-  precios.forEach((e: any, i: number) =>
+  let precios=[];
+  precios.push(mayores);
+  precios.push(menores);
+  precios.push(rodante);
+  console.log("PRECIOS",precios);
+ 
+   precios.forEach((e: any, i: number) =>
     sequelize.query(
       `INSERT INTO Relacion_campo_tarifas(precio, createdAt,updatedAt, TarifaId, CampingId) VALUES (${e},NOW(),NOW(),
     '${i + 1}',${CampingId})`
     )
-  )
+  ) 
 
   return CampingId;
 }

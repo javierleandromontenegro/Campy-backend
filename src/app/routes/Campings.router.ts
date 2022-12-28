@@ -16,8 +16,10 @@ import {
   getUserFavoritesCampings, 
   addFavoriteCamping, 
   removeFavoriteCamping,
-  getCampingsCantReservas, 
-  getCampingsPorUserId
+  getCampingsPorUserId,
+  getCampingsCantReservas,
+  getPreciosCamping,
+  getCampingsImagenes ,getCampingsTodosDatos
 } from '../services/Campings.service';
 import {datosFiltros} from "../types/datosFiltros"
 
@@ -140,7 +142,8 @@ CampingsRouter.get('/:idCamping', async (req: Request<{idCamping: string}>, res:
   }
 });
 
-//TODOS LOS CAMPING CON DETALLE E IMAGENES
+// POST FILTROS DE BOOKING
+//http://localhost:3001/api/campings
 CampingsRouter.post('/', async (req: Request<datosFiltros>, res: Response) => {
 
   try {
@@ -150,7 +153,17 @@ CampingsRouter.post('/', async (req: Request<datosFiltros>, res: Response) => {
   }
 });
 
+//TODOS LOS CAMPING CON DETALLE E IMAGENES
+CampingsRouter.get('/', async (_req: Request, res: Response) => {
 
+  try {
+    res.status(200).json(await getCampingsTodosDatos())
+  } catch {
+    res.status(404).json({error: `no se pudo en http://localhost/api/camping`});
+  }
+});
+
+//// CREA UN NUEVO CAMPING
 CampingsRouter.post('/create', async (req: Request<createCamping>, res: Response) => {
 
   try {
@@ -160,17 +173,19 @@ CampingsRouter.post('/create', async (req: Request<createCamping>, res: Response
   }
 });
 
-/* CampingsRouter.get('/imagenes/:idCamping', async (req: Request<{idCamping: string}>, res: Response) => {
+CampingsRouter.get('/imagenes/:idCamping', async (req: Request<{idCamping: number}>, res: Response) => {
   const { idCamping } = req.params;
 
   try {
     res.status(200).json(await getCampingsImagenes(idCamping))
-  } catch {
+  } catch(error) {
+    console.log(error)
     res.status(404).json({error: `no se pudo en http://localhost/api/camping/imagenes/${idCamping}`});
   }
-}); */
+});
 
-/* CampingsRouter.get('/tarifas/:idCamping', async (req: Request<{idCamping: string}>, res: Response) => {
+// lista de precios de un determinado campings
+CampingsRouter.get('/tarifas/:idCamping', async (req: Request<{idCamping: number}>, res: Response) => {
   const { idCamping } = req.params;
 
   try {
@@ -178,7 +193,22 @@ CampingsRouter.post('/create', async (req: Request<createCamping>, res: Response
   } catch {
     res.status(404).json({error: `no se pudo en http://localhost/api/camping/tarifas/${idCamping}`});
   }
-}); */
+
+});
+
+CampingsRouter.post(
+  '/favoritos/obtener/:userId', 
+  checkoutUser, 
+  async (req: Request<{userId: string}>, res: Response) => {
+  const { userId }: {userId: string} = req.params;
+
+  try {
+    res.status(200).json(await getUserFavoritesCampings(userId));
+  } catch(e: any) {
+    console.log(e)
+    res.status(e.error || 400).json(e);
+  }
+});
 
 CampingsRouter.post(
   '/favoritos/agregar/:campingId', 
@@ -209,4 +239,4 @@ CampingsRouter.delete(
 });
 
 
-export default CampingsRouter;
+export default CampingsRouter; 
