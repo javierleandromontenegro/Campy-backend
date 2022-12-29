@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { createCamping } from '../types/datosCamping';
-import {checkoutUser,checkoutAdmin} from '../services/CheckoutUser.service';
+import {checkoutUser,checkoutAdmin, checkoutOwner} from '../services/CheckoutUser.service';
 import { 
   getCampingsPorLocalidad, 
   getCampingsPorProvincia, 
@@ -16,9 +16,10 @@ import {
   getUserFavoritesCampings, 
   addFavoriteCamping, 
   removeFavoriteCamping,
+  getCampingsPorUserId,
   getCampingsCantReservas,
   getPreciosCamping,
-  getCampingsImagenes ,getCampingsTodosDatos
+  getCampingsImagenes ,getCampingsTodosDatos, inhabilitarCamping
 } from '../services/Campings.service';
 import {datosFiltros} from "../types/datosFiltros"
 
@@ -106,6 +107,31 @@ CampingsRouter.get('/localidades/:idLocalidad', async (req: Request<{idLocalidad
   }
 });
 
+CampingsRouter.get('/propietario/:userId', checkoutUser, async (req: Request<{ userId: string }>, res: Response) => {
+  const { userId }: { userId: string } = req.params;
+
+  try {
+    res.status(200).json(await getCampingsPorUserId(userId))
+  } catch(e: any) {
+    console.log(e)
+    res.status(404).json({error: `no se pudo en http://localhost/api/camping/${userId}`});
+  }
+});
+
+CampingsRouter.get(
+  '/favoritos/obtener/:userId', 
+  checkoutUser, 
+  async (req: Request<{userId: string}>, res: Response) => {
+  const { userId }: {userId: string} = req.params;
+
+  try {
+    res.status(200).json(await getUserFavoritesCampings(userId));
+  } catch(e: any) {
+    console.log(e)
+    res.status(e.error || 400).json(e);
+  }
+});
+
 CampingsRouter.get('/:idCamping', async (req: Request<{idCamping: string}>, res: Response) => {
   const { idCamping } = req.params;
 
@@ -116,7 +142,8 @@ CampingsRouter.get('/:idCamping', async (req: Request<{idCamping: string}>, res:
   }
 });
 
-// POST -TODOS LOS CAMPING CON DETALLE E IMAGENES SE ENVIA POR BODY UN ARCHIVO CON LOS FILTROS ACTIVOS
+// POST FILTROS DE BOOKING
+//http://localhost:3001/api/campings
 CampingsRouter.post('/', async (req: Request<datosFiltros>, res: Response) => {
 
   try {
@@ -136,7 +163,7 @@ CampingsRouter.get('/', async (_req: Request, res: Response) => {
   }
 });
 
-
+//// CREA UN NUEVO CAMPING
 CampingsRouter.post('/create', async (req: Request<createCamping>, res: Response) => {
 
   try {
@@ -157,6 +184,7 @@ CampingsRouter.get('/imagenes/:idCamping', async (req: Request<{idCamping: numbe
   }
 });
 
+// lista de precios de un determinado campings
 CampingsRouter.get('/tarifas/:idCamping', async (req: Request<{idCamping: number}>, res: Response) => {
   const { idCamping } = req.params;
 
@@ -165,7 +193,9 @@ CampingsRouter.get('/tarifas/:idCamping', async (req: Request<{idCamping: number
   } catch {
     res.status(404).json({error: `no se pudo en http://localhost/api/camping/tarifas/${idCamping}`});
   }
+
 });
+
 CampingsRouter.post(
   '/favoritos/obtener/:userId', 
   checkoutUser, 
@@ -189,6 +219,20 @@ CampingsRouter.post(
 
   try {
     res.status(200).json(await addFavoriteCamping(campingId, id));
+  } catch(e: any) {
+    res.status(e.error || 400).json(e);
+  }
+});
+
+CampingsRouter.put(
+  '/inhabilitar/:campingId', 
+  checkoutUser, 
+  checkoutOwner,
+  async (req: Request<{campingId: string}, { id: string }>, res: Response) => {
+  const { campingId }: {campingId: string} = req.params;
+
+  try {
+    res.status(200).json(await inhabilitarCamping(campingId));
   } catch(e: any) {
     res.status(e.error || 400).json(e);
   }
