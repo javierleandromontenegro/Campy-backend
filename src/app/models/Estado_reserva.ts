@@ -7,6 +7,10 @@ export default (sequelize: Sequelize) => {
       descrip_estado: {
         type: DataTypes.TEXT,
       },
+      prioridad: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+      }
     }
   );
 };
