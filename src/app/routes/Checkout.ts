@@ -16,6 +16,7 @@ CheckoutRouter.post('/', async (req: Request<datosMerca>, res: Response) => {
     let preference : any = {
         items : [
             {
+              id : "idrutabackgaby",
                 title : req.body.title,
                 picture_url : "https://mapio.net/images-p/8402429.jpg",
             description : "NADAAAAAAAAAAA",
@@ -29,16 +30,20 @@ CheckoutRouter.post('/', async (req: Request<datosMerca>, res: Response) => {
           pending: "http://localhost:3000/booking/camping/1"
       },
       auto_return: "approved",
+      notification_url : "https://2a2b-181-23-131-222.sa.ngrok.io/api/checkout/payment"
     }; 
 
     mercadopago.preferences.create(preference)
     .then(function(response){
-console.log(response.body)
+console.log(response)
  
 res.redirect(response.body.init_point)
     })
 
-    console.log(req)
+    let algo : any = req 
+
+    algo = undefined 
+    console.log(algo)
  
     
    
@@ -47,5 +52,38 @@ res.redirect(response.body.init_point)
     res.status(400).json(e)
   }
 });
+
+
+
+CheckoutRouter.post('/payment', async (req: Request<datosMerca>, res: Response) => {
+  const { query  } = req
+  var merchantOrder 
+  var payment
+ 
+  const topic = query.topic || query.type 
+
+  switch (topic) {
+    case "payment" :
+    const  paymentId : any  = query.id || query['data.id'];
+   payment  = await  mercadopago.payment.findById(paymentId)
+    merchantOrder = await mercadopago.merchant_orders.findById(payment.body.order.id);
+   break
+   
+   case "merchant_order" : 
+   const orderId : any = query.id;
+   merchantOrder = await mercadopago.merchant_orders.findById(orderId);
+   break
+  }
+
+if(false){
+  console.log(payment)
+}
+
+console.log(merchantOrder?.body?.items)
+console.log(merchantOrder)
+//  console.log(merchantOrder)
+
+  res.send()
+})
 
 export default CheckoutRouter;
