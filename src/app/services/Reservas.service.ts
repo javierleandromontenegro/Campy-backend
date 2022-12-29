@@ -147,4 +147,4 @@ const [ReservaPago]: [ReservaId: number] = await sequelize.query(
 );
 
 return ReservaPago;
-};
+}
