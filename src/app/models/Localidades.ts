@@ -9,6 +9,15 @@ export default (sequelize: Sequelize) => {
       },
       imagen: {
         type: DataTypes.STRING
+      },
+      descrip_historia:{
+        type: DataTypes.STRING
+      },
+      latitud:{
+        type: DataTypes.STRING
+      },
+      longitud:{
+        type: DataTypes.STRING
       }
     }
   );
