@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { createCamping } from '../types/datosCamping';
-import {checkoutUser,checkoutAdmin} from '../services/CheckoutUser.service';
+import {checkoutUser,checkoutAdmin, checkoutOwner} from '../services/CheckoutUser.service';
 import { 
   getCampingsPorLocalidad, 
   getCampingsPorProvincia, 
@@ -19,7 +19,7 @@ import {
   getCampingsPorUserId,
   getCampingsCantReservas,
   getPreciosCamping,
-  getCampingsImagenes ,getCampingsTodosDatos
+  getCampingsImagenes ,getCampingsTodosDatos, inhabilitarCamping
 } from '../services/Campings.service';
 import {datosFiltros} from "../types/datosFiltros"
 
@@ -219,6 +219,20 @@ CampingsRouter.post(
 
   try {
     res.status(200).json(await addFavoriteCamping(campingId, id));
+  } catch(e: any) {
+    res.status(e.error || 400).json(e);
+  }
+});
+
+CampingsRouter.put(
+  '/inhabilitar/:campingId', 
+  checkoutUser, 
+  checkoutOwner,
+  async (req: Request<{campingId: string}, { id: string }>, res: Response) => {
+  const { campingId }: {campingId: string} = req.params;
+
+  try {
+    res.status(200).json(await inhabilitarCamping(campingId));
   } catch(e: any) {
     res.status(e.error || 400).json(e);
   }

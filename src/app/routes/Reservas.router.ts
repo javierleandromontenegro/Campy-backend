@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { getReservas, getReservaDetalle, getReservasByUserId, getReservasByCampingId } from '../services/Reservas.service';
+import { getReservas, getReservaDetalle, getReservasByUserId, getReservasByCampingId, putEstadoReserva } from '../services/Reservas.service';
 import { checkoutUser } from '../services/CheckoutUser.service';
 
 const ReservasRouter: Router = Router();
@@ -42,6 +42,17 @@ ReservasRouter.get('/detalle/:reservaId', async (req: Request<{ reservaId: strin
     res.status(200).json(await getReservaDetalle(reservaId))
   } catch {
     res.status(404).json({ error: `no se pudo en http://localhost/api/reservas/detalle/:idReserva` });
+  }
+});
+
+ReservasRouter.put('/:reservaId', checkoutUser, async (req: Request<{reservaId: string }>, res: Response) => {
+  const { reservaId }: {reservaId: string } = req.params;
+  const { newEstado }: { newEstado: string } = req.body;
+
+  try {
+    res.status(200).json(await putEstadoReserva(reservaId, newEstado))
+  } catch(e: any) {
+    res.status(e.error || 400).json(e);
   }
 });
 
