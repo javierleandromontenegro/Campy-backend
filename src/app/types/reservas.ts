@@ -16,3 +16,18 @@ export interface reservas {
     cantidad:number,
     subtotal:number
   }
+
+  export interface reservaCreate {
+    fecha_desde_reserva:Date,
+    fecha_hasta_reserva:Date,
+    cant_noches:number,
+    total:number,    
+    UsuarioId:string,
+    CampingId:string,
+    cantMayores:number,
+    cantMenores:number,
+    extraRodante:number,
+    precioMayores:number,
+    precioMenores:number,
+    precioextraRodante:number
+  }

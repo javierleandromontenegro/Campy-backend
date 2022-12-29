@@ -1,6 +1,7 @@
 import { reservas, reservasdetalle } from "../types/reservas";
 import { stateBooking } from "../types/datosBase";//stateBookig es un objeto que tiene el id de los tipos de reserva
 import { ResultSetHeader } from "mysql2";
+import {reservaCreate} from "../types/reservas";
 const { sequelize } = require("../db");
 
 //http://localhost:3001/api/campings/reservas
@@ -67,13 +68,61 @@ export const getReservasByUserId = async (id: string): Promise<reservas[]> => {
 //http://localhost:3001/api/reservas/detalle/2
 export const getReservaDetalle = async (id: string): Promise<reservasdetalle[]> => {
   const [querySql]: [querySql: reservasdetalle[]] = await sequelize.query(
-    `SELECT T.descrip_tarifa, D.cantidad, D.subtotal
+    `SELECT T.descrip_tarifa, D.cantidad, D.precio, D.subtotal
     FROM Detalle_reservas AS D 
     INNER JOIN Reservas AS R ON D.ReservaId=R.id
     INNER JOIN Tarifas AS T ON D.TarifaId=T.id WHERE D.ReservaId=${id}`
   );
 
   return querySql;
+}
+
+// hacer el POST DE RESERVAS Y POST DE DETALLE DE RESERVA
+
+//http://localhost:3001/api/reservas/create
+export const postReservaCreate = async ({fecha_desde_reserva, fecha_hasta_reserva, cant_noches, total, UsuarioId, CampingId, cantMayores, cantMenores, extraRodante, precioMayores, precioMenores, precioextraRodante
+  }: reservaCreate): Promise<number> => {
+
+  /* if (!nombre_camping || !descripcion_camping || !direccion || !telefono || !contacto_nombre || !contacto_tel || !CategoriaCampingId || !LocalidadeId) throw {
+    error: 406,
+    message: 'Faltan parámetros'
+  };
+ */
+  const [ReservaId]: [ReservaId: number] = await sequelize.query(
+    `INSERT INTO Reservas(fecha_desde_reserva, fecha_hasta_reserva, cant_noches, total, createdAt, updatedAt, EstadoReservaId, UsuarioId, CampingId) VALUES ('${fecha_desde_reserva}','${fecha_hasta_reserva}',${cant_noches},${total},NOW(),NOW(),'${process.env.PENDIENTE}',${UsuarioId},${CampingId})`
+  );
+
+  //CARGA DETALLE DE CANT
+  let detalle=[];
+  detalle.push(cantMayores);
+  detalle.push(cantMenores);
+  detalle.push(extraRodante);
+  console.log("MOSTRAR DETALLE ARRAY= ",detalle);
+ 
+   detalle.forEach((e: any, i: number) =>
+    sequelize.query(
+      `INSERT INTO Detalle_reservas(cantidad, subtotal, createdAt, updatedAt, ReservaId, TarifaId) VALUES (${e},0,NOW(),NOW(),${ReservaId},${i+1})`
+    )
+  )  
+
+  // CARGA DETALLE DE PRECIOS AL MOMENTO DE LA RESERVA
+  let SubtotalArray=[];
+  SubtotalArray.push(precioMayores);
+  SubtotalArray.push(precioMenores);
+  SubtotalArray.push(precioextraRodante);
+  console.log("MOSTRAR SUBTOTALES ARRAY= ",SubtotalArray);
+ 
+  SubtotalArray.forEach((e: any, i: number) =>
+    sequelize.query(
+      `UPDATE Detalle_reservas SET precio=${e} WHERE ReservaId=${ReservaId} AND TarifaId=${i+1}`
+    )
+  )    
+// ACTUALIZA SUBTOTAL EN DETALLE DE RESERVA
+  await sequelize.query(
+    `UPDATE Detalle_reservas SET subtotal=(cantidad*precio) WHERE ReservaId=${ReservaId}`
+  );
+
+  return ReservaId;
 }
 
 //Confirmar estado de una reserva pendiente
@@ -88,5 +137,3 @@ export const putEstadoReserva = async (reservaId: string, newEstado: string): Pr
 
   return { reservaId: +reservaId, newEstado }
 };
-
-// hacer el POST DE RESERVAS Y POST DE DETALLE DE RESERVA

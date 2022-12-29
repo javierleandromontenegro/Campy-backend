@@ -42,7 +42,7 @@ export const getCampingsCategorias = async (): Promise<campingCategorias[]> => {
 // MUESTRA TODOS LOS CAMPINGS INDICANDO EL ESTADO DE HABILITACION
 export const getCampingsHabilitacion = async (): Promise<campingHabilitado[]> => {
   const [querySql]: [querySql: campingHabilitado[]] = await sequelize.query(
-    `SELECT C.id, C.nombre_camping, C.habilitado, L.nombre AS localidad, P.nombre AS provincia FROM Campings AS C INNER JOIN Localidades AS L INNER JOIN Provincias AS P ON L.ProvinciaId=P.id ON C.LocalidadeId=L.id`
+    `SELECT C.id, C.nombre_camping, C.habilitado, C.contacto_tel, L.nombre AS localidad, P.nombre AS provincia FROM Campings AS C INNER JOIN Localidades AS L INNER JOIN Provincias AS P ON L.ProvinciaId=P.id ON C.LocalidadeId=L.id`
   );
 
   return querySql;
@@ -134,8 +134,7 @@ export const getCampingsPorLocalidad = async (id: string): Promise<datosCamping[
 
 
 
-// QUERY SOLO 1 CAMPING POR ID CON DETALLE E IMAGENES *******************
-
+// MUESTRA UN DETERMINADO CAMPING CON DETALLE E IMAGENES *******************
 export const getCampingsPorId = async (id: string): Promise<datosCamping> => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
     `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.abierto_fecha_desde , C.abierto_fecha_hasta, L.nombre AS localidad,P.nombre AS provincia,
@@ -162,6 +161,9 @@ WHERE C.habilitado=1 AND C.id=${id};`
 
   return querySql[0];
 }
+
+
+//MUESTRA TODOS LOS CAMPING CON DETALLES E IMAGENES
 
 export const getCampingsPorUserId = async (userId: string): Promise<datosCamping[]> => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(

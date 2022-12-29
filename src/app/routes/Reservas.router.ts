@@ -1,8 +1,28 @@
 import { Router, Request, Response } from 'express';
-import { getReservas, getReservaDetalle, getReservasByUserId, getReservasByCampingId, putEstadoReserva } from '../services/Reservas.service';
+import { reservaCreate } from '../types/reservas';
+import { 
+    getReservas, 
+    getReservaDetalle, 
+    getReservasByUserId, 
+    getReservasByCampingId,
+    postReservaCreate, 
+    putEstadoReserva } from '../services/Reservas.service';
 import { checkoutUser } from '../services/CheckoutUser.service';
 
+
 const ReservasRouter: Router = Router();
+
+
+//http://localhost:3001/api/reservas/create
+ReservasRouter.post('/create', async (req: Request<reservaCreate>, res: Response) => {
+
+  try {
+    res.status(200).json(await postReservaCreate(req.body))
+  } catch(error: any) {
+    res.status(error.error).json(error);
+  }
+});
+
 
 // http://localhost:3001/api/reservas
 ReservasRouter.get('/', async (_req: Request, res: Response) => {
