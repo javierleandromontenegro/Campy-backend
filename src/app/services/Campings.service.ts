@@ -161,9 +161,9 @@ WHERE C.habilitado=1 AND C.id=${id};`
   return querySql[0];
 }
 
-<<<<<<< HEAD
+
 //MUESTRA TODOS LOS CAMPING CON DETALLES E IMAGENES
-=======
+
 export const getCampingsPorUserId = async (userId: string): Promise<datosCamping[]> => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
     `SELECT id, nombre_camping, habilitado FROM Campings WHERE UsuarioId=${userId}`
@@ -172,7 +172,6 @@ export const getCampingsPorUserId = async (userId: string): Promise<datosCamping
   return querySql;
 }
 
->>>>>>> e54ce2e82e605692a9a55876b7217026938b921b
 // GET -> http://localhost:3001/api/campings
 export const getCampingsTodosDatos = async (): Promise<datosCamping[]> => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(

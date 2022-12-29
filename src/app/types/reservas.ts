@@ -23,5 +23,11 @@ export interface reservas {
     cant_noches:number,
     total:number,    
     UsuarioId:string,
-    CampingId:string
+    CampingId:string,
+    cantMayores:number,
+    cantMenores:number,
+    extraRodante:number,
+    precioMayores:number,
+    precioMenores:number,
+    precioextraRodante:number
   }

@@ -1,11 +1,10 @@
 import { Router, Request, Response } from 'express';
-<<<<<<< HEAD
+
 import { reservaCreate } from '../types/reservas';
 import { getReservas, getReservaDetalle, getReservasByUserId, getReservasByCampingId ,postReservaCreate } from '../services/Reservas.service';
-=======
-import { getReservas, getReservaDetalle, getReservasByUserId, getReservasByCampingId } from '../services/Reservas.service';
+
 import { checkoutUser } from '../services/CheckoutUser.service';
->>>>>>> e54ce2e82e605692a9a55876b7217026938b921b
+
 
 const ReservasRouter: Router = Router();
 
