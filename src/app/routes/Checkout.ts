@@ -12,21 +12,9 @@ mercadopago.configure({
 
 CheckoutRouter.post('/', async (req: Request<datosMerca>, res: Response) => {
   try {
-    
     const { titleM , priceM} = req.body 
     console.log(titleM , priceM) 
     let preference : any = {
-<<<<<<< HEAD
-      items : [
-          {
-            id : "idrutabackgaby",
-            title : req.body.title,
-            picture_url : "https://mapio.net/images-p/8402429.jpg",
-            description : "NADAAAAAAAAAAA",
-            unit_price : parseInt(req.body.price),
-            quantity : 1,
-          }
-=======
         items : [
             {
 
@@ -34,11 +22,9 @@ CheckoutRouter.post('/', async (req: Request<datosMerca>, res: Response) => {
                 title : req.body.title,
                 picture_url : "https://res.cloudinary.com/pfcampy/image/upload/v1670849448/campy/logo_CAMPY-BLANCO_hn507u.png",
                 description: `Alquiler temporario desde ${req.body.alldate} hasta ${req.body.alldate2}  para ${req.body.mayores} mayores y ${req.body.menores} menores`  ,
-                unit_price : parseInt(req.body.price),
-                quantity : 1,
-                 
+                unit_price : parseFloat(req.body.price),
+                quantity : 1,           
             }
->>>>>>> 88979e42958ee23c8cede88d7c585325ba89b43d
         ],
       "back_urls": {
         success: `${process.env.HOST_FRONTEND || 'http://localhost:3000'}/booking/camping/1`,
@@ -46,14 +32,9 @@ CheckoutRouter.post('/', async (req: Request<datosMerca>, res: Response) => {
         pending: `${process.env.HOST_FRONTEND || 'http://localhost:3000'}/booking/camping/1`
       },
       auto_return: "approved",
-<<<<<<< HEAD
-      notification_url : `${process.env.HOST || 'https://2a2b-181-23-131-222.sa.ngrok.io'}/api/checkout/payment`
-    };
-=======
-      notification_url : "https://5312-181-23-159-5.sa.ngrok.io/api/checkout/payment",
+      notification_url : `${process.env.HOST || 'https://2a2b-181-23-131-222.sa.ngrok.io'}/api/checkout/payment`,
         "statement_descriptor": "CAMPY"
     }; 
->>>>>>> 88979e42958ee23c8cede88d7c585325ba89b43d
 
     mercadopago.preferences.create(preference)
     .then(function(response){
