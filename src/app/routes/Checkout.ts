@@ -12,7 +12,7 @@ mercadopago.configure({
 
 CheckoutRouter.post('/', async (req: Request<datosMerca>, res: Response) => {
   try {
-  
+    
     const { titleM , priceM} = req.body 
     console.log(titleM , priceM) 
     let preference : any = {
