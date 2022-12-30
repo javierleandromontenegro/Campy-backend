@@ -31,3 +31,9 @@ export interface reservas {
     precioMenores:number,
     precioextraRodante:number
   }
+
+  export interface reservaPago {
+    ID_reserva:string,
+    ID_transaccion:string,
+    Estado_transaccion:string
+  }  

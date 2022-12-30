@@ -18,7 +18,14 @@ export default (sequelize: Sequelize) => {
       },
       total: {
         type: DataTypes.FLOAT,
+      },
+      ID_transaccion: {
+        type: DataTypes.STRING,
+      },
+      Estado_transaccion: {
+        type: DataTypes.STRING,
       }
+
     }
   );
 };
