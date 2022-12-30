@@ -142,9 +142,11 @@ CampingsRouter.get('/:idCamping', async (req: Request<{idCamping: string}>, res:
   }
 });
 
+
 // POST FILTROS DE BOOKING
 //http://localhost:3001/api/campings
 CampingsRouter.post('/', async (req: Request<datosFiltros>, res: Response) => {
+
 
   try {
     res.status(200).json(await getCampingsTodos(req.body))
@@ -163,7 +165,9 @@ CampingsRouter.get('/', async (_req: Request, res: Response) => {
   }
 });
 
+
 //// CREA UN NUEVO CAMPING
+
 CampingsRouter.post('/create', async (req: Request<createCamping>, res: Response) => {
 
   try {

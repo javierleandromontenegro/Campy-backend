@@ -217,6 +217,7 @@ export const getCampingsTodos = async ({ id_provincia,
   juegos_infantiles,
   salon_sum,
   wifi,
+
   estacionamiento}: datosFiltros): Promise<datosCamping[]> => {
 
 
