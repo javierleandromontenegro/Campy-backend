@@ -6,8 +6,9 @@ const { sequelize } = require("../db");
 //http://localhost:3001/api/provincias/idpais
 export const getProvincias = async (id: string): Promise<datosBase[]> => {
   const [querySql]: [querySql: datosBase[]] = await sequelize.query(
-    `SELECT PV.id AS id, PV.nombre AS nombre, PV.imagen AS imagen FROM Paises AS PS
-    INNER JOIN Provincias as PV ON PS.id=PV.PaiseId WHERE PS.id=${id} ORDER BY nombre`
+    `SELECT P.id AS id,P.nombre AS nombre, P.descrip_historia, P.latitud, P.longitud, P.imagen AS imagen FROM Provincias AS P 
+    INNER JOIN Paises ON P.PaiseId=Paises.id
+    WHERE P.PaiseId=${id} ORDER BY P.nombre`
   );
 
   return querySql;

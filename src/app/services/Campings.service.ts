@@ -4,6 +4,7 @@ import { createCamping, campingCategorias, campingTarifas, campingAbiertoPeriodo
 import { datosFiltros } from "../types/datosFiltros";
 import datosPrecios from "../types/datosPrecios";
 import { campingsCantReservas } from "../types/datosBase";
+import { getReservasPendientesByCampingId } from "./Reservas.service";
 
 const { sequelize } = require("../db");
 
@@ -133,8 +134,7 @@ export const getCampingsPorLocalidad = async (id: string): Promise<datosCamping[
 
 
 
-// QUERY SOLO 1 CAMPING POR ID CON DETALLE E IMAGENES *******************
-
+// MUESTRA UN DETERMINADO CAMPING CON DETALLE E IMAGENES *******************
 export const getCampingsPorId = async (id: string): Promise<datosCamping> => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
     `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.abierto_fecha_desde , C.abierto_fecha_hasta, L.nombre AS localidad,P.nombre AS provincia,
@@ -161,6 +161,9 @@ WHERE C.habilitado=1 AND C.id=${id};`
 
   return querySql[0];
 }
+
+
+//MUESTRA TODOS LOS CAMPING CON DETALLES E IMAGENES
 
 export const getCampingsPorUserId = async (userId: string): Promise<datosCamping[]> => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
@@ -426,7 +429,7 @@ export const postCampingsCreate = async ({
   return CampingId;
 }
 
-
+//Obtiene los favoritos de un usuario
 export const getUserFavoritesCampings = async (userId: string): Promise<datosBase[]> => {
   const [querySql]: [querySql: datosBase[]] = await sequelize.query(
     `SELECT C.id, C.nombre_camping AS nombre FROM Favoritos AS F INNER JOIN Campings AS C ON C.id=F.CampingId INNER JOIN Usuarios AS U ON U.id=F.UsuarioId WHERE U.id=${userId};`
@@ -442,6 +445,7 @@ export const getUserFavoritesCampings = async (userId: string): Promise<datosBas
   return resultsWithImagenes;
 }
 
+//Añade un camping a favoritos del usuario
 export const addFavoriteCamping = async (campingId: string, userId: string): Promise<datosBase[]> => {
   await sequelize.query(
     `INSERT INTO Favoritos (CampingId, UsuarioId, createdAt, updatedAt) VALUES (${campingId}, ${userId}, NOW(), NOW());`
@@ -450,9 +454,24 @@ export const addFavoriteCamping = async (campingId: string, userId: string): Pro
   return await getUserFavoritesCampings(userId);
 }
 
+//Elimina un camping de favoritos de un usuario
 export const removeFavoriteCamping = async (campingId: string, userId: string): Promise<number> => {
   await sequelize.query(
     `DELETE FROM Favoritos WHERE UsuarioId=${userId} AND CampingId=${campingId}; `
+  );
+
+  return +campingId;
+}
+
+//Dar de baja un camping
+export const inhabilitarCamping = async (campingId: string) => {
+  const reservasCamping = await getReservasPendientesByCampingId(campingId);
+
+  if(reservasCamping.length)
+    throw { error: 400, message: 'No se puede dar de baja un camping con reservas pendientes.' }
+
+  await sequelize.query(
+    `UPDATE Campings SET habilitado=0 WHERE id=${campingId}`
   );
 
   return +campingId;
