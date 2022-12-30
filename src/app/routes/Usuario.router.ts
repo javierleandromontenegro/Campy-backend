@@ -46,15 +46,16 @@ UsuariosRouter.put('/deshabilitar/:userId', checkoutUser, checkoutAdmin, async (
   }
 });
 
-UsuariosRouter.put('/actualizar', checkoutUser, async (req: Request<{}, {}, { userId: number, token: string, user: any }, any>, res: Response) => {
+UsuariosRouter.put('/actualizar', checkoutUser, async (req: Request<{}, {}, { userId: number, user: any }, any>, res: Response) => {
   try {
-    const { userId, token } = req.body;
+    const { userId } = req.body;
+    const authorization: string = req.headers.authorization as string;
     const { id, tipo }: { id: number, tipo: string } = req.body.user;
 
     if (userId !== id && String(tipo) !== process.env.TIPO_ADMIN)
       throw { error: 401, message: 'Acceso denegado.' }
 
-    res.status(200).json(await updateUser(req.query, userId, token));
+    res.status(200).json(await updateUser(req.query, userId, authorization));
   } catch (e: any) {
     res.status(e.error || 404).json(e);
   }

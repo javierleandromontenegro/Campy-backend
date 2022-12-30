@@ -1,13 +1,13 @@
 import { reservas, reservasdetalle } from "../types/reservas";
 import { stateBooking } from "../types/datosBase";//stateBookig es un objeto que tiene el id de los tipos de reserva
 import { ResultSetHeader } from "mysql2";
-import {reservaCreate} from "../types/reservas";
+import {reservaCreate, reservaPago} from "../types/reservas";
 const { sequelize } = require("../db");
 
 //http://localhost:3001/api/campings/reservas
 export const getReservas = async (): Promise<reservas[]> => {
   const [querySql]: [querySql: reservas[]] = await sequelize.query(
-    `SELECT R.id,R.fecha_desde_reserva, R.fecha_hasta_reserva, R.cant_noches, R.total, ER.id AS id_estado, U.email, C.nombre_camping, C.id AS id_campings
+    `SELECT R.id,R.fecha_desde_reserva, R.fecha_hasta_reserva, R.createdAt, R.cant_noches, R.total, ER.id AS id_estado, U.email, C.nombre_camping, C.id AS id_campings
       FROM Reservas AS R
       INNER JOIN Estado_reservas AS ER ON ER.id=R.EstadoReservaId
       INNER JOIN Usuarios AS U ON U.id=R.UsuarioId
@@ -60,6 +60,18 @@ export const getReservasByUserId = async (id: string): Promise<reservas[]> => {
     ON C.id=R.CampingId 
     WHERE U.id=${id} 
     ORDER BY ER.prioridad`
+  );
+
+  return querySql;
+}
+
+//http://localhost:3001/api/reservas/propietarios/:ownerId
+export const getReservasByOwnerId = async (ownerId: string): Promise<reservas[]> => {
+  const [querySql]: [querySql: reservas[]] = await sequelize.query(
+    `SELECT R.id, C.nombre_camping FROM Reservas AS R
+    INNER JOIN Campings AS C
+    ON C.id=R.CampingId
+    WHERE C.UsuarioId=${ownerId} AND R.EstadoReservaId='${process.env.PENDIENTE}'`
   );
 
   return querySql;
@@ -137,3 +149,14 @@ export const putEstadoReserva = async (reservaId: string, newEstado: string): Pr
 
   return { reservaId: +reservaId, newEstado }
 };
+
+
+//ACTUALIZA LA RESERVA CON DATOS DE MERCADO PAGO COMO SER ID_TRANSACCION Y EL ESTADO DE LA MISMA
+export const postReservaPago = async ({ ID_reserva,ID_transaccion, Estado_transaccion}: reservaPago): Promise<number> => {
+
+const [ReservaPago]: [ReservaId: number] = await sequelize.query(
+  `UPDATE Reservas SET ID_transaccion='${ID_transaccion}',Estado_transaccion='${Estado_transaccion}' WHERE id=${ID_reserva}`
+);
+
+return ReservaPago;
+}
