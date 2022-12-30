@@ -37,7 +37,8 @@ export const registerUser = async ({
 
 
   await sendEmail({ userEmail: createdUser.email, subject: 'Confirmá tu cuenta de google', templateHtml });
-
+   
+  console.log(createdUser);
   return createdUser;
 };
 
@@ -128,6 +129,9 @@ async function sendEmail({ userEmail, subject, templateHtml }: { userEmail: stri
         user: EMAIL,
         pass: EMAIL_PASSWORD
       },
+      tls: {
+        rejectUnauthorized: false
+    }
     });
 
     await transporter.sendMail({
