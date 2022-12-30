@@ -92,7 +92,7 @@ console.log(merchantOrder?.body?.items)
  console.log(merchantOrder?.body?.items[0].id)
  console.log(merchantOrder?.body.id)
  console.log(merchantOrder?.body.order_status)
- //console.log(merchantOrder?.body?.payments)
+ 
 
 //  console.log(merchantOrder)
   postReservaPago({"ID_reserva" : merchantOrder?.body?.items[0].id , "ID_transaccion" : merchantOrder?.body.id , "Estado_transaccion" :  merchantOrder?.body.order_status  }) 
