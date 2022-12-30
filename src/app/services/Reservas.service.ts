@@ -7,7 +7,7 @@ const { sequelize } = require("../db");
 //http://localhost:3001/api/campings/reservas
 export const getReservas = async (): Promise<reservas[]> => {
   const [querySql]: [querySql: reservas[]] = await sequelize.query(
-    `SELECT R.id,R.fecha_desde_reserva, R.fecha_hasta_reserva, R.cant_noches, R.total, ER.id AS id_estado, U.email, C.nombre_camping, C.id AS id_campings
+    `SELECT R.id,R.fecha_desde_reserva, R.fecha_hasta_reserva, R.createdAt, R.cant_noches, R.total, ER.id AS id_estado, U.email, C.nombre_camping, C.id AS id_campings
       FROM Reservas AS R
       INNER JOIN Estado_reservas AS ER ON ER.id=R.EstadoReservaId
       INNER JOIN Usuarios AS U ON U.id=R.UsuarioId
@@ -60,6 +60,18 @@ export const getReservasByUserId = async (id: string): Promise<reservas[]> => {
     ON C.id=R.CampingId 
     WHERE U.id=${id} 
     ORDER BY ER.prioridad`
+  );
+
+  return querySql;
+}
+
+//http://localhost:3001/api/reservas/propietarios/:ownerId
+export const getReservasByOwnerId = async (ownerId: string): Promise<reservas[]> => {
+  const [querySql]: [querySql: reservas[]] = await sequelize.query(
+    `SELECT R.id, C.nombre_camping FROM Reservas AS R
+    INNER JOIN Campings AS C
+    ON C.id=R.CampingId
+    WHERE C.UsuarioId=${ownerId} AND R.EstadoReservaId='${process.env.PENDIENTE}'`
   );
 
   return querySql;

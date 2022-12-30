@@ -3,7 +3,8 @@ export const allPropertiesUsuario = [
   'numero_celular',
   'direccion',
   'dni',
-  'clave'
+  'clave',
+  'foto'
 ];
 
 export const prioridadEstadoReserva = {

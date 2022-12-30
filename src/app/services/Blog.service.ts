@@ -4,8 +4,8 @@ import { allPropertiesComentario, allPropertiesPost } from "../types/Properties"
 const { sequelize } = require("../db");
 
 export const postBlogCreate = async ({ titulo, texto, imagenes, usuarioId }: datosPost): Promise<number> => {
-
-  if (!titulo || !texto || !imagenes) throw {
+  console.log(titulo, texto, imagenes, usuarioId)
+  if (!titulo || !texto || imagenes.length<1) throw {
     error: 406,
     message: 'Faltan parámetros'
   };
@@ -14,8 +14,6 @@ export const postBlogCreate = async ({ titulo, texto, imagenes, usuarioId }: dat
     `INSERT INTO Posts_usuarios (titulo, texto, fecha, createdAt, updatedAt, UsuarioId) 
         VALUES ('${titulo.replace("'", "\\'")}', '${texto.replace("'", "\\'")}', NOW(), NOW(), NOW(), ${usuarioId})`
   )
-
-  console.log(postBlogId);
 
 
   await Promise.all(imagenes.map((imagenes) =>
