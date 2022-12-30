@@ -86,4 +86,30 @@ console.log(merchantOrder)
   res.send()
 })
 
+
+//Ruta provisoria hasta que realicen la ruta real de post
+CheckoutRouter.post('/provisoria', async (req: Request<datosMerca>, res: Response) => {
+try {
+  let body = req.body 
+  let data = {
+    user : body.user, 
+    ingreso : body.validate.alldate,
+    egreso : body.validate.alldate2,
+    rodante : body.validate.stay,
+    mayores : body.validate.travellers,
+    menores : body.validate.kids,
+    total : body.price
+  }
+  
+console.log(data)
+  res.send("sisi")
+}catch(e) {
+  console.log("error", e)
+  res.status(400).json(e)
+}
+
+})
+
+
+
 export default CheckoutRouter;
