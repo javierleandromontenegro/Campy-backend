@@ -137,7 +137,7 @@ export const putEstadoReserva = async (reservaId: string, newEstado: string): Pr
 
   return { reservaId: +reservaId, newEstado }
 };
-
+ 
 
 //ACTUALIZA LA RESERVA CON DATOS DE MERCADO PAGO COMO SER ID_TRANSACCION Y EL ESTADO DE LA MISMA
 export const postReservaPago = async ({ ID_reserva,ID_transaccion, Estado_transaccion}: reservaPago): Promise<number> => {

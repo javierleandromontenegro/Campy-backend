@@ -17,26 +17,7 @@ const ReservasRouter: Router = Router();
 ReservasRouter.post('/create', async (req: Request<reservaCreate>, res: Response) => {
 
   try {
-    let body = req.body 
-    let ingreso1 = body.validate.alldate.slice(0, 10).replace("-", '/').replace("-", '/')
-    let ingreso2 = body.validate.alldate2.slice(0, 10).replace("-", '/').replace("-", '/')
-    let trailer = body.validate.stay > 0 ?  1 : 0 
-  
-    let data = {
-      "fecha_desde_reserva" : ingreso1,
-      "fecha_hasta_reserva" : ingreso2,
-      "cant_noches" : body.validate.total,
-      "total" : body.price,
-      "UsuarioId" : body.user.id, 
-      "CampingId" : body.campId,
-      "cantMayores" : body.validate.travellers,
-      "cantMenores" : body.validate.kids,
-      "extraRodante" : trailer,
-      "precioMayores" : body.mayores[0].precio,
-      "precioMenores" : body.menores[0].precio, 
-      "precioextraRodante" : body.validate.stay,
-    }
-    res.status(200).json(await postReservaCreate(data))
+    res.status(200).json(await postReservaCreate(req.body))
   } catch(error: any) {
     res.status(error.error).json(error);
   }
