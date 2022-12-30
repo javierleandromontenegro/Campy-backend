@@ -65,6 +65,18 @@ export const getReservasByUserId = async (id: string): Promise<reservas[]> => {
   return querySql;
 }
 
+//http://localhost:3001/api/reservas/propietarios/:ownerId
+export const getReservasByOwnerId = async (ownerId: string): Promise<reservas[]> => {
+  const [querySql]: [querySql: reservas[]] = await sequelize.query(
+    `SELECT R.id, C.nombre_camping FROM Reservas AS R
+    INNER JOIN Campings AS C
+    ON C.id=R.CampingId
+    WHERE C.UsuarioId=${ownerId} AND R.EstadoReservaId='${process.env.PENDIENTE}'`
+  );
+
+  return querySql;
+}
+
 //http://localhost:3001/api/reservas/detalle/2
 export const getReservaDetalle = async (id: string): Promise<reservasdetalle[]> => {
   const [querySql]: [querySql: reservasdetalle[]] = await sequelize.query(

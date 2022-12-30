@@ -6,8 +6,9 @@ import {
     getReservasByUserId, 
     getReservasByCampingId,
     postReservaCreate, 
-    putEstadoReserva } from '../services/Reservas.service';
-import { checkoutUser } from '../services/CheckoutUser.service';
+    putEstadoReserva, 
+    getReservasByOwnerId} from '../services/Reservas.service';
+import { checkoutOwner, checkoutUser } from '../services/CheckoutUser.service';
 
 
 const ReservasRouter: Router = Router();
@@ -51,6 +52,17 @@ ReservasRouter.get('/usuarios/:userId', checkoutUser, async (req: Request<{ user
     res.status(200).json(await getReservasByUserId(userId))
   } catch {
     res.status(404).json({ error: `no se pudo en http://localhost/api/reservas/userId` });
+  }
+});
+
+//http://localhost:3001/api/reservas/propietarios/:ownerId
+ReservasRouter.get('/propietarios/:ownerId', checkoutUser, checkoutOwner, async (req: Request<{ ownerId: string }>, res: Response) => {
+  const { ownerId }: { ownerId: string } = req.params;
+
+  try {
+    res.status(200).json(await getReservasByOwnerId(ownerId))
+  } catch(e: any) {
+    res.status(e.error || 400).json(e);
   }
 });
 
