@@ -13,14 +13,15 @@ export default (models: any):void => {
     Categoria_camping,
     Caracteristicas_camping,
     Reviews,
-    Puntaje,
     Relacion_campo_tarifa,
     Localidades,
     Provincias,
     Paises,
     Caracteristicas_parcela,
     Abierto_periodo,
-    Periodo_agua_caliente
+    Periodo_agua_caliente,
+    Favoritos,
+    Posts_imagenes
 } = models;
 
 
@@ -38,6 +39,9 @@ export default (models: any):void => {
 
   Posts_comentario.belongsTo(Posts_usuario);
   Posts_usuario.hasMany(Posts_comentario);
+
+  Posts_imagenes.belongsTo(Posts_usuario);
+  Posts_usuario.hasMany(Posts_imagenes);
   
   //Reservas
 
@@ -97,6 +101,6 @@ export default (models: any):void => {
   Campings.belongsToMany(Usuarios, { through: Reviews });
   Usuarios.belongsToMany(Campings, { through: Reviews });
 
-  Campings.belongsToMany(Usuarios, { through: Puntaje });
-  Usuarios.belongsToMany(Campings, { through: Puntaje });
+  Campings.belongsToMany(Usuarios, { through: Favoritos });
+  Usuarios.belongsToMany(Campings, { through: Favoritos });
 }

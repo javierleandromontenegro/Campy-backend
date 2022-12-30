@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import morgan from 'morgan';
 import routes from './routes/index';
 
+
 require("./db");
 
 const app = express();
@@ -20,6 +21,7 @@ app.use((_, res, next) => {
     "Origin, X-Requested-With, Content-Type, Accept"
   );
   res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With")
   next();
 });
 
