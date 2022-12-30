@@ -4,7 +4,7 @@ import { allPropertiesComentario, allPropertiesPost } from "../types/Properties"
 const { sequelize } = require("../db");
 
 export const postBlogCreate = async ({ titulo, texto, imagenes, usuarioId }: datosPost): Promise<number> => {
-
+  
   if (!titulo || !texto || !imagenes) throw {
     error: 406,
     message: 'Faltan parámetros'
@@ -14,8 +14,6 @@ export const postBlogCreate = async ({ titulo, texto, imagenes, usuarioId }: dat
     `INSERT INTO Posts_usuarios (titulo, texto, fecha, createdAt, updatedAt, UsuarioId) 
         VALUES ('${titulo.replace("'", "\\'")}', '${texto.replace("'", "\\'")}', NOW(), NOW(), NOW(), ${usuarioId})`
   )
-
-  console.log(postBlogId);
 
 
   await Promise.all(imagenes.map((imagenes) =>
@@ -56,7 +54,7 @@ export const getPostImagenes = async (id: number): Promise<string[]> => {
 
 export const getAllPost = async (): Promise<datosAllPost[]> => {
   const [querySql]: [querySql: datosAllPost[]] = await sequelize.query(
-    `SELECT PU.titulo, U.username, PU.fecha, PU.texto FROM Posts_usuarios as PU INNER JOIN Usuarios as U ON U.id=PU.UsuarioId`
+    `SELECT PU.id, PU.titulo, U.username, PU.fecha, PU.texto FROM Posts_usuarios as PU INNER JOIN Usuarios as U ON U.id=PU.UsuarioId`
   );
 
   return querySql;

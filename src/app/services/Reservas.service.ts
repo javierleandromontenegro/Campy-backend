@@ -1,7 +1,7 @@
 import { reservas, reservasdetalle } from "../types/reservas";
 import { stateBooking } from "../types/datosBase";//stateBookig es un objeto que tiene el id de los tipos de reserva
 import { ResultSetHeader } from "mysql2";
-import {reservaCreate} from "../types/reservas";
+import {reservaCreate, reservaPago} from "../types/reservas";
 const { sequelize } = require("../db");
 
 //http://localhost:3001/api/campings/reservas
@@ -149,3 +149,14 @@ export const putEstadoReserva = async (reservaId: string, newEstado: string): Pr
 
   return { reservaId: +reservaId, newEstado }
 };
+
+
+//ACTUALIZA LA RESERVA CON DATOS DE MERCADO PAGO COMO SER ID_TRANSACCION Y EL ESTADO DE LA MISMA
+export const postReservaPago = async ({ ID_reserva,ID_transaccion, Estado_transaccion}: reservaPago): Promise<number> => {
+
+const [ReservaPago]: [ReservaId: number] = await sequelize.query(
+  `UPDATE Reservas SET ID_transaccion='${ID_transaccion}',Estado_transaccion='${Estado_transaccion}' WHERE id=${ID_reserva}`
+);
+
+return ReservaPago;
+}
