@@ -22,22 +22,22 @@ CheckoutRouter.post('/', async (req: Request<datosMerca>, res: Response) => {
               id : req.body.idm,
                 title : req.body.title,
                 picture_url : "https://res.cloudinary.com/pfcampy/image/upload/v1670849448/campy/logo_CAMPY-BLANCO_hn507u.png",
-                description: `Alquiler temporario desde ${req.body.alldate} hasta ${req.body.alldate2}  para ${req.body.mayores} mayores y ${req.body.menores} menores`  ,
+                description: `Alquiler temporario desde ${req.body.ingreso.slice(0,10)} hasta ${req.body.egreso.slice(0,10)}  para ${req.body.mayores} mayores y ${req.body.menores} menores`  ,
                 unit_price : parseInt(req.body.price),
                 quantity : 1,
                  
             }
         ],
         "back_urls": {
-          success: "http://localhost:3000/booking/camping/1",
-          failure: "http://localhost:3000/booking/camping/1",
-          pending: "http://localhost:3000/booking/camping/1"
-      },
+          success: `${process.env.HOST_FRONTEND || 'http://localhost:3000'}/dashboard`,
+          failure: `${process.env.HOST_FRONTEND || 'http://localhost:3000'}/dashboard`,
+          pending: `${process.env.HOST_FRONTEND || 'http://localhost:3000'}/dashboard`
+        },
       auto_return: "approved",
-      notification_url : "https://5312-181-23-159-5.sa.ngrok.io/api/checkout/payment",
+      notification_url : `${process.env.HOST || 'https://2a2b-181-23-131-222.sa.ngrok.io'}/api/checkout/payment`,
         "statement_descriptor": "CAMPY"
     }; 
-
+    
     mercadopago.preferences.create(preference)
     .then(function(response){
 
