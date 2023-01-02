@@ -16,6 +16,7 @@ CheckoutRouter.post('/', async (req: Request<datosMerca>, res: Response) => {
     const { titleM , priceM} = req.body 
     console.log(titleM , priceM) 
     let preference : any = {
+
         items : [
             {
 
@@ -27,6 +28,7 @@ CheckoutRouter.post('/', async (req: Request<datosMerca>, res: Response) => {
                 quantity : 1,
                  
             }
+
         ],
         "back_urls": {
           success: `${process.env.HOST_FRONTEND || 'http://localhost:3000'}/dashboard`,
