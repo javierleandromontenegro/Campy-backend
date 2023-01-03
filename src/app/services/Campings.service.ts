@@ -137,7 +137,7 @@ export const getCampingsPorLocalidad = async (id: string): Promise<datosCamping[
 // MUESTRA UN DETERMINADO CAMPING CON DETALLE E IMAGENES *******************
 export const getCampingsPorId = async (id: string): Promise<datosCamping> => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
-    `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.abierto_fecha_desde , C.abierto_fecha_hasta, L.nombre AS localidad,P.nombre AS provincia,
+    `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.abierto_fecha_desde , C.abierto_fecha_hasta, L.nombre AS localidad,P.nombre AS provincia, P.descrip_historia, P.latitud, P.longitud,    
     CA.categoria,CA.cantidad_estrellas,CC.duchas,CC.baños,CC.mascotas,CC.rodantes,CC.proveduria,CC.salon_sum,CC.restaurant,CC.vigilancia,CC.pileta,CC.estacionamiento,CC.juegos_infantiles,CC.maquinas_gimnasia,CC.wifi,
     CP.techada AS parcela_techada,CP.agua_en_parcela AS parcela_agua_en_parcela,CP.iluminacion_toma_corriente AS parcela_iluminacion_toma_corriente,CP.superficie AS parcela_superficie,
     AP.descripcion_periodo,
@@ -245,6 +245,7 @@ export const getCampingsTodos = async ({ id_provincia,
     filtros = filtros + ` AND (RT.precio>=${precio[0]} AND RT.precio<=${precio[1]})`;
   }
 
+  //puntuacion_promedio
   //console.log("LONGITUD ARRAY Review ES= ", reviews.length);
   if (reviews.length <= 1) {
     //console.log("TIENE UN SOLO VALOR");
@@ -255,14 +256,21 @@ export const getCampingsTodos = async ({ id_provincia,
  
    if (reviews.length > 1) {
     //console.log("TIENE MAS DE 1 VALOR")
-    filtros = filtros + ` AND `;
+    let filtrosPuntRevie="";
+    
     let ban: number = 0;
     reviews.forEach(element => {
       /* console.log("BANDA ES = ",ban); */
-      if (ban == 1) filtros = filtros + ` OR `;
-      filtros = filtros + ` C.puntuacion_promedio=('${element}')`;
+      if (ban == 1) filtrosPuntRevie = filtrosPuntRevie + ` OR `;
+      filtrosPuntRevie = filtrosPuntRevie + ` C.puntuacion_promedio=('${element}')`;
       ban = 1;
     })
+
+    filtrosPuntRevie= ` ( `+ filtrosPuntRevie+` ) `;
+    console.log("filtrosPuntRevie= ",filtrosPuntRevie)
+    filtros = filtros + ` AND `;
+    filtros= filtros + filtrosPuntRevie;
+   
   }
   
 
@@ -277,14 +285,20 @@ export const getCampingsTodos = async ({ id_provincia,
 
   if (id_categoria.length > 1) {
     /*  console.log("TIENE MAS DE 1 VALOR") */
-    filtros = filtros + ` AND `;
+    let filtrosCateg="";
+   
     let ban: number = 0;
     id_categoria.forEach(element => {
       /* console.log("BANDA ES = ",ban); */
-      if (ban == 1) filtros = filtros + ` OR `;
-      filtros = filtros + ` CA.id=('${element}')`;
+      if (ban == 1) filtrosCateg = filtrosCateg + ` OR `;
+      filtrosCateg = filtrosCateg + ` CA.id=('${element}')`;
       ban = 1;
     })
+
+    filtrosCateg= ` ( `+ filtrosCateg+` ) `;
+    console.log("filtrosCateg= ",filtrosCateg)
+    filtros = filtros + ` AND `;
+    filtros= filtros + filtrosCateg;
   }
 
   if (parcela_superficie.length > 0) {

@@ -15,7 +15,7 @@ CheckoutRouter.post('/', async (req: Request<datosMerca>, res: Response) => {
     const { titleM , priceM} = req.body 
     console.log(titleM , priceM) 
     let preference : any = {
-        items : [
+        items : [ 
             {
 
               id : req.body.idm,
