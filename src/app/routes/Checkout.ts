@@ -36,12 +36,6 @@ CheckoutRouter.post('/', async (req: Request<datosMerca>, res: Response) => {
       auto_return: "approved",
       notification_url : "https://5312-181-23-159-5.sa.ngrok.io/api/checkout/payment",
         "statement_descriptor": "CAMPY"
-// <<<<<<< HEAD
-//       notification_url : `${process.env.HOST || 'https://2a2b-181-23-131-222.sa.ngrok.io'}/api/checkout/payment`
-//     };
-// =======
-      notification_url : "https://5312-181-23-159-5.sa.ngrok.io/api/checkout/payment",
-        "statement_descriptor": "CAMPY"
     }; 
     
 
