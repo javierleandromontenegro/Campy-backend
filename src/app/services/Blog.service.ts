@@ -152,3 +152,30 @@ export const updateComentario = async (data: datosComentario, comentarioId: numb
 
   return querySql;
 }
+
+export const deletePostPorId = async (id: number): Promise<datosPost> => {
+  const [querySql]: [querySql: datosPost[]] = await sequelize.query(
+    `DELETE FROM Posts_usuarios WHERE Posts_usuarios.id=${id}`
+  );
+
+  return querySql[0];
+}
+
+export const deleteComentarioPorId = async (id: number): Promise<datosComentario> => {
+  const [querySql]: [querySql: datosComentario[]] = await sequelize.query(
+    `DELETE FROM Posts_comentarios WHERE Posts_comentarios.id=${id}`
+  );
+
+  return querySql[0];
+}
+
+export const cantidadComentariosPorIdDePost = async (id: number): Promise<datosComentario> => {
+  const [querySql]: [querySql: datosComentario[]] = await sequelize.query(
+    `SELECT COUNT(PC.id) AS cant_comentarios
+    FROM Posts_comentarios AS PC
+    INNER JOIN Posts_usuarios AS PU ON PU.id=PC.PostsUsuarioId
+    WHERE PU.id=${id}`
+  );
+
+  return querySql[0];
+}

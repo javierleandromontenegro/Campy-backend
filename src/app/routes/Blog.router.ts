@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { datosPost, datosComentario } from '../types/datosBlog';
-import { postBlogComentario, postBlogCreate, getPostImagenes, getAllPost, getComentario, getPostPorId, updatePost, updateComentario } from '../services/Blog.service';
+import { postBlogComentario, postBlogCreate, getPostImagenes, getAllPost, getComentario, getPostPorId, updatePost, updateComentario, deletePostPorId, deleteComentarioPorId, cantidadComentariosPorIdDePost } from '../services/Blog.service';
 import { checkoutUser, /* checkoutAdmin */ } from '../services/CheckoutUser.service';
 
 const BlogRouter: Router = Router();
@@ -84,6 +84,36 @@ BlogRouter.put('/comentarios/:idComentario', async (req: Request<{idComentario: 
     res.status(200).json(await updateComentario(req.body, idComentario))
   } catch {
     res.status(404).json({error: `no se pudo en http://localhost/api/blog/comentarios/${idComentario}`});
+  }
+});
+
+BlogRouter.delete('/:postId', async (req: Request<{postId: number}>, res: Response) => {
+  const { postId } = req.params;
+
+  try {
+    res.status(200).json(await deletePostPorId(postId))
+  } catch {
+    res.status(404).json({error: `no se pudo en http://localhost/api/blog/${postId}`});
+  }
+});
+
+BlogRouter.delete('/comentarios/:comentarioId', async (req: Request<{comentarioId: number}>, res: Response) => {
+  const { comentarioId } = req.params;
+
+  try {
+    res.status(200).json(await deleteComentarioPorId(comentarioId))
+  } catch {
+    res.status(404).json({error: `no se pudo en http://localhost/api/blog/comentarios/${comentarioId}`});
+  }
+});
+
+BlogRouter.get('/comentarios/cantidad/:postId', async (req: Request<{postId: number}>, res: Response) => {
+  const { postId } = req.params;
+
+  try {
+    res.status(200).json(await cantidadComentariosPorIdDePost(postId))
+  } catch {
+    res.status(404).json({error: `no se pudo en http://localhost/api/blog/comentarios/cantidad/${postId}`});
   }
 });
 
