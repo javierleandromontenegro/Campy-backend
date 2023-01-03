@@ -54,7 +54,7 @@ export const getPostImagenes = async (id: number): Promise<string[]> => {
 
 export const getAllPost = async (): Promise<datosAllPost[]> => {
   const [querySql]: [querySql: datosAllPost[]] = await sequelize.query(
-    `SELECT PU.id, PU.titulo, U.username, PU.fecha, PU.texto FROM Posts_usuarios as PU INNER JOIN Usuarios as U ON U.id=PU.UsuarioId`
+    `SELECT PU.id, PU.titulo, U.foto, U.username, PU.fecha, PU.texto FROM Posts_usuarios as PU INNER JOIN Usuarios as U ON U.id=PU.UsuarioId ORDER BY PU.fecha DESC`
   );
 
   return querySql;
@@ -62,7 +62,7 @@ export const getAllPost = async (): Promise<datosAllPost[]> => {
 
 export const getComentario = async (id: number): Promise<string[]> => {
   const [querySql]: [querySql: datosPost[]] = await sequelize.query(
-    `SELECT U.username, PC.comentario, PC.createdAt
+    `SELECT U.foto, U.username, PC.comentario, PC.createdAt
       FROM Posts_comentarios AS PC
       INNER JOIN Usuarios AS U ON U.id=PC.UsuarioId
       INNER JOIN Posts_usuarios AS PU ON PU.id=PC.PostsUsuarioId
@@ -74,7 +74,7 @@ export const getComentario = async (id: number): Promise<string[]> => {
 
 export const getPostPorId = async (id: number): Promise<datosPost> => {
   const [querySql]: [querySql: datosPost[]] = await sequelize.query(
-    `SELECT PU.id, U.username, PU.fecha, PU.titulo, PU.texto
+    `SELECT PU.id, U.foto, U.username, PU.fecha, PU.titulo, PU.texto
     FROM Posts_usuarios AS PU
     INNER JOIN Usuarios AS U ON U.id=PU.UsuarioId
     WHERE PU.id=${id}`
