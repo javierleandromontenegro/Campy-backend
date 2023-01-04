@@ -137,7 +137,7 @@ export const getCampingsPorLocalidad = async (id: string): Promise<datosCamping[
 // MUESTRA UN DETERMINADO CAMPING CON DETALLE E IMAGENES *******************
 export const getCampingsPorId = async (id: string): Promise<datosCamping> => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
-    `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.abierto_fecha_desde , C.abierto_fecha_hasta, L.nombre AS localidad,P.nombre AS provincia, P.descrip_historia, P.latitud, P.longitud,    
+    `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.abierto_fecha_desde , C.abierto_fecha_hasta, L.nombre AS localidad,P.nombre AS provincia, P.descrip_historia,    
     CA.categoria,CA.cantidad_estrellas,CC.duchas,CC.baños,CC.mascotas,CC.rodantes,CC.proveduria,CC.salon_sum,CC.restaurant,CC.vigilancia,CC.pileta,CC.estacionamiento,CC.juegos_infantiles,CC.maquinas_gimnasia,CC.wifi,
     CP.techada AS parcela_techada,CP.agua_en_parcela AS parcela_agua_en_parcela,CP.iluminacion_toma_corriente AS parcela_iluminacion_toma_corriente,CP.superficie AS parcela_superficie,
     AP.descripcion_periodo,
