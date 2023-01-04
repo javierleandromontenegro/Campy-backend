@@ -8,6 +8,7 @@ export interface datosPost {
 }
 
 export interface datosComentario {
+  id: number,
   comentario: string,
   postId: number,
   usuarioId: number
