@@ -12,7 +12,6 @@ mercadopago.configure({
 
 CheckoutRouter.post('/', async (req: Request<datosMerca>, res: Response) => {
   try {
-    
     const { titleM , priceM} = req.body 
     console.log(titleM , priceM) 
     let preference : any = {
@@ -34,11 +33,10 @@ CheckoutRouter.post('/', async (req: Request<datosMerca>, res: Response) => {
         pending: `${process.env.HOST_FRONTEND || 'http://localhost:3000'}/booking/camping/1`
       },
       auto_return: "approved",
-      notification_url : "https://5312-181-23-159-5.sa.ngrok.io/api/checkout/payment",
+      notification_url : `${process.env.HOST || 'https://2a2b-181-23-131-222.sa.ngrok.io'}/api/checkout/payment`,
         "statement_descriptor": "CAMPY"
     }; 
     
-
     mercadopago.preferences.create(preference)
     .then(function(response){
 

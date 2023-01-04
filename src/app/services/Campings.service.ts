@@ -1,6 +1,13 @@
 import { datosBase } from "../types/datosBase";
 import datosCamping from "../types/datosCamping";
-import { createCamping, campingCategorias, campingTarifas, campingAbiertoPeriodo, campingPeriodoAguaCaliente, campingHabilitado } from "../types/datosCamping";
+import {
+  createCamping,
+  campingCategorias,
+  campingTarifas,
+  campingAbiertoPeriodo,
+  campingPeriodoAguaCaliente,
+  campingHabilitado,
+} from "../types/datosCamping";
 import { datosFiltros } from "../types/datosFiltros";
 import datosPrecios from "../types/datosPrecios";
 import { campingsCantReservas } from "../types/datosBase";
@@ -15,10 +22,12 @@ export const getCampingsImagenes = async (id: number): Promise<string[]> => {
   );
 
   return querySql.map((query: any): string => query.url);
-}
+};
 
 // ESTA ES LA LISTA DE PRECIOS DE UN DETERMINADO CAMPING
-export const getPreciosCamping = async (id: number): Promise<datosPrecios[]> => {
+export const getPreciosCamping = async (
+  id: number
+): Promise<datosPrecios[]> => {
   const [querySql]: [querySql: datosPrecios[]] = await sequelize.query(
     `SELECT T.id, RT.precio, T.descrip_tarifa 
     FROM Relacion_campo_tarifas AS RT 
@@ -28,41 +37,50 @@ export const getPreciosCamping = async (id: number): Promise<datosPrecios[]> => 
   );
 
   return querySql;
-}
+};
 
-// MUESTRA TODAS LAS CATEGORIAS DE CAMPING QUE HAY 
+// MUESTRA TODAS LAS CATEGORIAS DE CAMPING QUE HAY
 export const getCampingsCategorias = async (): Promise<campingCategorias[]> => {
   const [querySql]: [querySql: campingCategorias[]] = await sequelize.query(
     `SELECT id,categoria,cantidad_estrellas,descripcion_categoria FROM Categoria_campings`
   );
 
   return querySql;
-}
+};
 
 // MUESTRA TODOS LOS CAMPINGS INDICANDO EL ESTADO DE HABILITACION
-export const getCampingsHabilitacion = async (): Promise<campingHabilitado[]> => {
+export const getCampingsHabilitacion = async (): Promise<
+  campingHabilitado[]
+> => {
   const [querySql]: [querySql: campingHabilitado[]] = await sequelize.query(
     `SELECT C.id, C.nombre_camping, C.habilitado, C.contacto_tel, L.nombre AS localidad, P.nombre AS provincia FROM Campings AS C INNER JOIN Localidades AS L INNER JOIN Provincias AS P ON L.ProvinciaId=P.id ON C.LocalidadeId=L.id`
   );
 
   return querySql;
-}
+};
 
 // HABILITA O DESHABILITA UN DETERMINADO CAMPING
-export const disableCamping = async (id: string, habilitar: number): Promise<{ success: boolean }> => {
-  if (habilitar < 0 || habilitar > 1) throw {
-    error: 406, message: 'tipo de habilitación inválida'
-  }
+export const disableCamping = async (
+  id: string,
+  habilitar: number
+): Promise<{ success: boolean }> => {
+  if (habilitar < 0 || habilitar > 1)
+    throw {
+      error: 406,
+      message: "tipo de habilitación inválida",
+    };
 
   const [updatedCamping] = await sequelize.query(
     `UPDATE Campings SET habilitado=${habilitar} WHERE id=${id};`
   );
 
-  return { success: !!updatedCamping.changedRows }
+  return { success: !!updatedCamping.changedRows };
 };
 
 //http://localhost:3001/api/campings/reservas
-export const getCampingsCantReservas= async (): Promise<campingsCantReservas[]> => {
+export const getCampingsCantReservas = async (): Promise<
+  campingsCantReservas[]
+> => {
   const [querySql]: [querySql: campingsCantReservas[]] = await sequelize.query(
     `SELECT C.nombre_camping, COUNT(R.id) AS cant_reservas FROM Reservas AS R 
     INNER JOIN Campings AS C ON R.CampingId=C.id
@@ -70,7 +88,7 @@ export const getCampingsCantReservas= async (): Promise<campingsCantReservas[]> 
   );
 
   return querySql;
-}
+};
 
 // MUESTRA LOS TIPOS DE TARIFAS
 export const getCampingTarifas = async (): Promise<campingTarifas[]> => {
@@ -81,7 +99,9 @@ export const getCampingTarifas = async (): Promise<campingTarifas[]> => {
   return querySql;
 };
 
-export const getCampingAbiertoPeriodo = async (): Promise<campingAbiertoPeriodo[]> => {
+export const getCampingAbiertoPeriodo = async (): Promise<
+  campingAbiertoPeriodo[]
+> => {
   const [querySql]: [querySql: campingAbiertoPeriodo[]] = await sequelize.query(
     `SELECT id, descripcion_periodo FROM Abierto_periodos`
   );
@@ -89,22 +109,28 @@ export const getCampingAbiertoPeriodo = async (): Promise<campingAbiertoPeriodo[
   return querySql;
 };
 
-export const getCampingPeriodoAguaCaliente = async (): Promise<campingPeriodoAguaCaliente[]> => {
-  const [querySql]: [querySql: campingPeriodoAguaCaliente[]] = await sequelize.query(
-    `SELECT id, descripcion_periodo_agua FROM Periodo_agua_calientes`
-  );
+export const getCampingPeriodoAguaCaliente = async (): Promise<
+  campingPeriodoAguaCaliente[]
+> => {
+  const [querySql]: [querySql: campingPeriodoAguaCaliente[]] =
+    await sequelize.query(
+      `SELECT id, descripcion_periodo_agua FROM Periodo_agua_calientes`
+    );
 
   return querySql;
 };
 
-
 // MUESTRA TODOS LOS CAMPINGS POR PROVINCIA
-export const getCampingsPorProvincia = async (id: string): Promise<datosCamping[]> => {
+export const getCampingsPorProvincia = async (
+  id: string
+): Promise<datosCamping[]> => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
     `SELECT C.id as id, C.nombre_camping as nombre, L.nombre as localidad, P.nombre as provincia FROM Campings AS C INNER JOIN Localidades AS L INNER JOIN Provincias AS P ON L.ProvinciaId=P.id ON C.LocalidadeId=L.id WHERE C.habilitado=1 AND P.id=${id} ORDER BY L.nombre, C.nombre_camping;`
   );
 
-  const imagenesQuery = await Promise.all(querySql.map(query => getCampingsImagenes(query.id)));
+  const imagenesQuery = await Promise.all(
+    querySql.map((query) => getCampingsImagenes(query.id))
+  );
 
   const results = querySql.map((query, i) => {
     query.imagenes = imagenesQuery[i];
@@ -112,16 +138,19 @@ export const getCampingsPorProvincia = async (id: string): Promise<datosCamping[
   });
 
   return results;
-}
-
+};
 
 // MUESTRA TODOS LOS CAMPINGS POR LOCALIDAD
-export const getCampingsPorLocalidad = async (id: string): Promise<datosCamping[]> => {
+export const getCampingsPorLocalidad = async (
+  id: string
+): Promise<datosCamping[]> => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
     `SELECT C.id as id, C.nombre_camping as nombre, L.nombre as localidad, P.nombre as provincia FROM Campings AS C INNER JOIN Localidades AS L INNER JOIN Provincias AS P ON L.ProvinciaId=P.id ON C.LocalidadeId=L.id WHERE C.habilitado=1 AND L.id=${id}  ORDER BY L.nombre, C.nombre_camping;`
   );
 
-  const imagenesQuery: string[][] = await Promise.all(querySql.map(query => getCampingsImagenes(query.id)))
+  const imagenesQuery: string[][] = await Promise.all(
+    querySql.map((query) => getCampingsImagenes(query.id))
+  );
 
   const results = querySql.map((query, i) => {
     query.imagenes = imagenesQuery[i];
@@ -129,16 +158,13 @@ export const getCampingsPorLocalidad = async (id: string): Promise<datosCamping[
   });
 
   return results;
-}
-
-
-
+};
 
 // MUESTRA UN DETERMINADO CAMPING CON DETALLE E IMAGENES *******************
 export const getCampingsPorId = async (id: string): Promise<datosCamping> => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
-    `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.abierto_fecha_desde , C.abierto_fecha_hasta, L.nombre AS localidad,P.nombre AS provincia, P.descrip_historia,    
-    CA.categoria,CA.cantidad_estrellas,CC.duchas,CC.baños,CC.mascotas,CC.rodantes,CC.proveduria,CC.salon_sum,CC.restaurant,CC.vigilancia,CC.pileta,CC.estacionamiento,CC.juegos_infantiles,CC.maquinas_gimnasia,CC.wifi,
+    `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.abierto_fecha_desde , C.abierto_fecha_hasta, C.CategoriaCampingId, C.LocalidadeId, C.contacto_nombre, C.contacto_tel, L.nombre AS localidad,P.nombre AS provincia, P.id AS ProvinciaId, P.descrip_historia,   
+    CA.categoria,CA.cantidad_estrellas,CC.duchas,CC.baños,CC.mascotas,CC.rodantes,CC.proveduria,CC.salon_sum,CC.restaurant,CC.vigilancia,CC.pileta,CC.estacionamiento,CC.juegos_infantiles,CC.maquinas_gimnasia,CC.wifi, CC.AbiertoPeriodoId, CC.PeriodoAguaCalienteId,
     CP.techada AS parcela_techada,CP.agua_en_parcela AS parcela_agua_en_parcela,CP.iluminacion_toma_corriente AS parcela_iluminacion_toma_corriente,CP.superficie AS parcela_superficie,
     AP.descripcion_periodo,
     PAC.descripcion_periodo_agua,C.puntuacion_promedio   
@@ -153,30 +179,32 @@ INNER JOIN Provincias AS P ON L.ProvinciaId=P.id ON C.LocalidadeId=L.id
 WHERE C.habilitado=1 AND C.id=${id};`
   );
 
-  if (!querySql[0]) throw { error: 404, message: 'No se encontró un camping con ese ID' };
+  if (!querySql[0])
+    throw { error: 404, message: "No se encontró un camping con ese ID" };
 
   querySql[0].imagenes = await getCampingsImagenes(querySql[0].id);
 
   querySql[0].precios = await getPreciosCamping(querySql[0].id);
 
   return querySql[0];
-}
-
+};
 
 //MUESTRA TODOS LOS CAMPING CON DETALLES E IMAGENES
 
-export const getCampingsPorUserId = async (userId: string): Promise<datosCamping[]> => {
+export const getCampingsPorUserId = async (
+  userId: string
+): Promise<datosCamping[]> => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
     `SELECT id, nombre_camping, habilitado FROM Campings WHERE UsuarioId=${userId}`
   );
 
   return querySql;
-}
+};
 
 // GET -> http://localhost:3001/api/campings
 export const getCampingsTodosDatos = async (): Promise<datosCamping[]> => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
-    `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.abierto_fecha_desde , C.abierto_fecha_hasta,L.nombre AS localidad, L.id AS id_localidad, P.nombre AS provincia,P.id as id_provincia,CA.categoria,CA.id AS id_categoria,
+    `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.abierto_fecha_desde , C.abierto_fecha_hasta, L.nombre AS localidad, L.id AS id_localidad, P.nombre AS provincia,P.id as id_provincia,CA.categoria,CA.id AS id_categoria,
     CC.duchas,CC.baños,CC.mascotas,CC.rodantes,CC.proveduria,CC.salon_sum,CC.restaurant,CC.vigilancia,CC.pileta,CC.estacionamiento,CC.juegos_infantiles,CC.maquinas_gimnasia,CC.wifi,
     CP.techada AS parcela_techada,CP.agua_en_parcela AS parcela_agua_en_parcela,CP.iluminacion_toma_corriente AS parcela_iluminacion_toma_corriente,CP.superficie AS parcela_superficie, AP.descripcion_periodo,
     PAC.descripcion_periodo_agua,
@@ -190,7 +218,9 @@ export const getCampingsTodosDatos = async (): Promise<datosCamping[]> => {
     INNER JOIN Periodo_agua_calientes AS PAC ON CC.PeriodoAguaCalienteId=PAC.id
     WHERE C.habilitado=1 ;`
   );
-  const imagenesQuery: string[][] = await Promise.all(querySql.map(query => getCampingsImagenes(query.id)));
+  const imagenesQuery: string[][] = await Promise.all(
+    querySql.map((query) => getCampingsImagenes(query.id))
+  );
 
   const resultsWithImagenes: datosCamping[] = querySql.map((query, i) => {
     query.imagenes = imagenesQuery[i];
@@ -198,15 +228,23 @@ export const getCampingsTodosDatos = async (): Promise<datosCamping[]> => {
   });
 
   return resultsWithImagenes;
-}
-
+};
 
 // FILTROS
 // POST -> http://localhost:3001/api/campings
 // QUERY TODOS LOS CAMPINGS CON DETALLE E IMAGENES
-export const getCampingsTodos = async ({ id_provincia,
-  id_localidad, parcela_techada, parcela_agua_en_parcela, abierto_fecha_desde,
-  abierto_fecha_hasta, parcela_iluminacion_toma_corriente, precio,reviews,id_categoria, parcela_superficie,
+export const getCampingsTodos = async ({
+  id_provincia,
+  id_localidad,
+  parcela_techada,
+  parcela_agua_en_parcela,
+  abierto_fecha_desde,
+  abierto_fecha_hasta,
+  parcela_iluminacion_toma_corriente,
+  precio,
+  reviews,
+  id_categoria,
+  parcela_superficie,
   mascotas,
   rodantes,
   proveduria,
@@ -218,9 +256,8 @@ export const getCampingsTodos = async ({ id_provincia,
   salon_sum,
   wifi,
 
-  estacionamiento}: datosFiltros): Promise<datosCamping[]> => {
-
-
+  estacionamiento,
+}: datosFiltros): Promise<datosCamping[]> => {
   let filtros = " ";
   if (id_provincia) {
     // SI TIENE DATO
@@ -233,77 +270,80 @@ export const getCampingsTodos = async ({ id_provincia,
 
   if (abierto_fecha_desde) {
     // SI TIENE DATO
-    filtros = filtros + ` AND C.abierto_fecha_desde <= DATE('${abierto_fecha_desde}')`;
+    filtros =
+      filtros + ` AND C.abierto_fecha_desde <= DATE('${abierto_fecha_desde}')`;
   }
   if (abierto_fecha_hasta) {
     // SI TIENE DATO
-    filtros = filtros + ` AND C.abierto_fecha_hasta >= DATE('${abierto_fecha_hasta}')`;
+    filtros =
+      filtros + ` AND C.abierto_fecha_hasta >= DATE('${abierto_fecha_hasta}')`;
   }
   /*  console.log("LONGITUD ARRAY PRECIOS ES= ",precio.length); */
   if (precio.length > 0) {
     /* console.log(" el precio desde es = ",precio[0]); */
-    filtros = filtros + ` AND (RT.precio>=${precio[0]} AND RT.precio<=${precio[1]})`;
+    filtros =
+      filtros + ` AND (RT.precio>=${precio[0]} AND RT.precio<=${precio[1]})`;
   }
 
   //puntuacion_promedio
   //console.log("LONGITUD ARRAY Review ES= ", reviews.length);
   if (reviews.length <= 1) {
     //console.log("TIENE UN SOLO VALOR");
-    reviews.forEach(element => {
+    reviews.forEach((element) => {
       filtros = filtros + ` AND C.puntuacion_promedio=('${element}')`;
     });
-   }
- 
-   if (reviews.length > 1) {
+  }
+
+  if (reviews.length > 1) {
     //console.log("TIENE MAS DE 1 VALOR")
-    let filtrosPuntRevie="";
-    
+    let filtrosPuntRevie = "";
+
     let ban: number = 0;
-    reviews.forEach(element => {
+    reviews.forEach((element) => {
       /* console.log("BANDA ES = ",ban); */
       if (ban == 1) filtrosPuntRevie = filtrosPuntRevie + ` OR `;
-      filtrosPuntRevie = filtrosPuntRevie + ` C.puntuacion_promedio=('${element}')`;
+      filtrosPuntRevie =
+        filtrosPuntRevie + ` C.puntuacion_promedio=('${element}')`;
       ban = 1;
-    })
+    });
 
-    filtrosPuntRevie= ` ( `+ filtrosPuntRevie+` ) `;
-    console.log("filtrosPuntRevie= ",filtrosPuntRevie)
+    filtrosPuntRevie = ` ( ` + filtrosPuntRevie + ` ) `;
+    console.log("filtrosPuntRevie= ", filtrosPuntRevie);
     filtros = filtros + ` AND `;
-    filtros= filtros + filtrosPuntRevie;
-   
+    filtros = filtros + filtrosPuntRevie;
   }
-  
-
 
   //console.log("LONGITUD ARRAY categorias ES= ", id_categoria.length);
   if (id_categoria.length == 1) {
     /*  console.log("TIENE UN SOLO VALOR") */
-    id_categoria.forEach(element => {
+    id_categoria.forEach((element) => {
       filtros = filtros + ` AND CA.id=('${element}')`;
-    })
+    });
   }
 
   if (id_categoria.length > 1) {
     /*  console.log("TIENE MAS DE 1 VALOR") */
-    let filtrosCateg="";
-   
+    let filtrosCateg = "";
+
     let ban: number = 0;
-    id_categoria.forEach(element => {
+    id_categoria.forEach((element) => {
       /* console.log("BANDA ES = ",ban); */
       if (ban == 1) filtrosCateg = filtrosCateg + ` OR `;
       filtrosCateg = filtrosCateg + ` CA.id=('${element}')`;
       ban = 1;
-    })
+    });
 
-    filtrosCateg= ` ( `+ filtrosCateg+` ) `;
-    console.log("filtrosCateg= ",filtrosCateg)
+    filtrosCateg = ` ( ` + filtrosCateg + ` ) `;
+    console.log("filtrosCateg= ", filtrosCateg);
     filtros = filtros + ` AND `;
-    filtros= filtros + filtrosCateg;
+    filtros = filtros + filtrosCateg;
   }
 
   if (parcela_superficie.length > 0) {
     //console.log("PARCELA SUPERFICIE = ", parcela_superficie.length)
-    filtros = filtros + ` AND (CP.superficie>=${parcela_superficie[0]} AND CP.superficie<=${parcela_superficie[1]})`;
+    filtros =
+      filtros +
+      ` AND (CP.superficie>=${parcela_superficie[0]} AND CP.superficie<=${parcela_superficie[1]})`;
   }
   if (parcela_techada === true) {
     /* parcela_techada=('1') */
@@ -361,9 +401,8 @@ export const getCampingsTodos = async ({ id_provincia,
     filtros = filtros + ` AND  CC.estacionamiento=('1')`;
     /*filtros = filtros + ` AND  CC.estacionamiento=('${estacionamiento}')`;*/
   }
-  
-  console.log("FILTROS ES = ", filtros);
 
+  console.log("FILTROS ES = ", filtros);
 
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
     `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.abierto_fecha_desde , C.abierto_fecha_hasta,L.nombre AS localidad, L.id AS id_localidad, P.nombre AS provincia,P.id as id_provincia,CA.categoria,CA.id AS id_categoria,
@@ -381,34 +420,79 @@ export const getCampingsTodos = async ({ id_provincia,
     WHERE C.habilitado=1 ${filtros};`
   );
 
-  const imagenesQuery: string[][] = await Promise.all(querySql.map(query => getCampingsImagenes(query.id)));
+  const imagenesQuery: string[][] = await Promise.all(
+    querySql.map((query) => getCampingsImagenes(query.id))
+  );
 
   const resultsWithImagenes: datosCamping[] = querySql.map((query, i) => {
     query.imagenes = imagenesQuery[i];
     return query;
   });
 
-
   return resultsWithImagenes;
-}
-
+};
 
 //ALTA DE CAMPING *********************
 export const postCampingsCreate = async ({
-  nombre_camping, descripcion_camping, direccion, telefono,longitud, latitud,abierto_fecha_desde,abierto_fecha_hasta, contacto_nombre, contacto_tel, CategoriaCampingId, LocalidadeId, wifi, duchas, baños, mascotas, rodantes, proveduria, salon_sum, restaurant, vigilancia, pileta, estacionamiento, juegos_infantiles, maquinas_gimnasia, AbiertoPeriodoId, PeriodoAguaCalienteId, techada, agua_en_parcela, iluminacion_toma_corriente, superficie, imagenes, mayores,menores,rodante,UsuarioId}: createCamping): Promise<number> => {
+  nombre_camping,
+  descripcion_camping,
+  direccion,
+  telefono,
+  longitud,
+  latitud,
+  abierto_fecha_desde,
+  abierto_fecha_hasta,
+  contacto_nombre,
+  contacto_tel,
+  CategoriaCampingId,
+  LocalidadeId,
+  wifi,
+  duchas,
+  baños,
+  mascotas,
+  rodantes,
+  proveduria,
+  salon_sum,
+  restaurant,
+  vigilancia,
+  pileta,
+  estacionamiento,
+  juegos_infantiles,
+  maquinas_gimnasia,
+  AbiertoPeriodoId,
+  PeriodoAguaCalienteId,
+  parcela_techada,
+  parcela_agua_en_parcela,
+  parcela_iluminacion_toma_corriente,
+  parcela_superficie,
+  imagenes,
+  mayores,
+  menores,
+  rodante,
+  UsuarioId,
+}: createCamping): Promise<number> => {
+  console.log("usuario id", UsuarioId);
 
-  if (!nombre_camping || !descripcion_camping || !direccion || !telefono || !contacto_nombre || !contacto_tel || !CategoriaCampingId || !LocalidadeId) throw {
-    error: 406,
-    message: 'Faltan parámetros'
-  };
-
+  if (
+    !nombre_camping ||
+    !descripcion_camping ||
+    !direccion ||
+    !telefono ||
+    !contacto_nombre ||
+    !contacto_tel ||
+    !CategoriaCampingId ||
+    !LocalidadeId
+  )
+    throw {
+      error: 406,
+      message: "Faltan parámetros",
+    };
 
   const [CaractCampingId]: [CaractCampingId: number[]] = await sequelize.query(
     `INSERT INTO Caracteristicas_campings(wifi,duchas,baños,mascotas,rodantes,proveduria,salon_sum,restaurant,vigilancia,pileta, estacionamiento,juegos_infantiles,maquinas_gimnasia,createdAt, updatedAt,AbiertoPeriodoId,PeriodoAguaCalienteId) VALUES (${wifi},${duchas},${baños},
     ${mascotas},${rodantes},${proveduria},${salon_sum},
     ${restaurant},${vigilancia},${pileta},${estacionamiento},${juegos_infantiles},${maquinas_gimnasia},NOW(),NOW(),${AbiertoPeriodoId},${PeriodoAguaCalienteId})`
   );
-
 
   const [CampingId]: [CampingId: number] = await sequelize.query(
     `INSERT INTO Campings(nombre_camping, descripcion_camping, direccion,telefono, longitud, latitud,abierto_fecha_desde,abierto_fecha_hasta, contacto_nombre, contacto_tel, createdAt, updatedAt, UsuarioId, CategoriaCampingId,CaracteristicasCampingId, LocalidadeId)
@@ -417,40 +501,45 @@ export const postCampingsCreate = async ({
   );
 
   await sequelize.query(
-    `INSERT INTO Caracteristicas_parcelas(techada,agua_en_parcela, iluminacion_toma_corriente,superficie,createdAt,updatedAt, CaracteristicasCampingId) VALUES (${techada},${agua_en_parcela},${iluminacion_toma_corriente},${superficie},NOW(),NOW(),
+    `INSERT INTO Caracteristicas_parcelas(techada,agua_en_parcela, iluminacion_toma_corriente,superficie,createdAt,updatedAt, CaracteristicasCampingId) VALUES (${parcela_techada},${parcela_agua_en_parcela},${parcela_iluminacion_toma_corriente},${parcela_superficie},NOW(),NOW(),
     ${CaractCampingId})`
   );
 
-  await Promise.all(imagenes.map((imagen) =>
-    sequelize.query(
-      `INSERT INTO Camping_imagenes(url,createdAt,updatedAt,CampingId) VALUES ('${imagen}',NOW(),NOW(),${CampingId})`
-
+  await Promise.all(
+    imagenes.map((imagen) =>
+      sequelize.query(
+        `INSERT INTO Camping_imagenes(url,createdAt,updatedAt,CampingId) VALUES ('${imagen}',NOW(),NOW(),${CampingId})`
+      )
     )
-  ));
+  );
 
-  let precios=[];
+  let precios = [];
   precios.push(mayores);
   precios.push(menores);
   precios.push(rodante);
-  console.log("PRECIOS",precios);
- 
-   precios.forEach((e: any, i: number) =>
+  console.log("PRECIOS", precios);
+
+  precios.forEach((e: any, i: number) =>
     sequelize.query(
       `INSERT INTO Relacion_campo_tarifas(precio, createdAt,updatedAt, TarifaId, CampingId) VALUES (${e},NOW(),NOW(),
     '${i + 1}',${CampingId})`
     )
-  ) 
+  );
 
   return CampingId;
-}
+};
 
 //Obtiene los favoritos de un usuario
-export const getUserFavoritesCampings = async (userId: string): Promise<datosBase[]> => {
+export const getUserFavoritesCampings = async (
+  userId: string
+): Promise<datosBase[]> => {
   const [querySql]: [querySql: datosBase[]] = await sequelize.query(
     `SELECT C.id, C.nombre_camping AS nombre FROM Favoritos AS F INNER JOIN Campings AS C ON C.id=F.CampingId INNER JOIN Usuarios AS U ON U.id=F.UsuarioId WHERE U.id=${userId};`
   );
 
-  const imagenesQuery: string[][] = await Promise.all(querySql.map(query => getCampingsImagenes(query.id)));
+  const imagenesQuery: string[][] = await Promise.all(
+    querySql.map((query) => getCampingsImagenes(query.id))
+  );
 
   const resultsWithImagenes: datosBase[] = querySql.map((query, i) => {
     query.imagen = imagenesQuery[i][0];
@@ -458,36 +547,45 @@ export const getUserFavoritesCampings = async (userId: string): Promise<datosBas
   });
 
   return resultsWithImagenes;
-}
+};
 
 //Añade un camping a favoritos del usuario
-export const addFavoriteCamping = async (campingId: string, userId: string): Promise<datosBase[]> => {
+export const addFavoriteCamping = async (
+  campingId: string,
+  userId: string
+): Promise<datosBase[]> => {
   await sequelize.query(
     `INSERT INTO Favoritos (CampingId, UsuarioId, createdAt, updatedAt) VALUES (${campingId}, ${userId}, NOW(), NOW());`
   );
 
   return await getUserFavoritesCampings(userId);
-}
+};
 
 //Elimina un camping de favoritos de un usuario
-export const removeFavoriteCamping = async (campingId: string, userId: string): Promise<number> => {
+export const removeFavoriteCamping = async (
+  campingId: string,
+  userId: string
+): Promise<number> => {
   await sequelize.query(
     `DELETE FROM Favoritos WHERE UsuarioId=${userId} AND CampingId=${campingId}; `
   );
 
   return +campingId;
-}
+};
 
 //Dar de baja un camping
 export const inhabilitarCamping = async (campingId: string) => {
   const reservasCamping = await getReservasPendientesByCampingId(campingId);
 
-  if(reservasCamping.length)
-    throw { error: 400, message: 'No se puede dar de baja un camping con reservas pendientes.' }
+  if (reservasCamping.length)
+    throw {
+      error: 400,
+      message: "No se puede dar de baja un camping con reservas pendientes.",
+    };
 
   await sequelize.query(
     `UPDATE Campings SET habilitado=0 WHERE id=${campingId}`
   );
 
   return +campingId;
-}
+};
