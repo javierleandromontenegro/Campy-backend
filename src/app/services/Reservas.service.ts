@@ -184,8 +184,32 @@ export const postReservaPago = async ({
   ID_transaccion,
   Estado_transaccion,
 }: reservaPago): Promise<number> => {
+
+if (!ID_reserva || !ID_transaccion || !Estado_transaccion) throw {
+    error: 406,
+    message: 'Faltan parámetros del id y estado de transacción de mercado pago'
+  };
+
+  console.log("EL Estado_transaccion",Estado_transaccion);
+
+  let axuEstado='';
+  if(Estado_transaccion=='Aproved'){
+    console.log("El estado es ABONADA");
+    axuEstado="02bdc29e-f809-4bf2-9e3a-4a88fa1c174a"; /* Abonada */
+  }
+
+  if(Estado_transaccion=='Rejected'){
+    console.log("El estado es RECHAZADO EL PAGO");
+    axuEstado="982a67e4-7dbb-49de-8464-a15f1193f40d"; /* Rechazada */
+  }
+
+  if(Estado_transaccion=='Pending'){
+    console.log("El estado sigue PENDIENTE");
+    axuEstado="bbd82337-7bea-4d9c-b948-41140c060a2f"; /* Pendiente */
+  }
+
   const [ReservaPago]: [ReservaId: number] = await sequelize.query(
-    `UPDATE Reservas SET ID_transaccion='${ID_transaccion}',Estado_transaccion='${Estado_transaccion}' WHERE id=${ID_reserva}`
+    `UPDATE Reservas SET EstadoReservaId=${axuEstado}, ID_transaccion='${ID_transaccion}',Estado_transaccion='${Estado_transaccion}' WHERE id=${ID_reserva}`
   );
 
   return ReservaPago;
