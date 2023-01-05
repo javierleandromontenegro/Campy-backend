@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { datosPost, datosComentario } from '../types/datosBlog';
-import { postBlogComentario, postBlogCreate, getPostImagenes, getAllPost, getComentario, getPostPorId, updatePost, updateComentario, deletePostPorId, deleteComentarioPorId, cantidadComentariosPorIdDePost } from '../services/Blog.service';
+import { updateVisitas, postBlogComentario, postBlogCreate, getPostImagenes, getAllPost, getComentario, getPostPorId, updatePost, updateComentario, deletePostPorId, deleteComentarioPorId, cantidadComentariosPorIdDePost } from '../services/Blog.service';
 import { checkoutUser, /* checkoutAdmin */ } from '../services/CheckoutUser.service';
 
 const BlogRouter: Router = Router();
@@ -77,6 +77,16 @@ BlogRouter.put('/:idPost', async (req: Request<{idPost: number}>, res: Response)
   }
 });
 
+BlogRouter.put('/visualizaciones/:idPost', async (req: Request<{idPost: number}>, res: Response) => {
+  const { idPost } = req.params;
+
+  try {
+    res.status(200).json(await updateVisitas(req.body, idPost))
+  } catch {
+    res.status(404).json({error: `no se pudo en http://localhost/api/blog/visualizaciones/${idPost}`});
+  }
+});
+
 BlogRouter.put('/comentarios/:idComentario', async (req: Request<{idComentario: number}>, res: Response) => {
   const { idComentario } = req.params;
 
@@ -86,6 +96,8 @@ BlogRouter.put('/comentarios/:idComentario', async (req: Request<{idComentario: 
     res.status(404).json({error: `no se pudo en http://localhost/api/blog/comentarios/${idComentario}`});
   }
 });
+
+
 
 BlogRouter.delete('/:postId', async (req: Request<{postId: number}>, res: Response) => {
   const { postId } = req.params;
