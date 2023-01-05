@@ -35,20 +35,20 @@ export const getReservasByCampingId = async (
 };
 
 //Obtiene SOLO las reservas Pendientes de un camping
-//Por ahora solo se usa como función auxiliar y no en una ruta
+//http://localhost:3001/api/reservas/campings/:campindId
 export const getReservasPendientesByCampingId = async (
-  id: string
-): Promise<reservas[]> => {
+  campingId: string
+): Promise<number> => {
   const [querySql]: [querySql: reservas[]] = await sequelize.query(
     `SELECT R.id,R.fecha_desde_reserva, R.fecha_hasta_reserva, R.cant_noches, R.total, ER.id AS id_estado, U.id as id_user, U.email, C.nombre_camping, C.id AS id_campings
     FROM Reservas AS R
     INNER JOIN Estado_reservas AS ER ON ER.id=R.EstadoReservaId
     INNER JOIN Usuarios AS U ON U.id=R.UsuarioId
     INNER JOIN Campings AS C ON C.id=R.CampingId
-    WHERE C.id=${id} AND ER.id='${stateBooking.PENDIENTE}'`
+    WHERE C.id=${campingId} AND ER.id='${stateBooking.PENDIENTE}'`
   );
 
-  return querySql;
+  return querySql.length;
 };
 
 //http://localhost:3001/api/reservas/usuarios/:userId
