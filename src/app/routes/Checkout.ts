@@ -16,7 +16,7 @@ CheckoutRouter.post('/', async (req: Request<datosMerca>, res: Response) => {
     const { titleM , priceM} = req.body 
     console.log(titleM , priceM) 
     let preference : any = {
-
+ 
         items : [ 
             {
 
@@ -27,7 +27,7 @@ CheckoutRouter.post('/', async (req: Request<datosMerca>, res: Response) => {
                 unit_price : parseInt(req.body.price),
                 quantity : 1,
                  
-            }
+            } 
 
         ],
         "back_urls": {
