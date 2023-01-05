@@ -5,7 +5,7 @@ const { sequelize } = require("../db");
 
 export const postBlogCreate = async ({ titulo, texto, imagenes, usuarioId }: datosPost): Promise<number> => {
   console.log(titulo, texto, imagenes, usuarioId)
-  if (!titulo || !texto || imagenes.length<1) throw {
+  if (!titulo || !texto ) throw {
     error: 406,
     message: 'Faltan parámetros'
   };
@@ -27,22 +27,29 @@ export const postBlogCreate = async ({ titulo, texto, imagenes, usuarioId }: dat
   return postBlogId;
 }
 
-
 export const postBlogComentario = async ({ comentario, usuarioId, postId }: datosComentario): Promise<number> => {
 
   if (!comentario) throw {
-    error: 406,
-    message: 'Faltan parámetros'
-  };
+        error: 406,
+         message: 'Faltan parámetros'
+       };
+    
+    const [postBlogComentario] = await sequelize.query(
+        `INSERT INTO Posts_comentarios (comentario, createdAt, updatedAt, UsuarioId, PostsUsuarioId) VALUES ('${comentario.replace("'", "\\'")}', NOW(), NOW(), ${usuarioId}, ${postId})`
+    )
 
-  const [postBlogComentario] = await sequelize.query(
-    `INSERT INTO Posts_comentarios (comentario, createdAt, updatedAt, UsuarioId, PostsUsuarioId) VALUES ('${comentario.replace("'", "\\'")}', NOW(), NOW(), ${usuarioId}, ${postId})`
-  )
-
-  console.log(postBlogComentario);
+   const [[SumaId]]: [[SumaId: {cant_comentarios:number}]] = await sequelize.query(
+    `SELECT COUNT(id) AS cant_comentarios FROM Posts_comentarios AS PC
+     WHERE PostsUsuarioId=${postId}
+     GROUP BY PostsUsuarioId`
+   ); 
+  
+  await sequelize.query(
+    `UPDATE Posts_usuarios SET cant_comentarios='${SumaId.cant_comentarios}' WHERE id=${postId}`
+  );
 
   return postBlogComentario;
-}
+}    
 
 export const getPostImagenes = async (id: number): Promise<string[]> => {
   const [querySql]: [querySql: datosPost[]] = await sequelize.query(
@@ -54,7 +61,10 @@ export const getPostImagenes = async (id: number): Promise<string[]> => {
 
 export const getAllPost = async (): Promise<datosAllPost[]> => {
   const [querySql]: [querySql: datosAllPost[]] = await sequelize.query(
-    `SELECT PU.id, PU.titulo, U.foto, U.username, PU.fecha, PU.texto FROM Posts_usuarios as PU INNER JOIN Usuarios as U ON U.id=PU.UsuarioId ORDER BY PU.fecha DESC`
+    `SELECT PU.id, PU.titulo, PU.cant_comentarios, PU.cant_visualizaciones, U.foto, U.username, PU.fecha, PU.texto
+    FROM Posts_usuarios as PU 
+    INNER JOIN Usuarios as U ON U.id=PU.UsuarioId 
+    ORDER BY PU.fecha DESC`
   );
 
   return querySql;
@@ -124,6 +134,17 @@ export const updatePost = async (data: datosPost, postId: number) => {
 
   return await getPostPorId(postId)
 }
+
+export const updateVisitas = async (data:{visitas:number},postId: number) => {
+
+      await sequelize.query(
+        `UPDATE Posts_usuarios AS PU
+        SET cant_visualizaciones='${data.visitas}'  
+        WHERE PU.id=${postId}`
+      )
+  
+    return postId
+  }
 
 export const updateComentario = async (data: datosComentario, comentarioId: number) => {
   const entries: [key: string, value: string][] = Object.entries(data);

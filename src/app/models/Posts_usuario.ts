@@ -15,6 +15,14 @@ export default (sequelize: Sequelize) => {
       fecha: {
         type: DataTypes.DATE,
         allowNull: false
+      },
+      cant_comentarios: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+      },
+      cant_visualizaciones: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
       }
     }
   );
