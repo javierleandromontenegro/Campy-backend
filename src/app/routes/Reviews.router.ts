@@ -14,7 +14,7 @@ ReviewsRouter.get('/:idCamping', async (req: Request<{idCamping: number}>, res: 
     } catch {
       res.status(404).json({error: `no se pudo en http://localhost/api/reviews/${idCamping}`});
     }
-  }); 
+  });
 
 //CREA UNA REVIEW
 // POST -> http://localhost:3001/api/reviews/
