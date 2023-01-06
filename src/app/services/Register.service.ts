@@ -1,7 +1,7 @@
 import { datosUsuario } from "../types/datosUsuario";
 import jwt from "jsonwebtoken";
 import { hash } from "bcrypt";
-import sendEmail from "../email/sendEmail";
+import { sendEmail } from "../email/sendEmail";
 import { getTemplateRegister } from "../email/templatesHTML";
 
 const { sequelize, Usuarios } = require("../db");
