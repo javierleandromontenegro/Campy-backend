@@ -4,6 +4,7 @@ import {
   checkoutUser,
   checkoutAdmin,
   checkoutOwner,
+  checkoutOwnerOrAdmin,
 } from "../services/CheckoutUser.service";
 import {
   getCampingsPorLocalidad,
@@ -26,6 +27,7 @@ import {
   getCampingsImagenes,
   getCampingsTodosDatos,
   inhabilitarCamping,
+  putCamping,
 } from "../services/Campings.service";
 import { datosFiltros } from "../types/datosFiltros";
 
@@ -297,6 +299,21 @@ CampingsRouter.put(
 
     try {
       res.status(200).json(await inhabilitarCamping(campingId));
+    } catch (e: any) {
+      res.status(e.error || 400).json(e);
+    }
+  }
+);
+
+CampingsRouter.put(
+  "/:campingId",
+  checkoutUser,
+  checkoutOwnerOrAdmin,
+  async (req: Request<{ campingId: string }>, res: Response) => {
+    const { campingId }: { campingId: string } = req.params;
+
+    try {
+      res.status(200).json(await putCamping(campingId, req.body));
     } catch (e: any) {
       res.status(e.error || 400).json(e);
     }
