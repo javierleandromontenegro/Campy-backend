@@ -577,7 +577,7 @@ export const removeFavoriteCamping = async (
 export const inhabilitarCamping = async (campingId: string) => {
   const reservasCamping = await getReservasPendientesByCampingId(campingId);
 
-  if (reservasCamping.length)
+  if (reservasCamping)
     throw {
       error: 400,
       message: "No se puede dar de baja un camping con reservas pendientes.",

@@ -1,3 +1,5 @@
+import { datosEmailContact } from "../types/datosEmailContact";
+
 export const getTemplateRegister = (
   name: string,
   token: string,
@@ -74,6 +76,7 @@ export const getTemplateRegister = (
 
 export const getTemplateReview = (
   campingId: string,
+  usuarioId: string,
   token: string,
   name: string
 ) => {
@@ -147,8 +150,8 @@ export const getTemplateReview = (
   <a
     id="confirm-link"
     href="${
-      process.env.HOST_FRONTEND || "http://localhost:3001"
-    }/review/${campingId}?token=${token}"
+      process.env.HOST_FRONTEND || "http://localhost:3000"
+    }/reviews/${campingId}?xlr8=${token}&ultraT=${usuarioId}"
     target="_blank"
     rel="noreferrer"
     >Ir al formulario</a
@@ -156,3 +159,120 @@ export const getTemplateReview = (
 </div>
   `;
 };
+
+export const getTemplateContactUser = (name: string) => {
+  return `
+  <head>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    #message-container {
+      width: 100%;
+      min-height: 100px;
+      justify-content: center;
+      align-items: center;
+      padding-bottom: 30px;
+      background-color: rgb(240, 239, 239);
+    }
+
+    #header {
+      min-height: 150px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      background: linear-gradient(
+          90deg,
+          rgba(138, 155, 140, 0.5),
+          rgba(83, 77, 66, 0.7)
+        ),
+        url("https://res.cloudinary.com/pfcampy/image/upload/v1670536537/Fotos/Corrientes.jpg");
+      background-size: cover;
+    }
+
+    #description {
+      padding: 5px 15px;
+      font-size: 1rem;
+      color: rgb(17, 17, 17);
+      font-weight: bolder;
+    }
+  </style>
+</head>
+<div id="message-container">
+  <div id="header">
+    <img
+      style="height: 30px; width: auto"
+      src="https://res.cloudinary.com/pfcampy/image/upload/v1670466096/logo_CAMPY_rjsp9a.png"
+      alt="logo-campy"
+    />
+    <h2 style="color: white; margin-top: 20px">
+      ¡Muchas gracias ${name} por contactarnos!
+    </h2>
+  </div>
+  <p style="margin-top: 20px" id="description">
+    Recibimos tu contacto con éxito. Próximamente un administrador de Campy se
+    contactará contigo.
+  </p>
+  <p id="description" style="font-size: 0.9rem; margin-top: 20px">¡Saludos!</p>
+  <p id="description" style="font-size: 0.9rem">Campy</p>
+</div>`;
+};
+
+export const getTemplateContactAdmin = ({
+  name,
+  email,
+  subject,
+  text,
+}: datosEmailContact) =>
+  `<head>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    #message-container {
+      position: relative;
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      justify-content: center;
+      align-items: center;
+      background-color: rgb(240, 239, 239);
+      border: 1px solid rgb(99, 99, 99);
+    }
+
+    #title {
+      color: white;
+      text-align: center;
+      padding: 15px;
+    }
+
+    #container-data * {
+      padding: 20px 15px;
+      word-wrap: break-word;
+    }
+
+    #logo-campy {
+      position: absolute;
+      bottom: 5px;
+      right: 5px;
+    }
+  </style>
+</head>
+<div id="message-container">
+  <div
+    style="background-color: #537b44; border-bottom: 1px solid rgb(99, 99, 99)"
+  >
+    <h2 id="title">Recibiste una consulta de: ${name.toLocaleUpperCase()}</h2>
+  </div>
+  <div id="container-data">
+    <p style="background-color: white; box-shadow: 0px 2px 5px black;"><strong>Nombre:</strong> ${name}</p>
+    <p><strong>Correo:</strong> ${email}</p>
+    <p><strong>Asunto:</strong> ${subject}</p>
+    <p style="background-color: white;"><strong>Texto:</strong> ${text}</p>
+  </div>
+</div>`;
