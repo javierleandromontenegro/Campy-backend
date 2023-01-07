@@ -6,10 +6,12 @@ import {
   getReservasByUserId,
   getReservasByCampingId,
   postReservaCreate,
-  putEstadoReserva,
   getReservasByOwnerId,
 } from "../services/Reservas.service";
-import { checkoutOwner, checkoutUser } from "../services/CheckoutUser.service";
+import {
+  checkoutOwnerOrAdmin,
+  checkoutUser,
+} from "../services/CheckoutUser.service";
 
 const ReservasRouter: Router = Router();
 
@@ -53,11 +55,27 @@ ReservasRouter.get(
   }
 );
 
+//http://localhost:3001/api/reservas/campings/:campingId
+ReservasRouter.get(
+  "/campings/:campingId",
+  checkoutUser,
+  checkoutOwnerOrAdmin,
+  async (req: Request<{ campingId: string }>, res: Response) => {
+    const { campingId }: { campingId: string } = req.params;
+
+    try {
+      res.status(200).json(await getReservasByCampingId(campingId));
+    } catch (e: any) {
+      res.status(e.error || 400).json(e);
+    }
+  }
+);
+
 //http://localhost:3001/api/reservas/propietarios/:ownerId
 ReservasRouter.get(
   "/propietarios/:ownerId",
   checkoutUser,
-  checkoutOwner,
+  checkoutOwnerOrAdmin,
   async (req: Request<{ ownerId: string }>, res: Response) => {
     const { ownerId }: { ownerId: string } = req.params;
 
@@ -76,13 +94,15 @@ ReservasRouter.get(
     const { campingId }: { campingId: string } = req.params;
 
     try {
-      res.status(200).json(await getReservasByCampingId(campingId));
-    } catch {
       res
-        .status(404)
-        .json({
-          error: `no se pudo en http://localhost/api/reservas/campingId`,
-        });
+        .status(200)
+        .json(
+          await getReservasByCampingId(campingId, req.query.filter === "true")
+        );
+    } catch {
+      res.status(404).json({
+        error: `no se pudo en http://localhost/api/reservas/campingId`,
+      });
     }
   }
 );
@@ -95,26 +115,9 @@ ReservasRouter.get(
     try {
       res.status(200).json(await getReservaDetalle(reservaId));
     } catch {
-      res
-        .status(404)
-        .json({
-          error: `no se pudo en http://localhost/api/reservas/detalle/:idReserva`,
-        });
-    }
-  }
-);
-
-ReservasRouter.put(
-  "/:reservaId",
-  checkoutUser,
-  async (req: Request<{ reservaId: string }>, res: Response) => {
-    const { reservaId }: { reservaId: string } = req.params;
-    const { newEstado }: { newEstado: string } = req.body;
-
-    try {
-      res.status(200).json(await putEstadoReserva(reservaId, newEstado));
-    } catch (e: any) {
-      res.status(e.error || 400).json(e);
+      res.status(404).json({
+        error: `no se pudo en http://localhost/api/reservas/detalle/:idReserva`,
+      });
     }
   }
 );

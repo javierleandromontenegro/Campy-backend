@@ -1,6 +1,5 @@
 import { reservas, reservasdetalle } from "../types/reservas";
 import { stateBooking } from "../types/datosBase"; //stateBookig es un objeto que tiene el id de los tipos de reserva
-import { ResultSetHeader } from "mysql2";
 import { reservaCreate, reservaPago } from "../types/reservas";
 const { sequelize } = require("../db");
 
@@ -19,15 +18,20 @@ export const getReservas = async (): Promise<reservas[]> => {
 
 //http://localhost:3001/api/reservas/1
 export const getReservasByCampingId = async (
-  id: string
+  id: string,
+  filter: boolean = false
 ): Promise<reservas[]> => {
+  let filterCondition = filter
+    ? `AND R.EstadoReservaId!='${process.env.VENCIDA}' AND R.EstadoReservaId!='${process.env.RECHAZADA}'`
+    : "";
+
   const [querySql]: [querySql: reservas[]] = await sequelize.query(
     `SELECT R.id,R.fecha_desde_reserva, R.fecha_hasta_reserva, R.cant_noches, R.total, ER.id AS id_estado, U.email, C.nombre_camping, C.id AS id_campings
     FROM Reservas AS R
     INNER JOIN Estado_reservas AS ER ON ER.id=R.EstadoReservaId
     INNER JOIN Usuarios AS U ON U.id=R.UsuarioId
     INNER JOIN Campings AS C ON C.id=R.CampingId
-    WHERE C.id=${id} 
+    WHERE C.id=${id} ${filterCondition} 
     ORDER BY ER.prioridad`
   );
 
@@ -35,20 +39,20 @@ export const getReservasByCampingId = async (
 };
 
 //Obtiene SOLO las reservas Pendientes de un camping
-//Por ahora solo se usa como función auxiliar y no en una ruta
+//http://localhost:3001/api/reservas/campings/:campindId
 export const getReservasPendientesByCampingId = async (
-  id: string
-): Promise<reservas[]> => {
+  campingId: string
+): Promise<number> => {
   const [querySql]: [querySql: reservas[]] = await sequelize.query(
     `SELECT R.id,R.fecha_desde_reserva, R.fecha_hasta_reserva, R.cant_noches, R.total, ER.id AS id_estado, U.id as id_user, U.email, C.nombre_camping, C.id AS id_campings
     FROM Reservas AS R
     INNER JOIN Estado_reservas AS ER ON ER.id=R.EstadoReservaId
     INNER JOIN Usuarios AS U ON U.id=R.UsuarioId
     INNER JOIN Campings AS C ON C.id=R.CampingId
-    WHERE C.id=${id} AND ER.id='${stateBooking.PENDIENTE}'`
+    WHERE C.id=${campingId} AND ER.id='${stateBooking.PENDIENTE}'`
   );
 
-  return querySql;
+  return querySql.length;
 };
 
 //http://localhost:3001/api/reservas/usuarios/:userId
@@ -159,33 +163,39 @@ export const postReservaCreate = async ({
   return ReservaId;
 };
 
-//Confirmar estado de una reserva pendiente
-export const putEstadoReserva = async (
-  reservaId: string,
-  newEstado: string
-): Promise<{ reservaId: number; newEstado: string }> => {
-  const [querySql]: [querySql: ResultSetHeader] = await sequelize.query(
-    `UPDATE Reservas SET EstadoReservaId='${newEstado}' WHERE id=${reservaId} AND EstadoReservaId='${process.env.PENDIENTE}'`
-  );
-
-  if (!querySql.changedRows)
-    throw {
-      error: 400,
-      message:
-        "El estado de la reserva ya es distinto a 'PENDIENTE' o la reserva no existe.",
-    };
-
-  return { reservaId: +reservaId, newEstado };
-};
-
 //ACTUALIZA LA RESERVA CON DATOS DE MERCADO PAGO COMO SER ID_TRANSACCION Y EL ESTADO DE LA MISMA
 export const postReservaPago = async ({
   ID_reserva,
   ID_transaccion,
   Estado_transaccion,
 }: reservaPago): Promise<number> => {
+  if (!ID_reserva || !ID_transaccion || !Estado_transaccion)
+    throw {
+      error: 406,
+      message:
+        "Faltan parámetros del id y estado de transacción de mercado pago",
+    };
+
+  console.log("EL Estado_transaccion", Estado_transaccion);
+
+  let axuEstado = "";
+  if (Estado_transaccion == "paid") {
+    console.log("El estado es ABONADA");
+    axuEstado = String(process.env.ABONADA); /* Abonada */
+  }
+
+  if (Estado_transaccion == "Rejected") {
+    console.log("El estado es RECHAZADO EL PAGO");
+    axuEstado = String(process.env.RECHAZADA); /* Rechazada */
+  }
+
+  if (Estado_transaccion == "Pending") {
+    console.log("El estado sigue PENDIENTE");
+    axuEstado = String(process.env.PENDIENTE); /* Pendiente */
+  }
+
   const [ReservaPago]: [ReservaId: number] = await sequelize.query(
-    `UPDATE Reservas SET ID_transaccion='${ID_transaccion}',Estado_transaccion='${Estado_transaccion}' WHERE id=${ID_reserva}`
+    `UPDATE Reservas SET EstadoReservaId=${axuEstado}, ID_transaccion='${ID_transaccion}',Estado_transaccion='${Estado_transaccion}' WHERE id=${ID_reserva}`
   );
 
   return ReservaPago;

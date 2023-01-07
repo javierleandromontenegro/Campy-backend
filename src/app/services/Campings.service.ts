@@ -163,7 +163,7 @@ export const getCampingsPorLocalidad = async (
 // MUESTRA UN DETERMINADO CAMPING CON DETALLE E IMAGENES *******************
 export const getCampingsPorId = async (id: string): Promise<datosCamping> => {
   const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
-    `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.abierto_fecha_desde , C.abierto_fecha_hasta, C.CategoriaCampingId, C.LocalidadeId, C.contacto_nombre, C.contacto_tel, L.nombre AS localidad,P.nombre AS provincia, P.id AS ProvinciaId, P.descrip_historia, P.latitud, P.longitud,    
+    `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.abierto_fecha_desde , C.abierto_fecha_hasta, C.CategoriaCampingId, C.LocalidadeId, C.contacto_nombre, C.contacto_tel, L.nombre AS localidad,P.nombre AS provincia, P.id AS ProvinciaId, P.descrip_historia,    
     CA.categoria,CA.cantidad_estrellas,CC.duchas,CC.baños,CC.mascotas,CC.rodantes,CC.proveduria,CC.salon_sum,CC.restaurant,CC.vigilancia,CC.pileta,CC.estacionamiento,CC.juegos_infantiles,CC.maquinas_gimnasia,CC.wifi, CC.AbiertoPeriodoId, CC.PeriodoAguaCalienteId,
     CP.techada AS parcela_techada,CP.agua_en_parcela AS parcela_agua_en_parcela,CP.iluminacion_toma_corriente AS parcela_iluminacion_toma_corriente,CP.superficie AS parcela_superficie,
     AP.descripcion_periodo,
@@ -577,7 +577,7 @@ export const removeFavoriteCamping = async (
 export const inhabilitarCamping = async (campingId: string) => {
   const reservasCamping = await getReservasPendientesByCampingId(campingId);
 
-  if (reservasCamping.length)
+  if (reservasCamping)
     throw {
       error: 400,
       message: "No se puede dar de baja un camping con reservas pendientes.",
@@ -588,4 +588,97 @@ export const inhabilitarCamping = async (campingId: string) => {
   );
 
   return +campingId;
+};
+
+//Actualiza un camping
+// /api/camping/:campingId
+export const putCamping = async (
+  campingId: string,
+  {
+    nombre_camping,
+    descripcion_camping,
+    direccion,
+    telefono,
+    longitud,
+    latitud,
+    abierto_fecha_desde,
+    abierto_fecha_hasta,
+    contacto_nombre,
+    contacto_tel,
+    CategoriaCampingId,
+    LocalidadeId,
+    wifi,
+    duchas,
+    baños,
+    mascotas,
+    rodantes,
+    proveduria,
+    salon_sum,
+    restaurant,
+    vigilancia,
+    pileta,
+    estacionamiento,
+    juegos_infantiles,
+    maquinas_gimnasia,
+    AbiertoPeriodoId,
+    PeriodoAguaCalienteId,
+    parcela_techada,
+    parcela_agua_en_parcela,
+    parcela_iluminacion_toma_corriente,
+    parcela_superficie,
+    imagenes,
+    mayores,
+    menores,
+    rodante,
+  }: createCamping
+) => {
+  const format_abierto_fecha_desde: string = new Date(abierto_fecha_desde)
+    .toLocaleDateString()
+    .split("/")
+    .reverse()
+    .join("/");
+  const format_abierto_fecha_hasta: string = new Date(abierto_fecha_hasta)
+    .toLocaleDateString()
+    .split("/")
+    .reverse()
+    .join("/");
+
+  await sequelize.query(
+    `UPDATE Campings SET nombre_camping='${nombre_camping}', descripcion_camping='${descripcion_camping}', direccion='${direccion}', telefono='${telefono}', longitud='${longitud}', latitud='${latitud}', abierto_fecha_desde=DATE('${format_abierto_fecha_desde}'), abierto_fecha_hasta=DATE('${format_abierto_fecha_hasta}'), contacto_nombre='${contacto_nombre}', contacto_tel='${contacto_tel}', updatedAt=NOW(), CategoriaCampingId=${CategoriaCampingId}, LocalidadeId=${LocalidadeId} WHERE id=${campingId}`
+  );
+
+  const [[{ CaracteristicasCampingId }]] = await sequelize.query(
+    `SELECT CaracteristicasCampingId FROM Campings WHERE id=${campingId}`
+  );
+
+  await sequelize.query(`
+    UPDATE Caracteristicas_campings SET wifi=${wifi}, duchas=${duchas}, baños=${baños}, mascotas=${mascotas}, rodantes=${rodantes}, proveduria=${proveduria}, salon_sum=${salon_sum}, restaurant=${restaurant}, vigilancia=${vigilancia}, pileta=${pileta}, estacionamiento=${estacionamiento}, juegos_infantiles=${juegos_infantiles}, maquinas_gimnasia=${maquinas_gimnasia}, AbiertoPeriodoId=${AbiertoPeriodoId}, PeriodoAguaCalienteId=${PeriodoAguaCalienteId}, updatedAt=NOW() WHERE id=${CaracteristicasCampingId}
+  `);
+
+  await sequelize.query(`
+  UPDATE Caracteristicas_parcelas SET techada=${parcela_techada}, agua_en_parcela=${parcela_agua_en_parcela}, iluminacion_toma_corriente=${parcela_iluminacion_toma_corriente}, superficie=${parcela_superficie}, updatedAt=NOW() WHERE CaracteristicasCampingId=${CaracteristicasCampingId}`);
+
+  await sequelize.query(`
+  DELETE FROM Camping_imagenes WHERE CampingId=${campingId}
+  `);
+
+  await Promise.all(
+    imagenes.map((imagen: string) =>
+      sequelize.query(
+        `INSERT INTO Camping_imagenes(url,createdAt,updatedAt,CampingId) VALUES ('${imagen}',NOW(),NOW(),${campingId})`
+      )
+    )
+  );
+
+  await Promise.all(
+    [mayores, menores, rodante].map((precio: number, i: number) =>
+      sequelize.query(
+        `UPDATE Relacion_campo_tarifas SET precio=${precio},updatedAt=NOW() WHERE CampingId=${campingId} AND TarifaId=${
+          i + 1
+        }`
+      )
+    )
+  );
+
+  return { success: true };
 };
