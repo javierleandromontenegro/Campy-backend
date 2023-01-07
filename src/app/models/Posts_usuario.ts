@@ -23,6 +23,10 @@ export default (sequelize: Sequelize) => {
       cant_visualizaciones: {
         type: DataTypes.INTEGER,
         defaultValue: 0
+      },
+      comentarios_vistos: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
       }
     }
   );
