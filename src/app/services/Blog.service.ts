@@ -61,7 +61,7 @@ export const getPostImagenes = async (id: number): Promise<string[]> => {
 
 export const getAllPost = async (): Promise<datosAllPost[]> => {
   const [querySql]: [querySql: datosAllPost[]] = await sequelize.query(
-    `SELECT PU.id, PU.titulo, PU.cant_comentarios, PU.cant_visualizaciones, U.foto, U.username, PU.fecha, PU.texto
+    `SELECT PU.id, PU.titulo, PU.cant_comentarios, PU.cant_visualizaciones, PU.comentarios_vistos, PU.UsuarioId, U.foto, U.username, PU.fecha, PU.texto
     FROM Posts_usuarios as PU 
     INNER JOIN Usuarios as U ON U.id=PU.UsuarioId 
     ORDER BY PU.fecha DESC`
@@ -143,8 +143,19 @@ export const updateVisitas = async (data:{visitas:number},postId: number) => {
         WHERE PU.id=${postId}`
       )
   
-    return postId
+    return postId 
   }
+
+  export const updateComentariosVistos = async (postId: number) => {
+
+    await sequelize.query(
+      `UPDATE Posts_usuarios AS PU
+      SET comentarios_vistos = cant_comentarios 
+      WHERE PU.id=${postId}`
+    )
+
+  return postId 
+}
 
 export const updateComentario = async (data: datosComentario, comentarioId: number) => {
   const entries: [key: string, value: string][] = Object.entries(data);
