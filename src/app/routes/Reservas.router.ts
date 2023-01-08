@@ -6,7 +6,6 @@ import {
   getReservasByUserId,
   getReservasByCampingId,
   postReservaCreate,
-  putEstadoReserva,
   getReservasByOwnerId,
 } from "../services/Reservas.service";
 import {
@@ -95,7 +94,11 @@ ReservasRouter.get(
     const { campingId }: { campingId: string } = req.params;
 
     try {
-      res.status(200).json(await getReservasByCampingId(campingId));
+      res
+        .status(200)
+        .json(
+          await getReservasByCampingId(campingId, req.query.filter === "true")
+        );
     } catch {
       res.status(404).json({
         error: `no se pudo en http://localhost/api/reservas/campingId`,
@@ -115,21 +118,6 @@ ReservasRouter.get(
       res.status(404).json({
         error: `no se pudo en http://localhost/api/reservas/detalle/:idReserva`,
       });
-    }
-  }
-);
-
-ReservasRouter.put(
-  "/:reservaId",
-  checkoutUser,
-  async (req: Request<{ reservaId: string }>, res: Response) => {
-    const { reservaId }: { reservaId: string } = req.params;
-    const { newEstado }: { newEstado: string } = req.body;
-
-    try {
-      res.status(200).json(await putEstadoReserva(reservaId, newEstado));
-    } catch (e: any) {
-      res.status(e.error || 400).json(e);
     }
   }
 );
