@@ -8,7 +8,11 @@ import {
   postReservaCreate,
   getReservasByOwnerId,
 } from "../services/Reservas.service";
-import { checkoutOwnerOrAdmin, checkoutUser } from "../jwt/CheckoutUser";
+import {
+  checkoutBeTheSameUserOrAdmin,
+  checkoutOwnerOrAdmin,
+  checkoutUser,
+} from "../jwt/CheckoutUser";
 
 const ReservasRouter: Router = Router();
 
@@ -39,6 +43,7 @@ ReservasRouter.get("/", async (_req: Request, res: Response) => {
 ReservasRouter.get(
   "/usuarios/:userId",
   checkoutUser,
+  checkoutBeTheSameUserOrAdmin,
   async (req: Request<{ userId: string }>, res: Response) => {
     const { userId }: { userId: string } = req.params;
 

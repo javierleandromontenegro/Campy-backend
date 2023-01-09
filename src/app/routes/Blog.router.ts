@@ -1,6 +1,10 @@
 import { Router, Request, Response } from "express";
 import { datosPost, datosComentario } from "../types/datosBlog";
-import { checkoutUser /* checkoutAdmin */ } from "../jwt/CheckoutUser";
+import {
+  checkoutAdmin,
+  checkoutBeTheSameUserOrAdmin,
+  checkoutUser /* checkoutAdmin */,
+} from "../jwt/CheckoutUser";
 import {
   updateComentariosVistos,
   updateVisitas,
@@ -100,6 +104,8 @@ BlogRouter.get(
 
 BlogRouter.put(
   "/:idPost",
+  checkoutUser,
+  checkoutBeTheSameUserOrAdmin,
   async (req: Request<{ idPost: string }>, res: Response) => {
     const { idPost } = req.params;
 
@@ -136,18 +142,18 @@ BlogRouter.put(
     try {
       res.status(200).json(await updateComentariosVistos(idPost));
     } catch {
-      res
-        .status(404)
-        .json({
-          error: `no se pudo en http://localhost/api/blog/comentarios/vistos/${idPost}`,
-        });
+      res.status(404).json({
+        error: `no se pudo en http://localhost/api/blog/comentarios/vistos/${idPost}`,
+      });
     }
   }
 );
 
 BlogRouter.put(
   "/comentarios/:idComentario",
-  async (req: Request<{ idComentario: number }>, res: Response) => {
+  checkoutUser,
+  checkoutBeTheSameUserOrAdmin,
+  async (req: Request<any>, res: Response) => {
     const { idComentario } = req.params;
 
     try {
@@ -162,6 +168,8 @@ BlogRouter.put(
 
 BlogRouter.delete(
   "/:postId",
+  checkoutUser,
+  checkoutAdmin,
   async (req: Request<{ postId: string }>, res: Response) => {
     const { postId } = req.params;
 
@@ -177,6 +185,8 @@ BlogRouter.delete(
 
 BlogRouter.delete(
   "/comentarios/:comentarioId",
+  checkoutUser,
+  checkoutAdmin,
   async (req: Request<{ comentarioId: string }>, res: Response) => {
     const { comentarioId } = req.params;
 
