@@ -96,16 +96,14 @@ export const disableCamping = async (
 export const getCampingsCantReservas = async (): Promise<
   campingsCantReservas[]
 > => {
-
-  const [querySql]: [querySql: campingsCantReservas[]] = await sequelize.query(
+  const querySql: campingsCantReservas[] = await sequelize.query(
     `SELECT C.nombre_camping, L.nombre as localidad, P.nombre as provincia, I.url as images, COUNT(R.id) AS cant_reservas FROM Reservas AS R 
     INNER JOIN Campings AS C ON R.CampingId=C.id
     INNER JOIN Localidades AS L ON C.LocalidadeId=L.id
     INNER JOIN Provincias AS P ON L.ProvinciaId=P.id 
     INNER JOIN Camping_imagenes as I ON I.CampingId=C.id
-    GROUP BY C.nombre_camping ORDER BY cant_reservas DESC`
+    GROUP BY C.nombre_camping ORDER BY cant_reservas DESC`,
     { type: QueryTypes.SELECT }
-
   );
 
   return querySql;
