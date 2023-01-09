@@ -12,39 +12,31 @@ mercadopago.configure({
 
 CheckoutRouter.post('/', async (req: Request<datosMerca>, res: Response) => {
   try {
-    
     const { titleM , priceM} = req.body 
     console.log(titleM , priceM) 
     let preference : any = {
-
-        items : [ 
+        items : [
             {
 
               id : req.body.idm,
                 title : req.body.title,
                 picture_url : "https://res.cloudinary.com/pfcampy/image/upload/v1670849448/campy/logo_CAMPY-BLANCO_hn507u.png",
-                description: `Alquiler temporario desde ${req.body.ingreso.slice(0,10)} hasta ${req.body.egreso.slice(0,10)}  para ${req.body.mayores} mayores y ${req.body.menores} menores`  ,
+                description: `Alquiler temporario desde ${req.body.alldate} hasta ${req.body.alldate2}  para ${req.body.mayores} mayores y ${req.body.menores} menores`  ,
                 unit_price : parseInt(req.body.price),
                 quantity : 1,
                  
             }
-
         ],
-        "back_urls": {
-          success: `${process.env.HOST_FRONTEND || 'http://localhost:3000'}/dashboard`,
-          failure: `${process.env.HOST_FRONTEND || 'http://localhost:3000'}/dashboard`,
-          pending: `${process.env.HOST_FRONTEND || 'http://localhost:3000'}/dashboard`
-        },
+      "back_urls": {
+        success: `${process.env.HOST_FRONTEND || 'http://localhost:3000'}/booking/camping/1`,
+        failure: `${process.env.HOST_FRONTEND || 'http://localhost:3000'}/booking/camping/1`,
+        pending: `${process.env.HOST_FRONTEND || 'http://localhost:3000'}/booking/camping/1`
+      },
       auto_return: "approved",
-
-
       notification_url : `${process.env.HOST || 'https://2a2b-181-23-131-222.sa.ngrok.io'}/api/checkout/payment`,
-  
-        "statement_descriptor": "CAMPY",
+        "statement_descriptor": "CAMPY"
     }; 
-
-
-
+    
     mercadopago.preferences.create(preference)
     .then(function(response){
 
