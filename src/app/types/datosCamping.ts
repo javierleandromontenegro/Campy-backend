@@ -21,6 +21,7 @@ export interface createCamping extends createCaratCamping {
   contacto_tel: string;
   CategoriaCampingId: number;
   LocalidadeId: number;
+  userType: string;
 }
 //UsuarioId:string
 export interface createCaratCamping {

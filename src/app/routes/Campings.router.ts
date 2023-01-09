@@ -5,7 +5,7 @@ import {
   checkoutAdmin,
   checkoutOwner,
   checkoutOwnerOrAdmin,
-} from "../services/CheckoutUser.service";
+} from "../jwt/CheckoutUser";
 import {
   getCampingsPorLocalidad,
   getCampingsPorProvincia,
@@ -39,7 +39,7 @@ CampingsRouter.get(
     const { idProvincia } = req.params;
 
     try {
-      res.status(200).json(await getCampingsPorProvincia(idProvincia));
+      res.status(200).json(await getCampingsPorProvincia(+idProvincia));
     } catch {
       res.status(404).json({
         error: `no se pudo en http://localhost/api/campings/sprovincias/${idProvincia}`,
@@ -80,7 +80,7 @@ CampingsRouter.put(
     const { habilitar }: { habilitar: string } = req.query;
 
     try {
-      res.status(200).json(await disableCamping(idCamping, +habilitar));
+      res.status(200).json(await disableCamping(+idCamping, +habilitar));
     } catch (e: any) {
       res.status(e.error || 404).json(e);
     }
@@ -133,7 +133,7 @@ CampingsRouter.get(
     const { idLocalidad } = req.params;
 
     try {
-      res.status(200).json(await getCampingsPorLocalidad(idLocalidad));
+      res.status(200).json(await getCampingsPorLocalidad(+idLocalidad));
     } catch {
       res.status(404).json({
         error: `no se pudo en http://localhost/api/localidades/${idLocalidad}`,
@@ -149,7 +149,7 @@ CampingsRouter.get(
     const { userId }: { userId: string } = req.params;
 
     try {
-      res.status(200).json(await getCampingsPorUserId(userId));
+      res.status(200).json(await getCampingsPorUserId(+userId));
     } catch (e: any) {
       console.log(e);
       res.status(404).json({
@@ -166,7 +166,7 @@ CampingsRouter.get(
     const { userId }: { userId: string } = req.params;
 
     try {
-      res.status(200).json(await getUserFavoritesCampings(userId));
+      res.status(200).json(await getUserFavoritesCampings(+userId));
     } catch (e: any) {
       console.log(e);
       res.status(e.error || 400).json(e);
@@ -180,7 +180,7 @@ CampingsRouter.get(
     const { idCamping } = req.params;
 
     try {
-      res.status(200).json(await getCampingsPorId(idCamping));
+      res.status(200).json(await getCampingsPorId(+idCamping));
     } catch {
       res.status(404).json({
         error: `no se pudo en http://localhost/api/camping/${idCamping}`,
@@ -264,7 +264,7 @@ CampingsRouter.post(
     const { userId }: { userId: string } = req.params;
 
     try {
-      res.status(200).json(await getUserFavoritesCampings(userId));
+      res.status(200).json(await getUserFavoritesCampings(+userId));
     } catch (e: any) {
       console.log(e);
       res.status(e.error || 400).json(e);
@@ -283,7 +283,7 @@ CampingsRouter.post(
     const { id }: { id: string } = req.body.user;
 
     try {
-      res.status(200).json(await addFavoriteCamping(campingId, id));
+      res.status(200).json(await addFavoriteCamping(+campingId, +id));
     } catch (e: any) {
       res.status(e.error || 400).json(e);
     }
@@ -298,7 +298,7 @@ CampingsRouter.put(
     const { campingId }: { campingId: string } = req.params;
 
     try {
-      res.status(200).json(await inhabilitarCamping(campingId));
+      res.status(200).json(await inhabilitarCamping(+campingId));
     } catch (e: any) {
       res.status(e.error || 400).json(e);
     }
@@ -313,7 +313,7 @@ CampingsRouter.put(
     const { campingId }: { campingId: string } = req.params;
 
     try {
-      res.status(200).json(await putCamping(campingId, req.body));
+      res.status(200).json(await putCamping(+campingId, req.body));
     } catch (e: any) {
       res.status(e.error || 400).json(e);
     }
@@ -331,7 +331,7 @@ CampingsRouter.delete(
     const { id }: { id: string } = req.body.user;
 
     try {
-      res.status(200).json(await removeFavoriteCamping(campingId, id));
+      res.status(200).json(await removeFavoriteCamping(+campingId, +id));
     } catch (e: any) {
       res.status(e.error || 400).json(e);
     }
