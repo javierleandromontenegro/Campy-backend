@@ -12,13 +12,18 @@ import { datosFiltros } from "../types/datosFiltros";
 import datosPrecios from "../types/datosPrecios";
 import { campingsCantReservas } from "../types/datosBase";
 import { getReservasPendientesByCampingId } from "./Reservas.service";
+import { QueryTypes } from "sequelize";
 
 const { sequelize } = require("../db");
 
 // IMAGENES DE UN DETERMINADO CAMPING
 export const getCampingsImagenes = async (id: number): Promise<string[]> => {
-  const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
-    `SELECT C.ID,CI.url from Campings as C INNER JOIN Camping_imagenes AS CI ON CI.CampingId=C.id WHERE C.habilitado=1 AND C.id=${id}`
+  const querySql: datosCamping[] = await sequelize.query(
+    `SELECT C.ID,CI.url from Campings as C INNER JOIN Camping_imagenes AS CI ON CI.CampingId=C.id WHERE C.habilitado=1 AND C.id=:id`,
+    {
+      replacements: { id },
+      type: QueryTypes.SELECT,
+    }
   );
 
   return querySql.map((query: any): string => query.url);
@@ -28,12 +33,16 @@ export const getCampingsImagenes = async (id: number): Promise<string[]> => {
 export const getPreciosCamping = async (
   id: number
 ): Promise<datosPrecios[]> => {
-  const [querySql]: [querySql: datosPrecios[]] = await sequelize.query(
+  const querySql: datosPrecios[] = await sequelize.query(
     `SELECT T.id, RT.precio, T.descrip_tarifa 
     FROM Relacion_campo_tarifas AS RT 
     INNER JOIN Tarifas AS T ON T.id=RT.TarifaId
     INNER JOIN Campings AS C ON C.id=RT.CampingId
-    WHERE C.id=${id}`
+    WHERE C.id=:id`,
+    {
+      replacements: { id },
+      type: QueryTypes.SELECT,
+    }
   );
 
   return querySql;
@@ -41,8 +50,9 @@ export const getPreciosCamping = async (
 
 // MUESTRA TODAS LAS CATEGORIAS DE CAMPING QUE HAY
 export const getCampingsCategorias = async (): Promise<campingCategorias[]> => {
-  const [querySql]: [querySql: campingCategorias[]] = await sequelize.query(
-    `SELECT id,categoria,cantidad_estrellas,descripcion_categoria FROM Categoria_campings`
+  const querySql: campingCategorias[] = await sequelize.query(
+    `SELECT id,categoria,cantidad_estrellas,descripcion_categoria FROM Categoria_campings`,
+    { type: QueryTypes.SELECT }
   );
 
   return querySql;
@@ -52,8 +62,9 @@ export const getCampingsCategorias = async (): Promise<campingCategorias[]> => {
 export const getCampingsHabilitacion = async (): Promise<
   campingHabilitado[]
 > => {
-  const [querySql]: [querySql: campingHabilitado[]] = await sequelize.query(
-    `SELECT C.id, C.nombre_camping, C.habilitado, C.contacto_tel, L.nombre AS localidad, P.nombre AS provincia FROM Campings AS C INNER JOIN Localidades AS L INNER JOIN Provincias AS P ON L.ProvinciaId=P.id ON C.LocalidadeId=L.id`
+  const querySql: campingHabilitado[] = await sequelize.query(
+    `SELECT C.id, C.nombre_camping, C.habilitado, C.contacto_tel, L.nombre AS localidad, P.nombre AS provincia FROM Campings AS C INNER JOIN Localidades AS L INNER JOIN Provincias AS P ON L.ProvinciaId=P.id ON C.LocalidadeId=L.id`,
+    { type: QueryTypes.SELECT }
   );
 
   return querySql;
@@ -61,7 +72,7 @@ export const getCampingsHabilitacion = async (): Promise<
 
 // HABILITA O DESHABILITA UN DETERMINADO CAMPING
 export const disableCamping = async (
-  id: string,
+  id: number,
   habilitar: number
 ): Promise<{ success: boolean }> => {
   if (habilitar < 0 || habilitar > 1)
@@ -70,8 +81,12 @@ export const disableCamping = async (
       message: "tipo de habilitación inválida",
     };
 
-  const [updatedCamping] = await sequelize.query(
-    `UPDATE Campings SET habilitado=${habilitar} WHERE id=${id};`
+  const updatedCamping = await sequelize.query(
+    `UPDATE Campings SET habilitado=:habilitar WHERE id=:id;`,
+    {
+      replacements: { id, habilitar },
+      type: QueryTypes.UPDATE,
+    }
   );
 
   return { success: !!updatedCamping.changedRows };
@@ -81,6 +96,7 @@ export const disableCamping = async (
 export const getCampingsCantReservas = async (): Promise<
   campingsCantReservas[]
 > => {
+
   const [querySql]: [querySql: campingsCantReservas[]] = await sequelize.query(
     `SELECT C.nombre_camping, L.nombre as localidad, P.nombre as provincia, I.url as images, COUNT(R.id) AS cant_reservas FROM Reservas AS R 
     INNER JOIN Campings AS C ON R.CampingId=C.id
@@ -88,6 +104,8 @@ export const getCampingsCantReservas = async (): Promise<
     INNER JOIN Provincias AS P ON L.ProvinciaId=P.id 
     INNER JOIN Camping_imagenes as I ON I.CampingId=C.id
     GROUP BY C.nombre_camping ORDER BY cant_reservas DESC`
+    { type: QueryTypes.SELECT }
+
   );
 
   return querySql;
@@ -95,8 +113,9 @@ export const getCampingsCantReservas = async (): Promise<
 
 // MUESTRA LOS TIPOS DE TARIFAS
 export const getCampingTarifas = async (): Promise<campingTarifas[]> => {
-  const [querySql]: [querySql: campingTarifas[]] = await sequelize.query(
-    `SELECT id, descrip_tarifa FROM Tarifas`
+  const querySql: campingTarifas[] = await sequelize.query(
+    `SELECT id, descrip_tarifa FROM Tarifas`,
+    { type: QueryTypes.SELECT }
   );
 
   return querySql;
@@ -105,8 +124,9 @@ export const getCampingTarifas = async (): Promise<campingTarifas[]> => {
 export const getCampingAbiertoPeriodo = async (): Promise<
   campingAbiertoPeriodo[]
 > => {
-  const [querySql]: [querySql: campingAbiertoPeriodo[]] = await sequelize.query(
-    `SELECT id, descripcion_periodo FROM Abierto_periodos`
+  const querySql: campingAbiertoPeriodo[] = await sequelize.query(
+    `SELECT id, descripcion_periodo FROM Abierto_periodos`,
+    { type: QueryTypes.SELECT }
   );
 
   return querySql;
@@ -115,20 +135,24 @@ export const getCampingAbiertoPeriodo = async (): Promise<
 export const getCampingPeriodoAguaCaliente = async (): Promise<
   campingPeriodoAguaCaliente[]
 > => {
-  const [querySql]: [querySql: campingPeriodoAguaCaliente[]] =
-    await sequelize.query(
-      `SELECT id, descripcion_periodo_agua FROM Periodo_agua_calientes`
-    );
+  const querySql: campingPeriodoAguaCaliente[] = await sequelize.query(
+    `SELECT id, descripcion_periodo_agua FROM Periodo_agua_calientes`,
+    { type: QueryTypes.SELECT }
+  );
 
   return querySql;
 };
 
 // MUESTRA TODOS LOS CAMPINGS POR PROVINCIA
 export const getCampingsPorProvincia = async (
-  id: string
+  id: number
 ): Promise<datosCamping[]> => {
-  const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
-    `SELECT C.id as id, C.nombre_camping as nombre, L.nombre as localidad, P.nombre as provincia FROM Campings AS C INNER JOIN Localidades AS L INNER JOIN Provincias AS P ON L.ProvinciaId=P.id ON C.LocalidadeId=L.id WHERE C.habilitado=1 AND P.id=${id} ORDER BY L.nombre, C.nombre_camping;`
+  const querySql: datosCamping[] = await sequelize.query(
+    `SELECT C.id as id, C.nombre_camping as nombre, L.nombre as localidad, P.nombre as provincia FROM Campings AS C INNER JOIN Localidades AS L INNER JOIN Provincias AS P ON L.ProvinciaId=P.id ON C.LocalidadeId=L.id WHERE C.habilitado=1 AND P.id=:id ORDER BY L.nombre, C.nombre_camping;`,
+    {
+      replacements: { id },
+      type: QueryTypes.SELECT,
+    }
   );
 
   const imagenesQuery = await Promise.all(
@@ -145,10 +169,14 @@ export const getCampingsPorProvincia = async (
 
 // MUESTRA TODOS LOS CAMPINGS POR LOCALIDAD
 export const getCampingsPorLocalidad = async (
-  id: string
+  id: number
 ): Promise<datosCamping[]> => {
-  const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
-    `SELECT C.id as id, C.nombre_camping as nombre, L.nombre as localidad, P.nombre as provincia FROM Campings AS C INNER JOIN Localidades AS L INNER JOIN Provincias AS P ON L.ProvinciaId=P.id ON C.LocalidadeId=L.id WHERE C.habilitado=1 AND L.id=${id}  ORDER BY L.nombre, C.nombre_camping;`
+  const querySql: datosCamping[] = await sequelize.query(
+    `SELECT C.id as id, C.nombre_camping as nombre, L.nombre as localidad, P.nombre as provincia FROM Campings AS C INNER JOIN Localidades AS L INNER JOIN Provincias AS P ON L.ProvinciaId=P.id ON C.LocalidadeId=L.id WHERE C.habilitado=1 AND L.id=:id  ORDER BY L.nombre, C.nombre_camping;`,
+    {
+      replacements: { id },
+      type: QueryTypes.SELECT,
+    }
   );
 
   const imagenesQuery: string[][] = await Promise.all(
@@ -164,8 +192,8 @@ export const getCampingsPorLocalidad = async (
 };
 
 // MUESTRA UN DETERMINADO CAMPING CON DETALLE E IMAGENES *******************
-export const getCampingsPorId = async (id: string): Promise<datosCamping> => {
-  const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
+export const getCampingsPorId = async (id: number): Promise<datosCamping> => {
+  const querySql: datosCamping[] = await sequelize.query(
     `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.abierto_fecha_desde , C.abierto_fecha_hasta, C.CategoriaCampingId, C.LocalidadeId, C.contacto_nombre, C.contacto_tel, L.nombre AS localidad,P.nombre AS provincia, P.id AS ProvinciaId, P.descrip_historia,    
     CA.categoria,CA.cantidad_estrellas,CC.duchas,CC.baños,CC.mascotas,CC.rodantes,CC.proveduria,CC.salon_sum,CC.restaurant,CC.vigilancia,CC.pileta,CC.estacionamiento,CC.juegos_infantiles,CC.maquinas_gimnasia,CC.wifi, CC.AbiertoPeriodoId, CC.PeriodoAguaCalienteId,
     CP.techada AS parcela_techada,CP.agua_en_parcela AS parcela_agua_en_parcela,CP.iluminacion_toma_corriente AS parcela_iluminacion_toma_corriente,CP.superficie AS parcela_superficie,
@@ -179,7 +207,11 @@ INNER JOIN Abierto_periodos AS AP ON CC.AbiertoPeriodoId=AP.id
 INNER JOIN Periodo_agua_calientes AS PAC ON CC.PeriodoAguaCalienteId=PAC.id
 INNER JOIN Localidades AS L 
 INNER JOIN Provincias AS P ON L.ProvinciaId=P.id ON C.LocalidadeId=L.id
-WHERE C.habilitado=1 AND C.id=${id};`
+WHERE C.habilitado=1 AND C.id=:id;`,
+    {
+      replacements: { id },
+      type: QueryTypes.SELECT,
+    }
   );
 
   if (!querySql[0])
@@ -195,10 +227,14 @@ WHERE C.habilitado=1 AND C.id=${id};`
 //MUESTRA TODOS LOS CAMPING CON DETALLES E IMAGENES
 
 export const getCampingsPorUserId = async (
-  userId: string
+  userId: number
 ): Promise<datosCamping[]> => {
-  const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
-    `SELECT id, nombre_camping, habilitado FROM Campings WHERE UsuarioId=${userId}`
+  const querySql: datosCamping[] = await sequelize.query(
+    `SELECT id, nombre_camping, habilitado FROM Campings WHERE UsuarioId=:userId`,
+    {
+      replacements: { userId },
+      type: QueryTypes.SELECT,
+    }
   );
 
   return querySql;
@@ -206,7 +242,7 @@ export const getCampingsPorUserId = async (
 
 // GET -> http://localhost:3001/api/campings
 export const getCampingsTodosDatos = async (): Promise<datosCamping[]> => {
-  const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
+  const querySql: datosCamping[] = await sequelize.query(
     `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.abierto_fecha_desde , C.abierto_fecha_hasta, L.nombre AS localidad, L.id AS id_localidad, P.nombre AS provincia,P.id as id_provincia,CA.categoria,CA.id AS id_categoria,
     CC.duchas,CC.baños,CC.mascotas,CC.rodantes,CC.proveduria,CC.salon_sum,CC.restaurant,CC.vigilancia,CC.pileta,CC.estacionamiento,CC.juegos_infantiles,CC.maquinas_gimnasia,CC.wifi,
     CP.techada AS parcela_techada,CP.agua_en_parcela AS parcela_agua_en_parcela,CP.iluminacion_toma_corriente AS parcela_iluminacion_toma_corriente,CP.superficie AS parcela_superficie, AP.descripcion_periodo,
@@ -219,7 +255,8 @@ export const getCampingsTodosDatos = async (): Promise<datosCamping[]> => {
     INNER JOIN Caracteristicas_campings AS CC INNER JOIN Caracteristicas_parcelas AS CP ON CP.CaracteristicasCampingId=CC.id ON C.CaracteristicasCampingId=CC.id
     INNER JOIN Abierto_periodos AS AP ON CC.AbiertoPeriodoId=AP.id
     INNER JOIN Periodo_agua_calientes AS PAC ON CC.PeriodoAguaCalienteId=PAC.id
-    WHERE C.habilitado=1 ;`
+    WHERE C.habilitado=1 ;`,
+    { type: QueryTypes.SELECT }
   );
   const imagenesQuery: string[][] = await Promise.all(
     querySql.map((query) => getCampingsImagenes(query.id))
@@ -407,7 +444,7 @@ export const getCampingsTodos = async ({
 
   console.log("FILTROS ES = ", filtros);
 
-  const [querySql]: [querySql: datosCamping[]] = await sequelize.query(
+  const querySql: datosCamping[] = await sequelize.query(
     `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.abierto_fecha_desde , C.abierto_fecha_hasta,L.nombre AS localidad, L.id AS id_localidad, P.nombre AS provincia,P.id as id_provincia,CA.categoria,CA.id AS id_categoria,
     CC.duchas,CC.baños,CC.mascotas,CC.rodantes,CC.proveduria,CC.salon_sum,CC.restaurant,CC.vigilancia,CC.pileta,CC.estacionamiento,CC.juegos_infantiles,CC.maquinas_gimnasia,CC.wifi,
     CP.techada AS parcela_techada,CP.agua_en_parcela AS parcela_agua_en_parcela,CP.iluminacion_toma_corriente AS parcela_iluminacion_toma_corriente,CP.superficie AS parcela_superficie, AP.descripcion_periodo,
@@ -420,8 +457,10 @@ export const getCampingsTodos = async ({
     INNER JOIN Caracteristicas_campings AS CC INNER JOIN Caracteristicas_parcelas AS CP ON CP.CaracteristicasCampingId=CC.id ON C.CaracteristicasCampingId=CC.id
     INNER JOIN Abierto_periodos AS AP ON CC.AbiertoPeriodoId=AP.id
     INNER JOIN Periodo_agua_calientes AS PAC ON CC.PeriodoAguaCalienteId=PAC.id
-    WHERE C.habilitado=1 ${filtros}
-    ;`
+    WHERE C.habilitado=1 ${filtros};`,
+    {
+      type: QueryTypes.SELECT,
+    }
   );
 
   const imagenesQuery: string[][] = await Promise.all(
@@ -474,6 +513,7 @@ export const postCampingsCreate = async ({
   menores,
   rodante,
   UsuarioId,
+  userType,
 }: createCamping): Promise<number> => {
   console.log("usuario id", UsuarioId);
 
@@ -492,27 +532,80 @@ export const postCampingsCreate = async ({
       message: "Faltan parámetros",
     };
 
-  const [CaractCampingId]: [CaractCampingId: number[]] = await sequelize.query(
-    `INSERT INTO Caracteristicas_campings(wifi,duchas,baños,mascotas,rodantes,proveduria,salon_sum,restaurant,vigilancia,pileta, estacionamiento,juegos_infantiles,maquinas_gimnasia,createdAt, updatedAt,AbiertoPeriodoId,PeriodoAguaCalienteId) VALUES (${wifi},${duchas},${baños},
-    ${mascotas},${rodantes},${proveduria},${salon_sum},
-    ${restaurant},${vigilancia},${pileta},${estacionamiento},${juegos_infantiles},${maquinas_gimnasia},NOW(),NOW(),${AbiertoPeriodoId},${PeriodoAguaCalienteId})`
+  const [CaractCampingId]: [CaractCampingId: number] = await sequelize.query(
+    `INSERT INTO Caracteristicas_campings(wifi,duchas,baños,mascotas,rodantes,proveduria,salon_sum,restaurant,vigilancia,pileta, estacionamiento,juegos_infantiles,maquinas_gimnasia,createdAt, updatedAt,AbiertoPeriodoId,PeriodoAguaCalienteId) VALUES (:wifi,:duchas,:baños,
+    :mascotas,:rodantes,:proveduria,:salon_sum,
+    :restaurant,:vigilancia,:pileta,:estacionamiento,:juegos_infantiles,:maquinas_gimnasia,NOW(),NOW(),:AbiertoPeriodoId,:PeriodoAguaCalienteId)`,
+    {
+      replacements: {
+        wifi,
+        duchas,
+        baños,
+        mascotas,
+        rodantes,
+        proveduria,
+        salon_sum,
+        restaurant,
+        vigilancia,
+        pileta,
+        estacionamiento,
+        juegos_infantiles,
+        maquinas_gimnasia,
+        AbiertoPeriodoId,
+        PeriodoAguaCalienteId,
+      },
+      type: QueryTypes.INSERT,
+    }
   );
 
-  const [CampingId]: [CampingId: number] = await sequelize.query(
+  const CampingId: number = await sequelize.query(
     `INSERT INTO Campings(nombre_camping, descripcion_camping, direccion,telefono, longitud, latitud,abierto_fecha_desde,abierto_fecha_hasta, contacto_nombre, contacto_tel, createdAt, updatedAt, UsuarioId, CategoriaCampingId,CaracteristicasCampingId, LocalidadeId)
-      VALUES ('${nombre_camping}','${descripcion_camping}', '${direccion}','${telefono}','${longitud}','${latitud}', '${abierto_fecha_desde}', '${abierto_fecha_hasta}','${contacto_nombre}', 
-      '${contacto_tel}', NOW(), NOW(),${UsuarioId}, ${CategoriaCampingId},${CaractCampingId},${LocalidadeId})`
+      VALUES (:nombre_camping,:descripcion_camping,:direccion,:telefono,:longitud,:latitud,:abierto_fecha_desde,:abierto_fecha_hasta,:contacto_nombre, 
+      :contacto_tel,NOW(),NOW(),:UsuarioId,:CategoriaCampingId,:CaractCampingId,:LocalidadeId)`,
+    {
+      replacements: {
+        nombre_camping,
+        descripcion_camping,
+        direccion,
+        telefono,
+        longitud,
+        latitud,
+        abierto_fecha_desde,
+        abierto_fecha_hasta,
+        contacto_nombre,
+        contacto_tel,
+        UsuarioId,
+        CategoriaCampingId,
+        CaractCampingId,
+        LocalidadeId,
+      },
+      type: QueryTypes.INSERT,
+    }
   );
 
   await sequelize.query(
-    `INSERT INTO Caracteristicas_parcelas(techada,agua_en_parcela, iluminacion_toma_corriente,superficie,createdAt,updatedAt, CaracteristicasCampingId) VALUES (${parcela_techada},${parcela_agua_en_parcela},${parcela_iluminacion_toma_corriente},${parcela_superficie},NOW(),NOW(),
-    ${CaractCampingId})`
+    `INSERT INTO Caracteristicas_parcelas(techada,agua_en_parcela, iluminacion_toma_corriente,superficie,createdAt,updatedAt, CaracteristicasCampingId) VALUES (:parcela_techada,:parcela_agua_en_parcela,:parcela_iluminacion_toma_corriente,:parcela_superficie,NOW(),NOW(),
+    :CaractCampingId)`,
+    {
+      replacements: {
+        parcela_techada,
+        parcela_agua_en_parcela,
+        parcela_iluminacion_toma_corriente,
+        parcela_superficie,
+        CaractCampingId,
+      },
+      type: QueryTypes.INSERT,
+    }
   );
 
   await Promise.all(
     imagenes.map((imagen) =>
       sequelize.query(
-        `INSERT INTO Camping_imagenes(url,createdAt,updatedAt,CampingId) VALUES ('${imagen}',NOW(),NOW(),${CampingId})`
+        `INSERT INTO Camping_imagenes(url,createdAt,updatedAt,CampingId) VALUES (:imagen,NOW(),NOW(),:CampingId)`,
+        {
+          replacements: { imagen, CampingId },
+          type: QueryTypes.INSERT,
+        }
       )
     )
   );
@@ -523,22 +616,36 @@ export const postCampingsCreate = async ({
   precios.push(rodante);
   console.log("PRECIOS", precios);
 
-  precios.forEach((e: any, i: number) =>
+  precios.forEach((precio: number, i: number) =>
     sequelize.query(
-      `INSERT INTO Relacion_campo_tarifas(precio, createdAt,updatedAt, TarifaId, CampingId) VALUES (${e},NOW(),NOW(),
-    '${i + 1}',${CampingId})`
+      `INSERT INTO Relacion_campo_tarifas(precio, createdAt,updatedAt, TarifaId, CampingId) VALUES (${precio},NOW(),NOW(),
+    ${i + 1},:CampingId)`,
+      {
+        replacements: { CampingId },
+        type: QueryTypes.INSERT,
+      }
     )
   );
+
+  if (userType === process.env.TIPO_USUARIO)
+    await sequelize.query(`UPDATE Usuarios SET TipoUsuarioId=:propietario`, {
+      replacements: { proietario: process.env.TIPO_PROPIETARIO as string },
+      type: QueryTypes.UPDATE,
+    });
 
   return CampingId;
 };
 
 //Obtiene los favoritos de un usuario
 export const getUserFavoritesCampings = async (
-  userId: string
+  userId: number
 ): Promise<datosBase[]> => {
-  const [querySql]: [querySql: datosBase[]] = await sequelize.query(
-    `SELECT C.id, C.nombre_camping AS nombre FROM Favoritos AS F INNER JOIN Campings AS C ON C.id=F.CampingId INNER JOIN Usuarios AS U ON U.id=F.UsuarioId WHERE U.id=${userId};`
+  const querySql: datosBase[] = await sequelize.query(
+    `SELECT C.id, C.nombre_camping AS nombre FROM Favoritos AS F INNER JOIN Campings AS C ON C.id=F.CampingId INNER JOIN Usuarios AS U ON U.id=F.UsuarioId WHERE U.id=:userId;`,
+    {
+      replacements: { userId },
+      type: QueryTypes.SELECT,
+    }
   );
 
   const imagenesQuery: string[][] = await Promise.all(
@@ -555,11 +662,15 @@ export const getUserFavoritesCampings = async (
 
 //Añade un camping a favoritos del usuario
 export const addFavoriteCamping = async (
-  campingId: string,
-  userId: string
+  campingId: number,
+  userId: number
 ): Promise<datosBase[]> => {
   await sequelize.query(
-    `INSERT INTO Favoritos (CampingId, UsuarioId, createdAt, updatedAt) VALUES (${campingId}, ${userId}, NOW(), NOW());`
+    `INSERT INTO Favoritos (CampingId, UsuarioId, createdAt, updatedAt) VALUES (:campingId, :userId, NOW(), NOW())`,
+    {
+      replacements: { campingId, userId },
+      type: QueryTypes.INSERT,
+    }
   );
 
   return await getUserFavoritesCampings(userId);
@@ -567,19 +678,23 @@ export const addFavoriteCamping = async (
 
 //Elimina un camping de favoritos de un usuario
 export const removeFavoriteCamping = async (
-  campingId: string,
-  userId: string
+  campingId: number,
+  userId: number
 ): Promise<number> => {
   await sequelize.query(
-    `DELETE FROM Favoritos WHERE UsuarioId=${userId} AND CampingId=${campingId}; `
+    `DELETE FROM Favoritos WHERE UsuarioId=:userId AND CampingId=:campingId`,
+    {
+      replacements: { userId, campingId },
+      type: QueryTypes.DELETE,
+    }
   );
 
   return +campingId;
 };
 
 //Dar de baja un camping
-export const inhabilitarCamping = async (campingId: string) => {
-  const reservasCamping = await getReservasPendientesByCampingId(campingId);
+export const inhabilitarCamping = async (campingId: number) => {
+  const reservasCamping = await getReservasPendientesByCampingId(+campingId);
 
   if (reservasCamping)
     throw {
@@ -588,7 +703,11 @@ export const inhabilitarCamping = async (campingId: string) => {
     };
 
   await sequelize.query(
-    `UPDATE Campings SET habilitado=0 WHERE id=${campingId}`
+    `UPDATE Campings SET habilitado=0 WHERE id=:campingId`,
+    {
+      replacements: { campingId },
+      type: QueryTypes.UPDATE,
+    }
   );
 
   return +campingId;
@@ -597,7 +716,7 @@ export const inhabilitarCamping = async (campingId: string) => {
 //Actualiza un camping
 // /api/camping/:campingId
 export const putCamping = async (
-  campingId: string,
+  campingId: number,
   {
     nombre_camping,
     descripcion_camping,
@@ -648,28 +767,95 @@ export const putCamping = async (
     .join("/");
 
   await sequelize.query(
-    `UPDATE Campings SET nombre_camping='${nombre_camping}', descripcion_camping='${descripcion_camping}', direccion='${direccion}', telefono='${telefono}', longitud='${longitud}', latitud='${latitud}', abierto_fecha_desde=DATE('${format_abierto_fecha_desde}'), abierto_fecha_hasta=DATE('${format_abierto_fecha_hasta}'), contacto_nombre='${contacto_nombre}', contacto_tel='${contacto_tel}', updatedAt=NOW(), CategoriaCampingId=${CategoriaCampingId}, LocalidadeId=${LocalidadeId} WHERE id=${campingId}`
+    `UPDATE Campings SET nombre_camping=:nombre_camping, descripcion_camping=:descripcion_camping, direccion=:direccion, telefono=:telefono, longitud=:longitud, latitud=:latitud, abierto_fecha_desde=DATE(:format_abierto_fecha_desde), abierto_fecha_hasta=DATE(:format_abierto_fecha_hasta), contacto_nombre=:contacto_nombre, contacto_tel=:contacto_tel, updatedAt=NOW(), CategoriaCampingId=:CategoriaCampingId, LocalidadeId=:LocalidadeId WHERE id=:campingId`,
+    {
+      replacements: {
+        nombre_camping,
+        descripcion_camping,
+        direccion,
+        telefono,
+        longitud,
+        latitud,
+        format_abierto_fecha_desde,
+        format_abierto_fecha_hasta,
+        contacto_nombre,
+        contacto_tel,
+        CategoriaCampingId,
+        LocalidadeId,
+        campingId,
+      },
+      type: QueryTypes.UPDATE,
+    }
   );
 
   const [[{ CaracteristicasCampingId }]] = await sequelize.query(
-    `SELECT CaracteristicasCampingId FROM Campings WHERE id=${campingId}`
+    `SELECT CaracteristicasCampingId FROM Campings WHERE id=:campingId`,
+    {
+      replacements: { campingId },
+      type: QueryTypes.SELECT,
+    }
   );
 
-  await sequelize.query(`
-    UPDATE Caracteristicas_campings SET wifi=${wifi}, duchas=${duchas}, baños=${baños}, mascotas=${mascotas}, rodantes=${rodantes}, proveduria=${proveduria}, salon_sum=${salon_sum}, restaurant=${restaurant}, vigilancia=${vigilancia}, pileta=${pileta}, estacionamiento=${estacionamiento}, juegos_infantiles=${juegos_infantiles}, maquinas_gimnasia=${maquinas_gimnasia}, AbiertoPeriodoId=${AbiertoPeriodoId}, PeriodoAguaCalienteId=${PeriodoAguaCalienteId}, updatedAt=NOW() WHERE id=${CaracteristicasCampingId}
-  `);
+  await sequelize.query(
+    `
+    UPDATE Caracteristicas_campings SET wifi=:wifi, duchas=:duchas, baños=:baños, mascotas=:mascotas, rodantes=:rodantes, proveduria=:proveduria, salon_sum=:salon_sum, restaurant=:restaurant, vigilancia=:vigilancia, pileta=:pileta, estacionamiento=:estacionamiento, juegos_infantiles=:juegos_infantiles, maquinas_gimnasia=:maquinas_gimnasia, AbiertoPeriodoId=:AbiertoPeriodoId, PeriodoAguaCalienteId=:PeriodoAguaCalienteId, updatedAt=NOW() WHERE id=:CaracteristicasCampingId
+  `,
+    {
+      replacements: {
+        wifi,
+        duchas,
+        baños,
+        mascotas,
+        rodantes,
+        proveduria,
+        salon_sum,
+        restaurant,
+        vigilancia,
+        pileta,
+        estacionamiento,
+        juegos_infantiles,
+        maquinas_gimnasia,
+        AbiertoPeriodoId,
+        PeriodoAguaCalienteId,
+        CaracteristicasCampingId,
+      },
+      type: QueryTypes.UPDATE,
+    }
+  );
 
-  await sequelize.query(`
-  UPDATE Caracteristicas_parcelas SET techada=${parcela_techada}, agua_en_parcela=${parcela_agua_en_parcela}, iluminacion_toma_corriente=${parcela_iluminacion_toma_corriente}, superficie=${parcela_superficie}, updatedAt=NOW() WHERE CaracteristicasCampingId=${CaracteristicasCampingId}`);
+  await sequelize.query(
+    `
+  UPDATE Caracteristicas_parcelas SET techada=:parcela_techada, agua_en_parcela=:parcela_agua_en_parcela, iluminacion_toma_corriente=:parcela_iluminacion_toma_corriente, superficie=:parcela_superficie,updatedAt=NOW() WHERE CaracteristicasCampingId=:CaracteristicasCampingId`,
+    {
+      replacements: {
+        parcela_techada,
+        parcela_agua_en_parcela,
+        parcela_iluminacion_toma_corriente,
+        parcela_superficie,
+        CaracteristicasCampingId,
+      },
+      type: QueryTypes.UPDATE,
+    }
+  );
 
-  await sequelize.query(`
-  DELETE FROM Camping_imagenes WHERE CampingId=${campingId}
-  `);
+  await sequelize.query(
+    `
+  DELETE FROM Camping_imagenes WHERE CampingId=:campingId
+  `,
+    {
+      replacements: { campingId },
+      type: QueryTypes.DELETE,
+    }
+  );
 
   await Promise.all(
     imagenes.map((imagen: string) =>
       sequelize.query(
-        `INSERT INTO Camping_imagenes(url,createdAt,updatedAt,CampingId) VALUES ('${imagen}',NOW(),NOW(),${campingId})`
+        `INSERT INTO Camping_imagenes(url,createdAt,updatedAt,CampingId) VALUES (:imagen,NOW(),NOW(),:campingId)`,
+        {
+          replacements: { imagen, campingId },
+          type: QueryTypes.INSERT,
+        }
       )
     )
   );

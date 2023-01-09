@@ -26,20 +26,16 @@ ReviewsRouter.get(
 
 //CREA UNA REVIEW
 // POST -> http://localhost:3001/api/reviews/
-ReviewsRouter.post("/", (req: Request<createReview>, res: Response) => {
+ReviewsRouter.post("/", async (req: Request<createReview>, res: Response) => {
   const { email }: { email: string } = req.body;
 
-  verify(email, String(process.env.SECRET), (err, _) => {
-    if (err) throw { error: 406, message: "Autorización denegada." };
+  verify(email, process.env.SECRET as string);
 
-    postReviewsCreate(req.body)
-      .then((result) => res.status(200).json(result))
-      .catch(() =>
-        res
-          .status(404)
-          .json({ error: 400, message: "No se pudo cargar esa review" })
-      );
-  });
+  try {
+    res.status(200).json(await postReviewsCreate(req.body));
+  } catch (e: any) {
+    res.status(e.error || 400).json(e);
+  }
 });
 
 export default ReviewsRouter;
