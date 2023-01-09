@@ -55,7 +55,7 @@ export const postBlogComentario = async ({
       error: 406,
       message: "Faltan parámetros",
     };
-
+    
   const postBlogComentario: number = await sequelize.query(
     `INSERT INTO Posts_comentarios (comentario, createdAt, updatedAt, UsuarioId, PostsUsuarioId) VALUES (:comentario, NOW(), NOW(), :usuarioId, :postId)`,
     {
@@ -245,18 +245,21 @@ export const updateComentario = async (
   comentarioId: number
 ) => {
   const entries: [key: string, value: string][] = Object.entries(data);
-
+  console.log(entries);
+  
+  
   if (!entries.length || entries.length > allPropertiesComentario.length)
     throw { error: 406, message: "Información errónea en el query." };
 
   for (let [key] of entries)
     if (!allPropertiesComentario.includes(key))
       throw { error: 406, message: "Propiedades inexistentes." };
+  
 
   if (data.comentario) {
     await sequelize.query(
       `UPDATE Posts_comentarios AS PC
-      SET comentario=:data.comentario 
+      SET comentario=:comentario 
       WHERE PC.id=:comentarioId`,
       {
         replacements: { comentario: data.comentario, comentarioId },
