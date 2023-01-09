@@ -26,11 +26,11 @@ export const registerUser = async ({
       message: "Ese correo ya se encuentra registrado.",
     };
 
-  const userRegisteredId: number = await sequelize.query(
-    `INSERT INTO Usuarios (email, clave, username, TipoUsuarioId, createdAt, updatedAt) VALUES (:email, ${await hash(
+  const [userRegisteredId]: [userRegistered: number] = await sequelize.query(
+    `INSERT INTO Usuarios (email, clave, username, TipoUsuarioId, createdAt, updatedAt) VALUES (:email, '${await hash(
       clave,
       8
-    )}, :username, :TipoUsuarioId, NOW(), NOW())`,
+    )}', :username, :TipoUsuarioId, NOW(), NOW())`,
     {
       replacements: {
         email,

@@ -108,18 +108,25 @@ UsuariosRouter.put(
   "/actualizar",
   checkoutUser,
   async (
-    req: Request<{}, {}, { userId: number; user: any }, any>,
+    req: Request<
+      {},
+      {},
+      { userId: number; user: any; justPhoto: boolean },
+      any
+    >,
     res: Response
   ) => {
     try {
-      const { userId } = req.body;
+      const { userId, justPhoto } = req.body;
       const authorization: string = req.headers.authorization as string;
       const { id, tipo }: { id: number; tipo: string } = req.body.user;
 
       if (userId !== id && tipo !== (process.env.TIPO_ADMIN as string))
         throw { error: 401, message: "Acceso denegado." };
 
-      res.status(200).json(await updateUser(req.query, userId, authorization));
+      res
+        .status(200)
+        .json(await updateUser(req.query, userId, authorization, justPhoto));
     } catch (e: any) {
       res.status(e.error || 404).json(e);
     }
