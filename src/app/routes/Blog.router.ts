@@ -150,18 +150,16 @@ BlogRouter.put(
 );
 
 BlogRouter.put(
-  "/comentarios/:idComentario",
+  "/comentarios/:userId",
   checkoutUser,
-  checkoutBeTheSameUserOrAdmin,
-  async (req: Request<any>, res: Response) => {
-    const { idComentario } = req.params;
+  async (req: Request<any, any, any, any>, res: Response) => {
+    const { userId } = req.params;
 
     try {
-      res.status(200).json(await updateComentario(req.body, +idComentario));
-    } catch {
-      res.status(404).json({
-        error: `no se pudo en http://localhost/api/blog/comentarios/${idComentario}`,
-      });
+      res.status(200).json(await updateComentario(req.query, +userId));
+    } catch(error) {
+      res.status(404).json(
+        error);
     }
   }
 );

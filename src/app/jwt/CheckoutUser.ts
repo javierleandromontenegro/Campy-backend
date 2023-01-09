@@ -114,8 +114,8 @@ export const checkoutBeTheSameUserOrAdmin = (
   const tipo: string = req.body.user.tipo;
   const userParamsId: number = +req.params.userId;
 
-  if (userId === userParamsId || tipo === (process.env.TIPO_ADMIN as string))
-    return next();
+
+  if (userId === userParamsId || tipo === (process.env.ADMIN as string)) return next();
 
   res.status(406).json({ error: 406, message: "Autorización denegada." });
 };
