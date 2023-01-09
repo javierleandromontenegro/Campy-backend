@@ -2,7 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import { sign, verify } from "jsonwebtoken";
 import { hash } from "bcrypt";
 import { datosUsuario } from "../types/datosUsuario";
-import { searchUser } from "./CheckoutUser.service";
+import { searchUser } from "../jwt/CheckoutUser";
+import { QueryTypes } from "sequelize";
 
 const { sequelize } = require("../db");
 
@@ -25,7 +26,7 @@ export const loginUser = async ({
     tipo,
   }: datosUsuario = await searchUser(email, clave);
 
-  const token = sign({ email, clave }, String(process.env.SECRET));
+  const token = sign({ email, clave }, process.env.SECRET as string);
 
   return {
     id,
@@ -97,7 +98,7 @@ export const loginUserWithGoogle = async ({
   sub: string;
   apikey: string;
   picture: string;
-}) => {
+}): Promise<any> => {
   try {
     if (apikey !== process.env.API_KEY)
       throw { error: 401, message: "Acceso no autorizado" };
@@ -110,7 +111,11 @@ export const loginUserWithGoogle = async ({
       })
       .catch(async () => {
         const [[findUser]] = await sequelize.query(
-          `SELECT id, email, clave, username, numero_celular, direccion, dni, habilitado, foto, TipoUsuarioId AS tipo FROM Usuarios WHERE email='${email}';`
+          `SELECT id, email, clave, username, numero_celular, direccion, dni, habilitado, foto, TipoUsuarioId AS tipo FROM Usuarios WHERE email=:email;`,
+          {
+            replacements: { email },
+            type: QueryTypes.SELECT,
+          }
         );
 
         if (findUser)
@@ -120,12 +125,19 @@ export const loginUserWithGoogle = async ({
           };
 
         await sequelize.query(
-          `INSERT INTO Usuarios (email, clave, username, foto, habilitado, TipoUsuarioId, createdAt, updatedAt) VALUES ('${email}', '${await hash(
+          `INSERT INTO Usuarios (email, clave, username, foto, habilitado, TipoUsuarioId, createdAt, updatedAt) VALUES (:email, '${await hash(
             sub,
             8
-          )}', '${nickname}', '${picture}', 1, '${
-            process.env.TIPO_USUARIO
-          }', NOW(), NOW())`
+          )}', :nickname, :picture, 1, :TipoUsuarioId, NOW(), NOW())`,
+          {
+            replacements: {
+              email,
+              nickname,
+              picture,
+              TipoUsuarioId: process.env.TIPO_USUARIO as string,
+            },
+            type: QueryTypes.INSERT,
+          }
         );
 
         const token = sign({ email, clave: sub }, String(process.env.SECRET));
