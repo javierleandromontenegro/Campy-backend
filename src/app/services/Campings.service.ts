@@ -103,7 +103,7 @@ export const getCampingsCantReservas = async (): Promise<
     INNER JOIN Localidades AS L ON C.LocalidadeId=L.id
     INNER JOIN Provincias AS P ON L.ProvinciaId=P.id 
     INNER JOIN Camping_imagenes as I ON I.CampingId=C.id
-    GROUP BY C.nombre_camping ORDER BY cant_reservas DESC`
+    GROUP BY C.nombre_camping ORDER BY cant_reservas DESC`,
     { type: QueryTypes.SELECT }
 
   );
