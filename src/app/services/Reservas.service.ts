@@ -2,9 +2,9 @@ import { reservas, reservasdetalle } from "../types/reservas";
 import { reservaCreate, reservaPago } from "../types/reservas";
 import { getUser } from "./Usuario.service";
 import { datosUsuario } from "../types/datosUsuario";
-import { getTemplateReserve } from "../email/templatesHTML";
 import { sendEmail } from "../email/sendEmail";
 import { QueryTypes } from "sequelize";
+import templateReserve from "../email/templateReserve";
 const { sequelize } = require("../db");
 
 //http://localhost:3001/api/campings/reservas
@@ -255,7 +255,7 @@ export const postReservaCreate = async ({
   sendEmail({
     userEmail: user.email,
     subject: "Confirmación de reserva",
-    html: getTemplateReserve(
+    html: templateReserve(
       user.username,
       reserve.nombre_camping,
       reserve.email,

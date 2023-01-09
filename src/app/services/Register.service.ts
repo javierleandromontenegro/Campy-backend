@@ -2,7 +2,7 @@ import { datosUsuario } from "../types/datosUsuario";
 import jwt from "jsonwebtoken";
 import { hash } from "bcrypt";
 import { sendEmail } from "../email/sendEmail";
-import { getTemplateRegister } from "../email/templatesHTML";
+import templateRegister from "../email/templateRegister";
 import { QueryTypes } from "sequelize";
 
 const { sequelize, Usuarios } = require("../db");
@@ -51,7 +51,7 @@ export const registerUser = async ({
 
   const token: string = getToken(createdUser);
 
-  const html: string = getTemplateRegister(
+  const html: string = templateRegister(
     createdUser.username,
     token,
     Number(createdUser.id)

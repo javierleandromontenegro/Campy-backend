@@ -100,7 +100,7 @@ export const getPostImagenes = async (id: number): Promise<string[]> => {
 
 export const getAllPost = async (): Promise<datosAllPost[]> => {
   const querySql: datosAllPost[] = await sequelize.query(
-    `SELECT PU.id, PU.titulo, PU.cant_comentarios, PU.cant_visualizaciones, U.foto, U.username, PU.fecha, PU.texto, TU.tipo
+    `SELECT PU.id, PU.titulo, PU.cant_comentarios, PU.cant_visualizaciones, PU.comentarios_vistos, PU.UsuarioId, U.foto, U.username, PU.fecha, PU.texto
     FROM Posts_usuarios as PU 
     INNER JOIN Usuarios as U ON U.id=PU.UsuarioId
     INNER JOIN Tipo_usuarios as TU ON TU.id=U.TipoUsuarioId
@@ -115,7 +115,7 @@ export const getAllPost = async (): Promise<datosAllPost[]> => {
 
 export const getComentario = async (id: number): Promise<string[]> => {
   const querySql: datosPost[] = await sequelize.query(
-    `SELECT U.foto, U.username, PC.comentario, PC.createdAt
+    `SELECT PC.id, U.foto, U.username, PC.comentario, PC.createdAt
       FROM Posts_comentarios AS PC
       INNER JOIN Usuarios AS U ON U.id=PC.UsuarioId
       INNER JOIN Posts_usuarios AS PU ON PU.id=PC.PostsUsuarioId
@@ -209,6 +209,30 @@ export const updateVisitas = async (
         WHERE PU.id=:postId`,
     {
       replacements: { cant_visualizaciones: data.visitas, postId },
+      type: QueryTypes.UPDATE,
+    }
+  );
+
+  await sequelize.query(
+    `UPDATE Posts_usuarios AS PU
+        SET cant_visualizaciones='${data.visitas}'  
+        WHERE PU.id=:postId`,
+    {
+      replacements: { postId },
+      type: QueryTypes.UPDATE,
+    }
+  );
+
+  return postId;
+};
+
+export const updateComentariosVistos = async (postId: number) => {
+  await sequelize.query(
+    `UPDATE Posts_usuarios AS PU
+      SET comentarios_vistos = cant_comentarios 
+      WHERE PU.id=:postId`,
+    {
+      replacements: { postId },
       type: QueryTypes.UPDATE,
     }
   );
