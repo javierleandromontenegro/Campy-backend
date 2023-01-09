@@ -110,7 +110,7 @@ export const loginUserWithGoogle = async ({
         return { ...res, token };
       })
       .catch(async () => {
-        const [[findUser]] = await sequelize.query(
+        const [findUser] = await sequelize.query(
           `SELECT id, email, clave, username, numero_celular, direccion, dni, habilitado, foto, TipoUsuarioId AS tipo FROM Usuarios WHERE email=:email;`,
           {
             replacements: { email },

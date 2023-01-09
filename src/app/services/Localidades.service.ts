@@ -54,7 +54,7 @@ export const postLocalidades = async ({
       message: "Faltan parámetros",
     };
 
-  const querySql: number = await sequelize.query(
+  const [querySql]: [querySql: number] = await sequelize.query(
     `INSERT INTO Localidades(nombre, imagen, createdAt, updatedAt, ProvinciaId)
     VALUES (:nombre, :imagen, NOW(), NOW(), :ProvinciaId)`,
     {

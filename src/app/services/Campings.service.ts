@@ -96,11 +96,16 @@ export const disableCamping = async (
 export const getCampingsCantReservas = async (): Promise<
   campingsCantReservas[]
 > => {
-  const querySql: campingsCantReservas[] = await sequelize.query(
-    `SELECT C.nombre_camping, COUNT(R.id) AS cant_reservas FROM Reservas AS R 
+
+  const [querySql]: [querySql: campingsCantReservas[]] = await sequelize.query(
+    `SELECT C.nombre_camping, L.nombre as localidad, P.nombre as provincia, I.url as images, COUNT(R.id) AS cant_reservas FROM Reservas AS R 
     INNER JOIN Campings AS C ON R.CampingId=C.id
-    GROUP BY C.nombre_camping ORDER BY cant_reservas DESC`,
+    INNER JOIN Localidades AS L ON C.LocalidadeId=L.id
+    INNER JOIN Provincias AS P ON L.ProvinciaId=P.id 
+    INNER JOIN Camping_imagenes as I ON I.CampingId=C.id
+    GROUP BY C.nombre_camping ORDER BY cant_reservas DESC`
     { type: QueryTypes.SELECT }
+
   );
 
   return querySql;
@@ -527,7 +532,7 @@ export const postCampingsCreate = async ({
       message: "Faltan parámetros",
     };
 
-  const CaractCampingId: number = await sequelize.query(
+  const [CaractCampingId]: [CaractCampingId: number] = await sequelize.query(
     `INSERT INTO Caracteristicas_campings(wifi,duchas,baños,mascotas,rodantes,proveduria,salon_sum,restaurant,vigilancia,pileta, estacionamiento,juegos_infantiles,maquinas_gimnasia,createdAt, updatedAt,AbiertoPeriodoId,PeriodoAguaCalienteId) VALUES (:wifi,:duchas,:baños,
     :mascotas,:rodantes,:proveduria,:salon_sum,
     :restaurant,:vigilancia,:pileta,:estacionamiento,:juegos_infantiles,:maquinas_gimnasia,NOW(),NOW(),:AbiertoPeriodoId,:PeriodoAguaCalienteId)`,
