@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { hash } from "bcrypt";
 import { sendEmail } from "../email/sendEmail";
 import { getTemplateRegister } from "../email/templatesHTML";
+import { QueryTypes } from "sequelize";
 
 const { sequelize, Usuarios } = require("../db");
 
@@ -25,15 +26,27 @@ export const registerUser = async ({
       message: "Ese correo ya se encuentra registrado.",
     };
 
-  const [userRegisteredId]: [userRegisteredId: number] = await sequelize.query(
-    `INSERT INTO Usuarios (email, clave, username, TipoUsuarioId, createdAt, updatedAt) VALUES ('${email}', '${await hash(
+  const userRegisteredId: number = await sequelize.query(
+    `INSERT INTO Usuarios (email, clave, username, TipoUsuarioId, createdAt, updatedAt) VALUES (:email, ${await hash(
       clave,
       8
-    )}', '${username}', '${process.env.TIPO_USUARIO}', NOW(), NOW())`
+    )}, :username, :TipoUsuarioId, NOW(), NOW())`,
+    {
+      replacements: {
+        email,
+        username,
+        TipoUsuarioId: process.env.TIPO_USUARIO,
+      },
+      type: QueryTypes.INSERT,
+    }
   );
 
-  const [[createdUser]]: [createdUser: datosUsuario[]] = await sequelize.query(
-    `SELECT id, email, clave, username, numero_celular, direccion, dni, foto, TipoUsuarioId AS tipo FROM Usuarios WHERE id=${userRegisteredId};`
+  const [createdUser]: [createdUser: datosUsuario] = await sequelize.query(
+    `SELECT id, email, clave, username, numero_celular, direccion, dni, foto, TipoUsuarioId AS tipo FROM Usuarios WHERE id=:userRegisteredId`,
+    {
+      replacements: { userRegisteredId },
+      type: QueryTypes.SELECT,
+    }
   );
 
   const token: string = getToken(createdUser);
