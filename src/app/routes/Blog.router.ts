@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { datosPost, datosComentario } from '../types/datosBlog';
 import { updateComentariosVistos, updateVisitas, postBlogComentario, postBlogCreate, getPostImagenes, getAllPost, getComentario, getPostPorId, updatePost, updateComentario, deletePostPorId, deleteComentarioPorId, cantidadComentariosPorIdDePost } from '../services/Blog.service';
-import { checkoutUser, /* checkoutAdmin */ } from '../services/CheckoutUser.service';
+import { checkoutUser/* , checkoutAdmin */ } from '../services/CheckoutUser.service';
 
 const BlogRouter: Router = Router();
 
@@ -67,7 +67,7 @@ BlogRouter.get('/:idPost', async (req: Request<{idPost: number}>, res: Response)
   }
 });
 
-BlogRouter.put('/:idPost', async (req: Request<{idPost: number}>, res: Response) => {
+BlogRouter.put('/:idPost',/*  checkoutUser, */ async (req: Request<{idPost: number}/* , {} */>, res: Response) => {
   const { idPost } = req.params;
 
   try {
@@ -98,6 +98,7 @@ BlogRouter.put('/comentarios/vistos/:idPost', async (req: Request<{idPost: numbe
 });
 
 BlogRouter.put('/comentarios/:idComentario', async (req: Request<{idComentario: number}>, res: Response) => {
+
   const { idComentario } = req.params;
 
   try {
@@ -109,7 +110,7 @@ BlogRouter.put('/comentarios/:idComentario', async (req: Request<{idComentario: 
 
 
 
-BlogRouter.delete('/:postId', async (req: Request<{postId: number}>, res: Response) => {
+BlogRouter.delete('/:postId',/*  checkoutUser, checkoutAdmin, */ async (req: Request<{postId: number}/* , {}, {} */>, res: Response) => {
   const { postId } = req.params;
 
   try {
@@ -119,7 +120,7 @@ BlogRouter.delete('/:postId', async (req: Request<{postId: number}>, res: Respon
   }
 });
 
-BlogRouter.delete('/comentarios/:comentarioId', async (req: Request<{comentarioId: number}>, res: Response) => {
+BlogRouter.delete('/comentarios/:comentarioId',/*  checkoutUser, checkoutAdmin, */ async (req: Request<{comentarioId: number}>, res: Response) => {
   const { comentarioId } = req.params;
 
   try {
