@@ -100,7 +100,7 @@ export const getPostImagenes = async (id: number): Promise<string[]> => {
 
 export const getAllPost = async (): Promise<datosAllPost[]> => {
   const querySql: datosAllPost[] = await sequelize.query(
-    `SELECT PU.id, PU.titulo, PU.cant_comentarios, PU.cant_visualizaciones, PU.comentarios_vistos, PU.UsuarioId, U.foto, U.username, PU.fecha, PU.texto
+    `SELECT PU.id, PU.titulo, PU.cant_comentarios, PU.cant_visualizaciones, PU.comentarios_vistos, PU.UsuarioId, U.foto, U.username, TU.tipo, PU.fecha, PU.texto
     FROM Posts_usuarios as PU 
     INNER JOIN Usuarios as U ON U.id=PU.UsuarioId
     INNER JOIN Tipo_usuarios as TU ON TU.id=U.TipoUsuarioId
