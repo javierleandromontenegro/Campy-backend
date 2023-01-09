@@ -1,9 +1,7 @@
 import { Router, Request, Response } from "express";
 import { sendEmail } from "../email/sendEmail";
-import {
-  getTemplateContactAdmin,
-  getTemplateContactUser,
-} from "../email/templatesHTML";
+import templateContactUser from "../email/templateContactUser";
+import templateContactAdmin from "../email/templateContactAdmin";
 import { datosEmailContact } from "../types/datosEmailContact";
 
 const SendEmailRouter: Router = Router();
@@ -16,12 +14,12 @@ SendEmailRouter.post(
         sendEmail({
           userEmail: String(process.env.EMAIL),
           subject: req.body.subject,
-          html: getTemplateContactAdmin(req.body),
+          html: templateContactAdmin(req.body),
         }),
         sendEmail({
           userEmail: req.body.email,
           subject: "Consulta enviada con éxito",
-          html: getTemplateContactUser(req.body.name),
+          html: templateContactUser(req.body.name),
         }),
       ]);
 

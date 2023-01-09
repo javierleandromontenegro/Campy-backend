@@ -8,10 +8,7 @@ import {
   postReservaCreate,
   getReservasByOwnerId,
 } from "../services/Reservas.service";
-import {
-  checkoutOwnerOrAdmin,
-  checkoutUser,
-} from "../services/CheckoutUser.service";
+import { checkoutOwnerOrAdmin, checkoutUser } from "../jwt/CheckoutUser";
 
 const ReservasRouter: Router = Router();
 
@@ -46,7 +43,7 @@ ReservasRouter.get(
     const { userId }: { userId: string } = req.params;
 
     try {
-      res.status(200).json(await getReservasByUserId(userId));
+      res.status(200).json(await getReservasByUserId(+userId));
     } catch {
       res
         .status(404)
@@ -64,7 +61,7 @@ ReservasRouter.get(
     const { campingId }: { campingId: string } = req.params;
 
     try {
-      res.status(200).json(await getReservasByCampingId(campingId));
+      res.status(200).json(await getReservasByCampingId(+campingId));
     } catch (e: any) {
       res.status(e.error || 400).json(e);
     }
@@ -80,7 +77,7 @@ ReservasRouter.get(
     const { ownerId }: { ownerId: string } = req.params;
 
     try {
-      res.status(200).json(await getReservasByOwnerId(ownerId));
+      res.status(200).json(await getReservasByOwnerId(+ownerId));
     } catch (e: any) {
       res.status(e.error || 400).json(e);
     }
@@ -97,7 +94,7 @@ ReservasRouter.get(
       res
         .status(200)
         .json(
-          await getReservasByCampingId(campingId, req.query.filter === "true")
+          await getReservasByCampingId(+campingId, req.query.filter === "true")
         );
     } catch {
       res.status(404).json({
@@ -113,7 +110,7 @@ ReservasRouter.get(
   async (req: Request<{ reservaId: string }>, res: Response) => {
     const { reservaId }: { reservaId: string } = req.params;
     try {
-      res.status(200).json(await getReservaDetalle(reservaId));
+      res.status(200).json(await getReservaDetalle(+reservaId));
     } catch {
       res.status(404).json({
         error: `no se pudo en http://localhost/api/reservas/detalle/:idReserva`,

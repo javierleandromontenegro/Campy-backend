@@ -1,4 +1,5 @@
-<head>
+export default (name: string, token: string) =>
+  `<head>
   <style>
     * {
       padding: 0;
@@ -49,7 +50,9 @@
     Solo se tendrá validez por las próximas 12hs.
   </p>
   <form
-    action="${process.env.HOST || 'http://localhost:3001'}/password/${token}"
+    action="${
+      process.env.HOST || "http://localhost:3001"
+    }/api/usuarios/password"
     method="POST"
     style="padding: 15px"
   >
@@ -63,9 +66,11 @@
       "
       type="password"
       placeholder="Nueva clave"
+      name="password"
       pattern="^.{5}.*"
       required
     />
+    <input type="hidden" name="token" value="${token}" />
     <input
       style="
         padding: 5px;
@@ -80,4 +85,4 @@
       value="aceptar"
     />
   </form>
-</div>
+</div>`;

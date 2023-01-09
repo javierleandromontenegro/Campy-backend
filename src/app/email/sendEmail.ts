@@ -1,6 +1,6 @@
 import { sign } from "jsonwebtoken";
 import nodemailer from "nodemailer";
-import { getTemplateReview } from "./templatesHTML";
+import templateReview from "./templateReview";
 
 const { sequelize } = require("../db");
 
@@ -60,7 +60,7 @@ export const sendFormReview = async () => {
     sendEmail({
       userEmail: sql.email,
       subject: "Llenar formulario de review de camping.",
-      html: getTemplateReview(
+      html: templateReview(
         String(sql.CampingId),
         String(sql.UsuarioId),
         sign({ email: sql.email }, String(process.env.SECRET)),
