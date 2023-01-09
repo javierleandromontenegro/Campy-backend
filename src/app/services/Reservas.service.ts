@@ -62,7 +62,7 @@ export const getReservasByCampingId = async (
     INNER JOIN Campings AS C
     INNER JOIN Usuarios AS P ON C.UsuarioId=P.id 
     ON C.id=R.CampingId 
-    WHERE U.id=:id ${filterCondition}
+    WHERE C.id=:id ${filterCondition}
     ORDER BY R.createdAt DESC`,
     {
       replacements: { id },
@@ -177,7 +177,7 @@ export const postReservaCreate = async ({
     message: 'Faltan parámetros'
   };
  */
-  const ReservaId: number = await sequelize.query(
+  const [ReservaId]: [ReservaId: number] = await sequelize.query(
     `INSERT INTO Reservas(fecha_desde_reserva, fecha_hasta_reserva, cant_noches, total, createdAt, updatedAt, EstadoReservaId, UsuarioId, CampingId) VALUES (DATE(:fecha_desde_reserva),DATE(:fecha_hasta_reserva),:cant_noches,:total,NOW(),NOW(),:EstadoReservaId,:UsuarioId,:CampingId)`,
     {
       replacements: {

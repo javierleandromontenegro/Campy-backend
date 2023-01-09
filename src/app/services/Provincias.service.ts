@@ -8,7 +8,8 @@ export const getProvincias = async (id: number): Promise<datosBase[]> => {
   const querySql: datosBase[] = await sequelize.query(
     `SELECT P.id AS id,P.nombre AS nombre, P.descrip_historia, P.latitud, P.longitud, P.imagen AS imagen FROM Provincias AS P 
     INNER JOIN Paises ON P.PaiseId=Paises.id
-    WHERE P.PaiseId=:id`,
+    WHERE P.PaiseId=:id
+    ORDER BY P.nombre`,
     {
       replacements: { id },
       type: QueryTypes.SELECT,

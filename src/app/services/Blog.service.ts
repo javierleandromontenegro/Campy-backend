@@ -20,7 +20,7 @@ export const postBlogCreate = async ({
       message: "Faltan parámetros",
     };
 
-  const postBlogId: number = await sequelize.query(
+  const [postBlogId]: [postBlogId: number] = await sequelize.query(
     `INSERT INTO Posts_usuarios (titulo, texto, fecha, createdAt, updatedAt, UsuarioId) 
         VALUES (:titulo, :texto, NOW(), NOW(), NOW(), :usuarioId)`,
     {
@@ -55,14 +55,15 @@ export const postBlogComentario = async ({
       error: 406,
       message: "Faltan parámetros",
     };
-    
-  const postBlogComentario: number = await sequelize.query(
-    `INSERT INTO Posts_comentarios (comentario, createdAt, updatedAt, UsuarioId, PostsUsuarioId) VALUES (:comentario, NOW(), NOW(), :usuarioId, :postId)`,
-    {
-      replacements: { comentario, usuarioId, postId },
-      type: QueryTypes.INSERT,
-    }
-  );
+
+  const [postBlogComentario]: [postBlogComentario: number] =
+    await sequelize.query(
+      `INSERT INTO Posts_comentarios (comentario, createdAt, updatedAt, UsuarioId, PostsUsuarioId) VALUES (:comentario, NOW(), NOW(), :usuarioId, :postId)`,
+      {
+        replacements: { comentario, usuarioId, postId },
+        type: QueryTypes.INSERT,
+      }
+    );
 
   const [SumaId]: [SumaId: { cant_comentarios: number }] =
     await sequelize.query(

@@ -1,6 +1,5 @@
 import { QueryTypes } from "sequelize";
 import { stateUsuario, datosUsuario } from "../types/datosUsuario";
-import { allPropertiesUsuario } from "../types/Properties";
 import { hash } from "bcrypt";
 import { sign, verify } from "jsonwebtoken";
 import { sendEmail } from "../email/sendEmail";
@@ -48,52 +47,43 @@ export const disableUser = async (
 };
 
 export const updateUser = async (
-  data: datosUsuario,
+  { username, clave, direccion, numero_celular, dni, foto }: datosUsuario,
   userId: number,
-  token: string
+  token: string,
+  justPhoto: boolean = false
 ) => {
-  const entries: [key: string, value: string][] = Object.entries(data);
+  if (justPhoto) {
+    await sequelize.query(`UPDATE Usuarios SET foto=:foto  WHERE id=:userId`, {
+      replacements: { foto, userId },
+      type: QueryTypes.UPDATE,
+    });
 
-  if (!entries.length || entries.length > allPropertiesUsuario.length)
-    throw { error: 406, message: "Información errónea en el query." };
+    return { ...(await getUser(userId)), token };
+  }
 
-  for (let [key] of entries)
-    if (!allPropertiesUsuario.includes(key))
-      throw { error: 406, message: "Propiedades inexistentes." };
-
-  let clave: string = "";
-
-  const querySentence = await Promise.all(
-    entries.map(async (entry) => {
-      if (entry[0] === "clave") clave = entry[1];
-      entry[1] = `'${
-        entry[0] === "clave" ? await hash(entry[1], 8) : entry[1]
-      }'`;
-
-      return entry.join("=");
-    })
-  ).then((res) => res.join(", "));
-
-  await sequelize.query(`UPDATE Usuarios SET :querySentence WHERE id=:userId`, {
-    replacements: { querySentence, userId },
-    type: QueryTypes.UPDATE,
-  });
-
-  const [
-    [
-      {
-        id,
-        email,
+  await sequelize.query(
+    `UPDATE Usuarios SET username=:username ${
+      clave ? `, clave='${await hash(clave, 8)}'` : ""
+    },direccion=:direccion, numero_celular=:numero_celular, dni=:dni, foto=:foto  WHERE id=:userId`,
+    {
+      replacements: {
         username,
-        foto,
-        numero_celular,
+        userId,
         direccion,
+        numero_celular,
         dni,
-        TipoUsuarioId,
+        foto,
       },
-    ],
-  ] = await sequelize.query(
-    `SELECT id, email, clave, username, foto, numero_celular, direccion, dni, TipoUsuarioId FROM Usuarios WHERE id=${userId}`
+      type: QueryTypes.UPDATE,
+    }
+  );
+
+  const [{ id, TipoUsuarioId, email }] = await sequelize.query(
+    `SELECT id, email, clave, username, foto, numero_celular, direccion, dni, TipoUsuarioId FROM Usuarios WHERE id=:userId`,
+    {
+      replacements: { userId },
+      type: QueryTypes.SELECT,
+    }
   );
 
   if (clave) token = sign({ email, clave }, String(process.env.SECRET));
