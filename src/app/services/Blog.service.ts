@@ -152,7 +152,10 @@ export const getPostPorId = async (id: number): Promise<datosPost> => {
   return querySql[0];
 };
 
-export const updatePost = async (data: datosPost, postId: number) => {
+export const updatePost = async (
+  data: { texto: string; imagenes: string },
+  postId: number
+) => {
   const entries: [key: string, value: string][] = Object.entries(data);
 
   if (!entries.length || entries.length > allPropertiesPost.length)
@@ -184,7 +187,7 @@ export const updatePost = async (data: datosPost, postId: number) => {
     );
 
     await Promise.all(
-      data.imagenes.map((imagenes) =>
+      data.imagenes.split(",").map((imagenes: string) =>
         sequelize.query(
           `INSERT INTO Posts_imagenes(url,createdAt,updatedAt, PostsUsuarioId) 
       VALUES (:imagenes,NOW(),NOW(),:postId)`,
@@ -247,15 +250,13 @@ export const updateComentario = async (
 ) => {
   const entries: [key: string, value: string][] = Object.entries(data);
   console.log(entries);
-  
-  
+
   if (!entries.length || entries.length > allPropertiesComentario.length)
     throw { error: 406, message: "Información errónea en el query." };
 
   for (let [key] of entries)
     if (!allPropertiesComentario.includes(key))
       throw { error: 406, message: "Propiedades inexistentes." };
-  
 
   if (data.comentario) {
     await sequelize.query(
