@@ -527,7 +527,7 @@ export const postCampingsCreate = async ({
       message: "Faltan parámetros",
     };
 
-  const CaractCampingId: number = await sequelize.query(
+  const [CaractCampingId]: [CaractCampingId: number] = await sequelize.query(
     `INSERT INTO Caracteristicas_campings(wifi,duchas,baños,mascotas,rodantes,proveduria,salon_sum,restaurant,vigilancia,pileta, estacionamiento,juegos_infantiles,maquinas_gimnasia,createdAt, updatedAt,AbiertoPeriodoId,PeriodoAguaCalienteId) VALUES (:wifi,:duchas,:baños,
     :mascotas,:rodantes,:proveduria,:salon_sum,
     :restaurant,:vigilancia,:pileta,:estacionamiento,:juegos_infantiles,:maquinas_gimnasia,NOW(),NOW(),:AbiertoPeriodoId,:PeriodoAguaCalienteId)`,

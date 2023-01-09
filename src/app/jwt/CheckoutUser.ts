@@ -114,7 +114,8 @@ export const checkoutBeTheSameUserOrAdmin = (
   const tipo: string = req.body.user.tipo;
   const userParamsId: number = +req.params.userId;
 
-  if (userId === userParamsId || tipo === (process.env.ADMIN as string)) next();
+  if (userId === userParamsId || tipo === (process.env.TIPO_ADMIN as string))
+    return next();
 
   res.status(406).json({ error: 406, message: "Autorización denegada." });
 };
@@ -130,7 +131,7 @@ export const checkoutBeTheOwnerCampingOrAdmin = async (
   const tipo: string = req.body.user.tipo;
   const campingParamsId: number = +req.params.campingId;
 
-  if (tipo === (process.env.ADMIN as string)) next();
+  if (tipo === (process.env.TIPO_ADMIN as string)) return next();
 
   const [verifyOwner]: [verifyOwner: { id: number; UsuarioId: number }] =
     await sequelize.query(
@@ -143,7 +144,7 @@ export const checkoutBeTheOwnerCampingOrAdmin = async (
       }
     );
 
-  if (verifyOwner) next();
+  if (verifyOwner) return next();
 
   res.status(406).json({ error: 406, message: "Autorización denegada." });
 };

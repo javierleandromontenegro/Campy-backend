@@ -43,7 +43,7 @@ export const postReviewsCreate = async ({
 
   if (!validateReserve) throw { error: 406, message: "Autorización denegada." };
 
-  const ReviewId: number = await sequelize.query(
+  const [ReviewId]: [ReviewId: number] = await sequelize.query(
     `INSERT INTO Reviews(comentario, fecha, puntaje,createdAt, updatedAt, CampingId, UsuarioId) VALUES (:comentario,NOW(),:puntaje,NOW(),NOW(),:camping,:usuario)`,
     {
       replacements: { comentario, puntaje, camping, usuario },
