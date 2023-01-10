@@ -178,7 +178,7 @@ export const updatePost = async (
     );
   }
 
-  if (data.imagenes) {
+  
     await sequelize.query(
       `DELETE FROM Posts_imagenes WHERE PostsUsuarioId=:postId`,
       {
@@ -187,6 +187,7 @@ export const updatePost = async (
       }
     );
 
+    if (data.imagenes){
     await Promise.all(
       data.imagenes.split(",").map((imagenes: string) =>
         sequelize.query(
@@ -198,8 +199,8 @@ export const updatePost = async (
           }
         )
       )
-    );
-  }
+    );}
+  
 
   return await getPostPorId(postId);
 };
