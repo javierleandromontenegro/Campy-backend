@@ -2,7 +2,6 @@ import { Router, Request, Response } from "express";
 import { datosPost, datosComentario } from "../types/datosBlog";
 import {
   checkoutAdmin,
-  checkoutBeTheSameUserOrAdmin,
   checkoutUser /* checkoutAdmin */,
 } from "../jwt/CheckoutUser";
 import {
@@ -105,16 +104,14 @@ BlogRouter.get(
 BlogRouter.put(
   "/:idPost",
   checkoutUser,
-  checkoutBeTheSameUserOrAdmin,
-  async (req: Request<{ idPost: string }>, res: Response) => {
+  async (req: Request<{ idPost: string }, any, any, any>, res: Response) => {
     const { idPost } = req.params;
 
     try {
-      res.status(200).json(await updatePost(req.body, +idPost));
-    } catch {
-      res
-        .status(404)
-        .json({ error: `no se pudo en http://localhost/api/blog/${idPost}` });
+      res.status(200).json(await updatePost(req.query, +idPost));
+    } catch (e: any) {
+      console.log("ERROR", e);
+      res.status(404).json(e);
     }
   }
 );
@@ -150,18 +147,15 @@ BlogRouter.put(
 );
 
 BlogRouter.put(
-  "/comentarios/:idComentario",
+  "/comentarios/:userId",
   checkoutUser,
-  checkoutBeTheSameUserOrAdmin,
-  async (req: Request<any>, res: Response) => {
-    const { idComentario } = req.params;
+  async (req: Request<any, any, any, any>, res: Response) => {
+    const { userId } = req.params;
 
     try {
-      res.status(200).json(await updateComentario(req.body, +idComentario));
-    } catch {
-      res.status(404).json({
-        error: `no se pudo en http://localhost/api/blog/comentarios/${idComentario}`,
-      });
+      res.status(200).json(await updateComentario(req.query, +userId));
+    } catch (error) {
+      res.status(404).json(error);
     }
   }
 );
