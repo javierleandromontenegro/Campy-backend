@@ -101,18 +101,26 @@ export const getPostImagenes = async (id: number): Promise<string[]> => {
 
 export const getAllPost = async (): Promise<datosAllPost[]> => {
   const querySql: datosAllPost[] = await sequelize.query(
-    `SELECT PU.id, PU.titulo, PU.cant_comentarios, PU.cant_visualizaciones, PU.comentarios_vistos, PU.UsuarioId, U.foto, U.username, TU.tipo, PU.fecha, PU.texto, PI.url
+    `SELECT PU.id, PU.titulo, PU.cant_comentarios, PU.cant_visualizaciones, PU.comentarios_vistos, PU.UsuarioId, U.foto, U.username, TU.tipo, PU.fecha, PU.texto
     FROM Posts_usuarios as PU 
     INNER JOIN Usuarios as U ON U.id=PU.UsuarioId
     INNER JOIN Tipo_usuarios as TU ON TU.id=U.TipoUsuarioId
-    INNER JOIN Posts_imagenes as PI ON PU.id=PI.PostsUsuarioId
     ORDER BY PU.fecha DESC`,
     {
       type: QueryTypes.SELECT,
     }
   );
 
-  return querySql;
+  const imagenesQuery = await Promise.all(
+    querySql.map((query) => getPostImagenes(query.id))
+  );
+
+  const results = querySql.map((query, i) => {
+    query.imagenes = imagenesQuery[i];
+    return query;
+  });
+
+  return results;
 };
 
 export const getComentario = async (id: number): Promise<string[]> => {
@@ -178,7 +186,7 @@ export const updatePost = async (
     );
   }
 
-  if (data.imagenes) {
+  
     await sequelize.query(
       `DELETE FROM Posts_imagenes WHERE PostsUsuarioId=:postId`,
       {
@@ -187,6 +195,7 @@ export const updatePost = async (
       }
     );
 
+    if (data.imagenes){
     await Promise.all(
       data.imagenes.split(",").map((imagenes: string) =>
         sequelize.query(
@@ -198,8 +207,8 @@ export const updatePost = async (
           }
         )
       )
-    );
-  }
+    );}
+  
 
   return await getPostPorId(postId);
 };
