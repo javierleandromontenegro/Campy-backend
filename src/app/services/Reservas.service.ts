@@ -25,7 +25,7 @@ export const getReservas = async (): Promise<reservas[]> => {
 
 //OBTIENE UNA SOLA RESERVA POR ID, SOLO ES UTILIZADO DE MANERA AUXILIAR POR AHORA
 export const getReservaById = async (id: number): Promise<reservas> => {
-  const querySql: reservas = await sequelize.query(
+  const [querySql]: [querySql: reservas] = await sequelize.query(
     `
    SELECT R.id,R.fecha_desde_reserva, R.fecha_hasta_reserva, R.cant_noches, R.total, ER.id AS id_estado, P.email, C.nombre_camping, C.id AS id_campings
     FROM Reservas AS R
@@ -301,7 +301,7 @@ export const postReservaPago = async ({
     axuEstado = String(process.env.RECHAZADA); /* Rechazada */
   }
 
-  if (Estado_transaccion == "Pending") {
+  if (Estado_transaccion == "paymen_required") {
     console.log("El estado sigue PENDIENTE");
     axuEstado = String(process.env.PENDIENTE); /* Pendiente */
   }
