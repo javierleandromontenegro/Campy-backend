@@ -33,9 +33,9 @@ export const postBlogCreate = async ({
     imagenes.map((imagenes) =>
       sequelize.query(
         `INSERT INTO Posts_imagenes(url,createdAt,updatedAt, PostsUsuarioId) 
-        VALUES (${imagenes},NOW(),NOW(),${postBlogId})`,
+        VALUES (:imagenes,NOW(),NOW(),:postBlogId)`,
         {
-          replacements: { titulo, texto, usuarioId },
+          replacements: { postBlogId, imagenes },
           type: QueryTypes.INSERT,
         }
       )
@@ -101,10 +101,11 @@ export const getPostImagenes = async (id: number): Promise<string[]> => {
 
 export const getAllPost = async (): Promise<datosAllPost[]> => {
   const querySql: datosAllPost[] = await sequelize.query(
-    `SELECT PU.id, PU.titulo, PU.cant_comentarios, PU.cant_visualizaciones, PU.comentarios_vistos, PU.UsuarioId, U.foto, U.username, TU.tipo, PU.fecha, PU.texto
+    `SELECT PU.id, PU.titulo, PU.cant_comentarios, PU.cant_visualizaciones, PU.comentarios_vistos, PU.UsuarioId, U.foto, U.username, TU.tipo, PU.fecha, PU.texto, PI.url
     FROM Posts_usuarios as PU 
     INNER JOIN Usuarios as U ON U.id=PU.UsuarioId
     INNER JOIN Tipo_usuarios as TU ON TU.id=U.TipoUsuarioId
+    INNER JOIN Posts_imagenes as PI ON PU.id=PI.PostsUsuarioId
     ORDER BY PU.fecha DESC`,
     {
       type: QueryTypes.SELECT,
