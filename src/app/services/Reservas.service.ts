@@ -301,7 +301,7 @@ export const postReservaPago = async ({
     axuEstado = String(process.env.RECHAZADA); /* Rechazada */
   }
 
-  if (Estado_transaccion == "Pending") {
+  if (Estado_transaccion == "paymen_required") {
     console.log("El estado sigue PENDIENTE");
     axuEstado = String(process.env.PENDIENTE); /* Pendiente */
   }
