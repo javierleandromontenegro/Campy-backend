@@ -24,4 +24,5 @@ export interface datosAllPost {
   foto: string;
   texto: string;
   tipo: string;
+  imagenes: string[];
 }
