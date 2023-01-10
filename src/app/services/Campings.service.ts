@@ -63,7 +63,8 @@ export const getCampingsHabilitacion = async (): Promise<
   campingHabilitado[]
 > => {
   const querySql: campingHabilitado[] = await sequelize.query(
-    `SELECT C.id, C.nombre_camping, C.habilitado, C.contacto_tel, L.nombre AS localidad, P.nombre AS provincia FROM Campings AS C INNER JOIN Localidades AS L INNER JOIN Provincias AS P ON L.ProvinciaId=P.id ON C.LocalidadeId=L.id`,
+    `SELECT C.id, C.nombre_camping, C.habilitado, C.contacto_tel, L.nombre AS localidad, P.nombre AS provincia FROM Campings AS C INNER JOIN Localidades AS L INNER JOIN Provincias AS P ON L.ProvinciaId=P.id ON C.LocalidadeId=L.id
+    ORDER BY C.createdAt DESC`,
     { type: QueryTypes.SELECT }
   );
 
@@ -253,7 +254,7 @@ export const getCampingsTodosDatos = async (): Promise<datosCamping[]> => {
     INNER JOIN Caracteristicas_campings AS CC INNER JOIN Caracteristicas_parcelas AS CP ON CP.CaracteristicasCampingId=CC.id ON C.CaracteristicasCampingId=CC.id
     INNER JOIN Abierto_periodos AS AP ON CC.AbiertoPeriodoId=AP.id
     INNER JOIN Periodo_agua_calientes AS PAC ON CC.PeriodoAguaCalienteId=PAC.id
-    WHERE C.habilitado=1 ;`,
+    WHERE C.habilitado=1;`,
     { type: QueryTypes.SELECT }
   );
   const imagenesQuery: string[][] = await Promise.all(
