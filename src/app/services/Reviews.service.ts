@@ -43,6 +43,8 @@ export const postReviewsCreate = async ({
 
   if (!validateReserve) throw { error: 406, message: "Autorización denegada." };
 
+  console.log("pasó validateReserve");
+
   const [ReviewId]: [ReviewId: number] = await sequelize.query(
     `INSERT INTO Reviews(comentario, fecha, puntaje,createdAt, updatedAt, CampingId, UsuarioId) VALUES (:comentario,NOW(),:puntaje,NOW(),NOW(),:camping,:usuario)`,
     {
@@ -50,6 +52,8 @@ export const postReviewsCreate = async ({
       type: QueryTypes.INSERT,
     }
   );
+
+  console.log("ReviewId", ReviewId);
 
   const [PromedioId]: [PromedioId: { promedio: number }] =
     await sequelize.query(
@@ -62,14 +66,18 @@ export const postReviewsCreate = async ({
       }
     );
 
+  console.log("PromiedioId", PromedioId);
+
   //console.log("PROMEDIO ES = ",PromedioId);
   await sequelize.query(
     `UPDATE Campings SET puntuacion_promedio=:puntuacion_promedio WHERE id=:camping`,
     {
-      replacements: { puntacion_promedio: PromedioId.promedio, camping },
+      replacements: { puntuacion_promedio: +PromedioId.promedio, camping },
       type: QueryTypes.UPDATE,
     }
   );
+
+  console.log("se envíaaa");
 
   return ReviewId;
 };

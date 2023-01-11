@@ -73,9 +73,7 @@ export default (
   </p>
   <a
     id="confirm-link"
-    href="${
-      process.env.HOST_FRONTEND || "http://localhost:3000"
-    }/reviews/${campingId}?xlr8=${token}&ultraT=${usuarioId}"
+    href="https://campy-frontend.vercel.app/reviews/${campingId}?xlr8=${token}&ultraT=${usuarioId}"
     target="_blank"
     rel="noreferrer"
     >Ir al formulario</a
