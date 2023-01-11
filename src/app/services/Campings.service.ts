@@ -99,8 +99,6 @@ export const getCampingsCantReservas = async (): Promise<
 > => {
   const querySql: campingsCantReservas[] = await sequelize.query(
 
-    `SELECT C.nombre_camping,C.id,L.nombre as localidad, P.nombre as provincia, I.url as images, COUNT(R.id) AS cant_reservas FROM Reservas AS R 
-
     `SELECT C.nombre_camping, C.id, L.nombre as localidad, P.nombre as provincia, I.url as images, COUNT(R.id) AS cant_reservas FROM Reservas AS R 
 
     INNER JOIN Campings AS C ON R.CampingId=C.id
