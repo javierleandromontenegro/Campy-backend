@@ -66,7 +66,7 @@ export const postReviewsCreate = async ({
   await sequelize.query(
     `UPDATE Campings SET puntuacion_promedio=:puntuacion_promedio WHERE id=:camping`,
     {
-      replacements: { puntacion_promedio: PromedioId.promedio, camping },
+      replacements: { puntuacion_promedio: +PromedioId.promedio, camping },
       type: QueryTypes.UPDATE,
     }
   );
