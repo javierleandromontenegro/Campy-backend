@@ -98,7 +98,6 @@ export const getCampingsCantReservas = async (): Promise<
   campingsCantReservas[]
 > => {
   const querySql: campingsCantReservas[] = await sequelize.query(
-
     `SELECT C.nombre_camping, C.id, L.nombre as localidad, P.nombre as provincia, I.url as images, COUNT(R.id) AS cant_reservas FROM Reservas AS R 
 
     INNER JOIN Campings AS C ON R.CampingId=C.id
@@ -782,8 +781,6 @@ export const putCamping = async (
       type: QueryTypes.UPDATE,
     }
   );
-
-  console.log("llegó del primer update");
 
   const [{ CaracteristicasCampingId }] = await sequelize.query(
     `SELECT CaracteristicasCampingId FROM Campings WHERE id=:campingId`,
