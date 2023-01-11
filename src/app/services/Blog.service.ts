@@ -13,12 +13,12 @@ export const postBlogCreate = async ({
   imagenes,
   usuarioId,
 }: datosPost): Promise<number> => {
-  console.log(titulo, texto, imagenes, usuarioId);
   if (!titulo || !texto)
     throw {
       error: 406,
       message: "Faltan parámetros",
     };
+  console.log("here bro text", texto);
 
   const [postBlogId]: [postBlogId: number] = await sequelize.query(
     `INSERT INTO Posts_usuarios (titulo, texto, fecha, createdAt, updatedAt, UsuarioId) 
@@ -180,22 +180,21 @@ export const updatePost = async (
       SET texto=:texto 
       WHERE PU.id=:postId`,
       {
-        replacements: { texto: data.texto, postId },
+        replacements: { texto: data.texto.split("\\n").join("\n"), postId },
         type: QueryTypes.UPDATE,
       }
     );
   }
 
-  
-    await sequelize.query(
-      `DELETE FROM Posts_imagenes WHERE PostsUsuarioId=:postId`,
-      {
-        replacements: { postId },
-        type: QueryTypes.DELETE,
-      }
-    );
+  await sequelize.query(
+    `DELETE FROM Posts_imagenes WHERE PostsUsuarioId=:postId`,
+    {
+      replacements: { postId },
+      type: QueryTypes.DELETE,
+    }
+  );
 
-    if (data.imagenes){
+  if (data.imagenes) {
     await Promise.all(
       data.imagenes.split(",").map((imagenes: string) =>
         sequelize.query(
@@ -207,8 +206,8 @@ export const updatePost = async (
           }
         )
       )
-    );}
-  
+    );
+  }
 
   return await getPostPorId(postId);
 };
