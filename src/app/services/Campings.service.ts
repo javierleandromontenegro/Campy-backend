@@ -439,7 +439,6 @@ export const getCampingsTodos = async ({
     /*filtros = filtros + ` AND  CC.estacionamiento=('${estacionamiento}')`;*/
   }
 
-
   const querySql: datosCamping[] = await sequelize.query(
     `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.abierto_fecha_desde , C.abierto_fecha_hasta,L.nombre AS localidad, L.id AS id_localidad, P.nombre AS provincia,P.id as id_provincia,CA.categoria,CA.id AS id_categoria,
     CC.duchas,CC.baños,CC.mascotas,CC.rodantes,CC.proveduria,CC.salon_sum,CC.restaurant,CC.vigilancia,CC.pileta,CC.estacionamiento,CC.juegos_infantiles,CC.maquinas_gimnasia,CC.wifi,
@@ -511,7 +510,6 @@ export const postCampingsCreate = async ({
   UsuarioId,
   userType,
 }: createCamping): Promise<number> => {
-
   if (
     !nombre_camping ||
     !descripcion_camping ||
@@ -528,14 +526,14 @@ export const postCampingsCreate = async ({
     };
 
   const [CaractCampingId]: [CaractCampingId: number] = await sequelize.query(
-    `INSERT INTO Caracteristicas_campings(wifi,duchas,baños,mascotas,rodantes,proveduria,salon_sum,restaurant,vigilancia,pileta, estacionamiento,juegos_infantiles,maquinas_gimnasia,createdAt, updatedAt,AbiertoPeriodoId,PeriodoAguaCalienteId) VALUES (:wifi,:duchas,:baños,
+    `INSERT INTO Caracteristicas_campings(wifi,duchas,baños,mascotas,rodantes,proveduria,salon_sum,restaurant,vigilancia,pileta, estacionamiento,juegos_infantiles,maquinas_gimnasia,createdAt, updatedAt,AbiertoPeriodoId,PeriodoAguaCalienteId) VALUES (:wifi,:duchas,:banos,
     :mascotas,:rodantes,:proveduria,:salon_sum,
     :restaurant,:vigilancia,:pileta,:estacionamiento,:juegos_infantiles,:maquinas_gimnasia,NOW(),NOW(),:AbiertoPeriodoId,:PeriodoAguaCalienteId)`,
     {
       replacements: {
         wifi,
         duchas,
-        baños,
+        banos: baños,
         mascotas,
         rodantes,
         proveduria,
@@ -553,7 +551,7 @@ export const postCampingsCreate = async ({
     }
   );
 
-  const CampingId: number = await sequelize.query(
+  const [CampingId]: [CampingId: number] = await sequelize.query(
     `INSERT INTO Campings(nombre_camping, descripcion_camping, direccion,telefono, longitud, latitud,abierto_fecha_desde,abierto_fecha_hasta, contacto_nombre, contacto_tel, createdAt, updatedAt, UsuarioId, CategoriaCampingId,CaracteristicasCampingId, LocalidadeId)
       VALUES (:nombre_camping,:descripcion_camping,:direccion,:telefono,:longitud,:latitud,:abierto_fecha_desde,:abierto_fecha_hasta,:contacto_nombre, 
       :contacto_tel,NOW(),NOW(),:UsuarioId,:CategoriaCampingId,:CaractCampingId,:LocalidadeId)`,
@@ -749,6 +747,7 @@ export const putCamping = async (
     rodante,
   }: createCamping
 ) => {
+  console.log("holaaaaaa");
   const format_abierto_fecha_desde: string = new Date(abierto_fecha_desde)
     .toLocaleDateString()
     .split("/")
@@ -782,7 +781,9 @@ export const putCamping = async (
     }
   );
 
-  const [[{ CaracteristicasCampingId }]] = await sequelize.query(
+  console.log("llegó del primer update");
+
+  const [{ CaracteristicasCampingId }] = await sequelize.query(
     `SELECT CaracteristicasCampingId FROM Campings WHERE id=:campingId`,
     {
       replacements: { campingId },
@@ -792,13 +793,13 @@ export const putCamping = async (
 
   await sequelize.query(
     `
-    UPDATE Caracteristicas_campings SET wifi=:wifi, duchas=:duchas, baños=:baños, mascotas=:mascotas, rodantes=:rodantes, proveduria=:proveduria, salon_sum=:salon_sum, restaurant=:restaurant, vigilancia=:vigilancia, pileta=:pileta, estacionamiento=:estacionamiento, juegos_infantiles=:juegos_infantiles, maquinas_gimnasia=:maquinas_gimnasia, AbiertoPeriodoId=:AbiertoPeriodoId, PeriodoAguaCalienteId=:PeriodoAguaCalienteId, updatedAt=NOW() WHERE id=:CaracteristicasCampingId
+    UPDATE Caracteristicas_campings SET wifi=:wifi, duchas=:duchas, baños=:banos, mascotas=:mascotas, rodantes=:rodantes, proveduria=:proveduria, salon_sum=:salon_sum, restaurant=:restaurant, vigilancia=:vigilancia, pileta=:pileta, estacionamiento=:estacionamiento, juegos_infantiles=:juegos_infantiles, maquinas_gimnasia=:maquinas_gimnasia, AbiertoPeriodoId=:AbiertoPeriodoId, PeriodoAguaCalienteId=:PeriodoAguaCalienteId, updatedAt=NOW() WHERE id=:CaracteristicasCampingId
   `,
     {
       replacements: {
         wifi,
         duchas,
-        baños,
+        banos: baños,
         mascotas,
         rodantes,
         proveduria,
@@ -857,9 +858,13 @@ export const putCamping = async (
   await Promise.all(
     [mayores, menores, rodante].map((precio: number, i: number) =>
       sequelize.query(
-        `UPDATE Relacion_campo_tarifas SET precio=${precio},updatedAt=NOW() WHERE CampingId=${campingId} AND TarifaId=${
+        `UPDATE Relacion_campo_tarifas SET precio=:precio,updatedAt=NOW() WHERE CampingId=:campingId AND TarifaId=${
           i + 1
-        }`
+        }`,
+        {
+          replacements: { precio, campingId },
+          type: QueryTypes.UPDATE,
+        }
       )
     )
   );
