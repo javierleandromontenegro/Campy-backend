@@ -32,9 +32,9 @@ export const postBlogCreate = async ({
     imagenes.map((imagenes) =>
       sequelize.query(
         `INSERT INTO Posts_imagenes(url,createdAt,updatedAt, PostsUsuarioId) 
-        VALUES (${imagenes},NOW(),NOW(),${postBlogId})`,
+        VALUES (:imagenes,NOW(),NOW(),:postBlogId)`,
         {
-          replacements: { titulo, texto, usuarioId },
+          replacements: { postBlogId, imagenes },
           type: QueryTypes.INSERT,
         }
       )
@@ -110,7 +110,16 @@ export const getAllPost = async (): Promise<datosAllPost[]> => {
     }
   );
 
-  return querySql;
+  const imagenesQuery = await Promise.all(
+    querySql.map((query) => getPostImagenes(query.id))
+  );
+
+  const results = querySql.map((query, i) => {
+    query.imagenes = imagenesQuery[i];
+    return query;
+  });
+
+  return results;
 };
 
 export const getComentario = async (id: number): Promise<string[]> => {
@@ -176,7 +185,7 @@ export const updatePost = async (
     );
   }
 
-  if (data.imagenes) {
+  
     await sequelize.query(
       `DELETE FROM Posts_imagenes WHERE PostsUsuarioId=:postId`,
       {
@@ -185,6 +194,7 @@ export const updatePost = async (
       }
     );
 
+    if (data.imagenes){
     await Promise.all(
       data.imagenes.split(",").map((imagenes: string) =>
         sequelize.query(
@@ -196,8 +206,8 @@ export const updatePost = async (
           }
         )
       )
-    );
-  }
+    );}
+  
 
   return await getPostPorId(postId);
 };
