@@ -13,7 +13,6 @@ export const postBlogCreate = async ({
   imagenes,
   usuarioId,
 }: datosPost): Promise<number> => {
-  console.log(titulo, texto, imagenes, usuarioId);
   if (!titulo || !texto)
     throw {
       error: 406,
@@ -249,7 +248,6 @@ export const updateComentario = async (
   comentarioId: number
 ) => {
   const entries: [key: string, value: string][] = Object.entries(data);
-  console.log(entries);
 
   if (!entries.length || entries.length > allPropertiesComentario.length)
     throw { error: 406, message: "Información errónea en el query." };
