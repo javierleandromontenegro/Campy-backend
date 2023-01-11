@@ -198,7 +198,6 @@ export const postReservaCreate = async ({
   detalle.push(cantMayores);
   detalle.push(cantMenores);
   detalle.push(extraRodante);
-  console.log("MOSTRAR DETALLE ARRAY= ", detalle);
 
   detalle.forEach((cantidad: number, i: number) =>
     sequelize.query(
@@ -217,7 +216,6 @@ export const postReservaCreate = async ({
   SubtotalArray.push(precioMayores);
   SubtotalArray.push(precioMenores);
   SubtotalArray.push(precioextraRodante);
-  console.log("MOSTRAR SUBTOTALES ARRAY= ", SubtotalArray);
 
   SubtotalArray.forEach((precio: number, i: number) =>
     sequelize.query(
@@ -288,21 +286,17 @@ export const postReservaPago = async ({
         "Faltan parámetros del id y estado de transacción de mercado pago",
     };
 
-  console.log("EL Estado_transaccion", Estado_transaccion);
 
   let axuEstado: string = "";
   if (Estado_transaccion == "paid") {
-    console.log("El estado es ABONADA");
     axuEstado = String(process.env.ABONADA); /* Abonada */
   }
 
   if (Estado_transaccion == "Rejected") {
-    console.log("El estado es RECHAZADO EL PAGO");
     axuEstado = String(process.env.RECHAZADA); /* Rechazada */
   }
 
   if (Estado_transaccion == "paymen_required") {
-    console.log("El estado sigue PENDIENTE");
     axuEstado = String(process.env.PENDIENTE); /* Pendiente */
   }
 

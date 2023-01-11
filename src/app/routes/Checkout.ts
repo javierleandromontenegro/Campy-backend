@@ -75,7 +75,6 @@ CheckoutRouter.post(
       case "payment":
         const paymentId: any = query.id || query["data.id"];
         payment = await mercadopago.payment.findById(paymentId);
-        console.log(payment.body.order.id);
 
         merchantOrder = await mercadopago.merchant_orders.findById(
           payment.body.order.id
@@ -85,7 +84,6 @@ CheckoutRouter.post(
       case "merchant_order":
         const orderId: any = query.id;
         merchantOrder = await mercadopago.merchant_orders.findById(orderId);
-        console.log(orderId);
         break;
     }
 
@@ -93,11 +91,7 @@ CheckoutRouter.post(
       console.log(payment);
       console.log(merchantOrder);
     }
-    console.log(merchantOrder?.body?.items);
-
-    console.log(merchantOrder?.body?.items[0].id);
-    console.log(merchantOrder?.body.id);
-    console.log(merchantOrder?.body.order_status);
+   
 
     //  console.log(merchantOrder)
     postReservaPago({

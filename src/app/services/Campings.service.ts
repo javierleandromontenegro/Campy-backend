@@ -347,7 +347,6 @@ export const getCampingsTodos = async ({
     });
 
     filtrosPuntRevie = ` ( ` + filtrosPuntRevie + ` ) `;
-    console.log("filtrosPuntRevie= ", filtrosPuntRevie);
     filtros = filtros + ` AND `;
     filtros = filtros + filtrosPuntRevie;
   }
@@ -373,7 +372,6 @@ export const getCampingsTodos = async ({
     });
 
     filtrosCateg = ` ( ` + filtrosCateg + ` ) `;
-    console.log("filtrosCateg= ", filtrosCateg);
     filtros = filtros + ` AND `;
     filtros = filtros + filtrosCateg;
   }
@@ -441,7 +439,6 @@ export const getCampingsTodos = async ({
     /*filtros = filtros + ` AND  CC.estacionamiento=('${estacionamiento}')`;*/
   }
 
-  console.log("FILTROS ES = ", filtros);
 
   const querySql: datosCamping[] = await sequelize.query(
     `SELECT C.id,C.nombre_camping,C.descripcion_camping,C.direccion,C.telefono,C.longitud,C.latitud,C.UsuarioId AS prop_camping_Id,C.abierto_fecha_desde , C.abierto_fecha_hasta,L.nombre AS localidad, L.id AS id_localidad, P.nombre AS provincia,P.id as id_provincia,CA.categoria,CA.id AS id_categoria,
@@ -514,7 +511,6 @@ export const postCampingsCreate = async ({
   UsuarioId,
   userType,
 }: createCamping): Promise<number> => {
-  console.log("usuario id", UsuarioId);
 
   if (
     !nombre_camping ||
@@ -613,7 +609,6 @@ export const postCampingsCreate = async ({
   precios.push(mayores);
   precios.push(menores);
   precios.push(rodante);
-  console.log("PRECIOS", precios);
 
   precios.forEach((precio: number, i: number) =>
     sequelize.query(

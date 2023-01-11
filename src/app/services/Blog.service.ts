@@ -258,7 +258,6 @@ export const updateComentario = async (
   comentarioId: number
 ) => {
   const entries: [key: string, value: string][] = Object.entries(data);
-  console.log(entries);
 
   if (!entries.length || entries.length > allPropertiesComentario.length)
     throw { error: 406, message: "Información errónea en el query." };

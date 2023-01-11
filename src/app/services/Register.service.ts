@@ -63,7 +63,6 @@ export const registerUser = async ({
     html,
   });
 
-  console.log(createdUser);
   return createdUser;
 };
 
