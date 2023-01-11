@@ -750,15 +750,13 @@ export const putCamping = async (
 ) => {
   console.log("holaaaaaa");
   const format_abierto_fecha_desde: string = new Date(abierto_fecha_desde)
-    .toLocaleDateString()
-    .split("/")
-    .reverse()
-    .join("/");
+    .toISOString()
+    .slice(0, 19)
+    .replace("T", " ");
   const format_abierto_fecha_hasta: string = new Date(abierto_fecha_hasta)
-    .toLocaleDateString()
-    .split("/")
-    .reverse()
-    .join("/");
+    .toISOString()
+    .slice(0, 19)
+    .replace("T", " ");
 
   await sequelize.query(
     `UPDATE Campings SET nombre_camping=:nombre_camping, descripcion_camping=:descripcion_camping, direccion=:direccion, telefono=:telefono, longitud=:longitud, latitud=:latitud, abierto_fecha_desde=DATE(:format_abierto_fecha_desde), abierto_fecha_hasta=DATE(:format_abierto_fecha_hasta), contacto_nombre=:contacto_nombre, contacto_tel=:contacto_tel, updatedAt=NOW(), CategoriaCampingId=:CategoriaCampingId, LocalidadeId=:LocalidadeId WHERE id=:campingId`,
